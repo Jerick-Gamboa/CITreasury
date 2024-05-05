@@ -1,20 +1,140 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<style>
-body {
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CITreasury: Sign In</title>
+    <style>
+        body{
+            background-image: linear-gradient(to bottom, #D9D9D9, #621668);
+            height: 100vh;
+            min-height: 100vh;
+        }
+        .container{
+            box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25), 4px 4px 4px 0px rgba(0, 0, 0, 0.25), -8px 4px 4px 0px rgba(0, 0, 0, 0.25);
+            background: #D9D9D9;
+            position: absolute;
+            left: 50%;
+            top: 50px;
+            transform: translate(-50%, 0);
+            width: 503px;
+            height: 640px;
+            overflow: hidden; /* Hide overflow to prevent the pseudo-element from extending beyond the container */
+            min-width: 420px;
+        }
+        .header img {
+            width: 100%;
+        }
+        .input-field{
+            top: 300px; /* Adjusted top position to make the input field accessible */
+            position: absolute; /* Position the input field absolutely */
+            left: 50%; /* Center the input field horizontally */
+            transform: translateX(-50%); /* Center the input field horizontally */
+        }
+        .input-field1{
+            top: 380px; /* Adjusted top position to make the input field accessible */
+            position: absolute; /* Position the input field absolutely */
+            left: 50%; /* Center the input field horizontally */
+            transform: translateX(-50%); /* Center the input field horizontally */
+        }
+        /* Pseudo-element for the background image */
+        .container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('COUNCIL-LOGO-removebg-preview.png');    
+            background-repeat: no-repeat;
+            background-position: 50% 80%;
+            opacity: 0.2;
+        }
+        .login{
+            text-align: center;
+            color: #621668;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 40px;
+            margin-top: 75px;
+        }
+        input[type=text]#user{
+            width: 300px;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 9px;
+            border: 2px solid #621668;
+            font-size: medium;
+            background: #621668;
+            background: transparent;
+            border: 2px solid #621668;
+            border-radius: 10px;
+            backdrop-filter: blur(20px);
+            color:#621668;
+        }
+        input[type=password]#pass{
+            width: 300px;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 9px;
+            border: 2px solid #621668;
+            font-size: medium;
+            background: #621668;
+            background: transparent;
+            border: 2px solid #621668;
+            border-radius: 10px;
+            backdrop-filter: blur(20px);
+            color:#621668;
+        }
+        
 
-    margin: 0;
-    padding: 0;
-    background-image: linear-gradient(red, yellow);
-}
-</style>
+        .btn{
+            width: 130px;
+            color: white;
+            margin-left: 95px;
+            margin-top: 30px;
+            padding: 7px;
+            border-radius: 4px;
+            background: #621668;
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;;
+            
+        }
+        label{
+            color: #621668;
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            font-size: 18px;
+            
+        }
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus,
+        input:-webkit-autofill::first-line {
+          background-color: transparent !important;
+          transition: background-color 5000s ease-in-out 0s;
+          color:  #621668   !important;
+        }
+    </style>
 </head>
+
 <body>
-
-
-
+    <form action="">
+    <div class="container">
+        <div class="header">
+            <img src="header.png" alt="">
+        </div>
+        <h2 class="login">SIGN IN</h2>
+        
+        <div class="input-field">
+            <label for="username">Username:</label><br>
+            <input type="text" id="user" required>
+        </div>
+        <div class="input-field1">
+            <label for="password">Password:</label><br>
+            <input type="password" id="pass" required>
+        <div>
+            <button type="submit" class="btn" name="submit">Sign In</button>
+        </div>
+        </div>
+    </div>
+    </form>   
 </body>
 </html>
-
-
