@@ -7,7 +7,8 @@
     <script src="../js/tailwind.config.js"></script>
     <script src="../js/sweetalert.min.js"></script>
     <script src="../js/jquery-3.7.1.min.js"></script>
-    <script src="../js/script.js"></script>
+    <script src="../js/predefined-script.js"></script>
+    <script src="../js/defer-script.js" defer></script>
 </head>
 <body>
     <nav class="fixed w-full bg-purple-700 flex flex-row">
@@ -84,18 +85,5 @@
             </div>
         </div>
     </div>
-    <script type="text/javascript">
-        const dashboardItems = $("#dashboard-items");
-        dashboardItems.hide();
-        let isDashboardOpened = false;
-        $("#dashboard").click((e) => {
-            isDashboardOpened = !isDashboardOpened;
-            if (isDashboardOpened) {
-                dashboardItems.slideDown();
-            } else {
-                dashboardItems.slideUp();
-            }
-        });
-    </script>
 </body>
 </html>
