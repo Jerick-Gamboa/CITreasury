@@ -1,10 +1,10 @@
-function sendNotif(notif_title, notif_body, notif_icon, notif_func) {
+function sendNotif(notif_title, notif_body, notif_icon, notif_clicked_func) {
   new Notification(notif_title,
     {
       body: notif_body,
       icon: notif_icon
     }
-  ).addEventListener('click', notif_func);
+  ).addEventListener('click', notif_clicked_func);
 }
 
 if ('Notification' in window) {
