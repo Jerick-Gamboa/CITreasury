@@ -63,7 +63,7 @@
         const getChartOptions = () => {
           return {
             series: [320, 46],
-            colors: ["#1C64F2", "#16BDCA"],
+            colors: ["#DD00DD", "#16BDCA"],
             chart: {
               height: 320,
               width: "100%",
@@ -80,14 +80,12 @@
                     show: true,
                     name: {
                       show: true,
-                      fontFamily: "Inter, sans-serif",
                       offsetY: 20,
                     },
                     total: {
                       showAlways: true,
                       show: true,
                       label: "Total Students",
-                      fontFamily: "Inter, sans-serif",
                       formatter: function (w) {
                         const sum = w.globals.seriesTotals.reduce((a, b) => {
                           return a + b
@@ -97,7 +95,6 @@
                     },
                     value: {
                       show: true,
-                      fontFamily: "Inter, sans-serif",
                       offsetY: -20,
                       formatter: function (value) {
                         return value
@@ -106,11 +103,6 @@
                   },
                   size: "80%",
                 },
-              },
-            },
-            grid: {
-              padding: {
-                top: -2,
               },
             },
             labels: ["Without Sanctions", "With Sanctions"],
@@ -133,12 +125,6 @@
                 formatter: function (value) {
                   return value
                 },
-              },
-              axisTicks: {
-                show: false,
-              },
-              axisBorder: {
-                show: false,
               },
             },
           }
