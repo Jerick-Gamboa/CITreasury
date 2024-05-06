@@ -13,17 +13,40 @@
     <nav class="fixed w-full bg-purple-700 flex flex-row">
         <img src="../img/nobgcitsclogo.png" class="w-12 h-12 my-2 ml-8">
         <h1 class="text-3xl p-3 font-bold text-white">CITreasury</h1>
+        <div class="w-full text-white">
+            <a href="#">
+                <svg id="mdi-menu" class="w-8 h-8 mr-3 my-4 float-right fill-current md:hidden" viewBox="0 0 24 24"><path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z" /></svg>
+            </a>
+        </div>
     </nav>
     <div class="flex flex-row">
-        <div class="w-72 bg-purple-500 h-screen">
+        <div class="hidden md:inline-block w-72 bg-purple-500 h-screen">
             <div class="mt-20 mx-4">
                 <ul>
                     <li class="text-xl text-white font-bold mb-2">
-                        <a href="#" class="hover:text-purple-200 flex items-center align-middle">
-                            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="mdi-view-dashboard-outline" class="w-6 h-6 mr-2 fill-current" viewBox="0 0 24 24">
+                        <a href="#" id="dashboard" class="hover:text-purple-200 flex items-center align-middle">
+                            <svg id="mdi-view-dashboard-outline" class="w-6 h-6 mr-2 fill-current" viewBox="0 0 24 24">
                                 <path d="M19,5V7H15V5H19M9,5V11H5V5H9M19,13V19H15V13H19M9,17V19H5V17H9M21,3H13V9H21V3M11,3H3V13H11V3M21,11H13V21H21V11M11,15H3V21H11V15Z" />
                             </svg>
                             Dashboard
+                        </a>
+                        <ul class="ml-4 mt-2" id="dashboard-items">
+                            <li>
+                                <a href="#" id="dashboard" class="hover:text-purple-200 flex items-center align-middle">
+                                    <svg id="mdi-pencil" class="w-6 h-6 mr-2 fill-current" viewBox="0 0 24 24">
+                                        <path d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z" />
+                                    </svg>
+                                    Modify Item
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="text-xl text-white font-bold mb-2">
+                        <a href="#" id="dashboard" class="hover:text-purple-200 flex items-center align-middle">
+                            <svg id="mdi-account-outline" class="w-6 h-6 mr-2 fill-current" viewBox="0 0 24 24">
+                                <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,6A2,2 0 0,0 10,8A2,2 0 0,0 12,10A2,2 0 0,0 14,8A2,2 0 0,0 12,6M12,13C14.67,13 20,14.33 20,17V20H4V17C4,14.33 9.33,13 12,13M12,14.9C9.03,14.9 5.9,16.36 5.9,17V18.1H18.1V17C18.1,16.36 14.97,14.9 12,14.9Z" />
+                            </svg>
+                            Students
                         </a>
                     </li>
                 </ul>
@@ -31,8 +54,8 @@
         </div>
         <div class="w-full bg-red-100 h-screen">
             <div class="mt-20 mx-6">
-                <h1 class="text-4xl text-purple-800 font-bold mb-5">Dashboard</h1>
-                <div class="flex md:flex-row flex-col">
+                <h1 class="text-3xl text-purple-800 font-bold mb-5">Dashboard</h1>
+                <div class="flex lg:flex-row flex-col">
                     <div class="w-full bg-green-600 rounded shadow mr-4 mb-4">
                         <h3 class="mx-3 my-5 text-white">1st Year</h3>
                         <div class="w-full px-3 py-2 bg-green-700 rounded-b">
@@ -61,5 +84,18 @@
             </div>
         </div>
     </div>
+    <script type="text/javascript">
+        const dashboardItems = $("#dashboard-items");
+        dashboardItems.hide();
+        let isDashboardOpened = false;
+        $("#dashboard").click((e) => {
+            isDashboardOpened = !isDashboardOpened;
+            if (isDashboardOpened) {
+                dashboardItems.slideDown();
+            } else {
+                dashboardItems.slideUp();
+            }
+        });
+    </script>
 </body>
 </html>
