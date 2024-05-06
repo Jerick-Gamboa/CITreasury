@@ -13,4 +13,4 @@ function sendNotif(notif_title, notif_body, notif_icon, notif_clicked_function) 
   }
 }
 
-sendNotif("Welcome to CITreasury!", "What's up?", "COUNCIL-LOGO-removebg-preview.png", null);
+sendNotif("Welcome to CITreasury!", "What's up?", "nobgcitsclogo.png", null);
