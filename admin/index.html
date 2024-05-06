@@ -7,6 +7,7 @@
     <script src="../js/tailwind.config.js"></script>
     <script src="../js/sweetalert.min.js"></script>
     <script src="../js/jquery-3.7.1.min.js"></script>
+    <script src="../js/apexcharts.js"></script>
     <script src="../js/predefined-script.js"></script>
     <script src="../js/defer-script.js" defer></script>
 </head>
@@ -105,7 +106,99 @@
                     </div>
                 </div>
             </div>
+            <div>
+                <div class="py-6" id="donut-chart"></div>
+            </div>
         </div>
     </div>
+    <script type="text/javascript">  
+        const getChartOptions = () => {
+          return {
+            series: [35.1, 23.5],
+            colors: ["#1C64F2", "#16BDCA"],
+            chart: {
+              height: 320,
+              width: "100%",
+              type: "donut",
+            },
+            stroke: {
+              colors: ["transparent"],
+              lineCap: "",
+            },
+            plotOptions: {
+              pie: {
+                donut: {
+                  labels: {
+                    show: true,
+                    name: {
+                      show: true,
+                      fontFamily: "Inter, sans-serif",
+                      offsetY: 20,
+                    },
+                    total: {
+                      showAlways: true,
+                      show: true,
+                      label: "Total Students",
+                      fontFamily: "Inter, sans-serif",
+                      formatter: function (w) {
+                        const sum = w.globals.seriesTotals.reduce((a, b) => {
+                          return a + b
+                        }, 0)
+                        return sum + 'k'
+                      },
+                    },
+                    value: {
+                      show: true,
+                      fontFamily: "Inter, sans-serif",
+                      offsetY: -20,
+                      formatter: function (value) {
+                        return value + "k"
+                      },
+                    },
+                  },
+                  size: "80%",
+                },
+              },
+            },
+            grid: {
+              padding: {
+                top: -2,
+              },
+            },
+            labels: ["Without Sanctions", "With Sanctions"],
+            dataLabels: {
+              enabled: false,
+            },
+            legend: {
+              position: "bottom",
+              fontFamily: "Inter, sans-serif",
+            },
+            yaxis: {
+              labels: {
+                formatter: function (value) {
+                  return value + "k"
+                },
+              },
+            },
+            xaxis: {
+              labels: {
+                formatter: function (value) {
+                  return value  + "k"
+                },
+              },
+              axisTicks: {
+                show: false,
+              },
+              axisBorder: {
+                show: false,
+              },
+            },
+          }
+        }
+        if (document.getElementById("donut-chart") && typeof ApexCharts !== 'undefined') {
+          const chart = new ApexCharts(document.getElementById("donut-chart"), getChartOptions());
+          chart.render();
+        }
+    </script>
 </body>
 </html>
