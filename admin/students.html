@@ -26,30 +26,33 @@
         </div>
         <div id="menu-items-mobile" class="fixed block md:hidden h-fit top-16 w-full p-4 bg-purple-500 opacity-95">
         </div>
-        <div class="w-full bg-red-100 h-full lg:h-screen">
-            <div class="mt-24 mx-6 mb-5">
-                <div class="flex flex-row justify-between w-full">
+        <div class="w-full bg-red-50 h-full px-6 h-screen">
+            <div class="mt-24 mb-5">
+                <div class="w-full">
                   <h1 class="text-3xl text-purple-800 font-bold ">Manage Students</h1>
-                  <a href="#" class="px-3 py-2 bg-green-600 text-white font-bold rounded hover:bg-green-500">Add Student</a>
                 </div>
             </div>
-            <div class="mx-6 mb-5">
+            <div class="mb-5 flex flex-row justify-between">
+              <form method="POST">
+                <input type="text" name="search" placeholder="Search student..." class="w-56 px-2 py-1 border border-black rounded">
+              </form>
+              <a href="#" class="px-3 py-2 bg-green-600 text-white font-bold rounded hover:bg-green-500">Add Student</a>
+            </div>
+            <div class="mb-5">
                 <table class="border w-full border-black px-1 text-center">
-                  <tr class="">
+                  <tr>
                     <th class="border border-black">Student ID</th>
                     <th class="border border-black">Student Name</th>
                     <th class="border border-black">Year&Section</th>
-                    <th class="border border-black" colspan="2">Actions</th>
+                    <th class="border border-black">Actions</th>
                   </tr>
                   <tr>
-                    <td class="p-2 border border-black">22-1677</td>
-                    <td class="p-2 border border-black">Gamboa, Jerick D.</td>
-                    <td class="p-2 border border-black">2C</td>
-                    <td class="p-2 border border-black">
-                      <a href="#" class="px-3 py-2 bg-green-600 text-white font-bold rounded hover:bg-green-500">Edit</a>
-                    </td>
-                    <td class="p-2">
-                      <a href="#" class="px-3 py-2 bg-green-600 text-white font-bold rounded hover:bg-green-500">Edit</a>
+                    <td class="p-3 border border-black">22-1677</td>
+                    <td class="p-3 border border-black">Gamboa, Jerick D.</td>
+                    <td class="p-3 border border-black">2C</td>
+                    <td class="p-3 border border-black w-56">
+                      <a href="#" class="px-3 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-400">Edit</a>
+                      <a href="#" class="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-500">Delete</a>
                     </td>
                   </tr>
                 </table>
