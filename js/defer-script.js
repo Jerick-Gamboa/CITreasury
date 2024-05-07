@@ -31,7 +31,15 @@ menuContent = `
             <svg id="mdi-calendar" class="w-6 h-6 mr-2 fill-current" viewBox="0 0 24 24">
                     <path d="M19,19H5V8H19M16,1V3H8V1H6V3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3H18V1M17,12H12V17H17V12Z" />
             </svg>
-            Events
+            Events List
+        </a>
+    </li>
+    <li class="text-lg text-white font-bold">
+        <a href="#" class="py-2 px-2 rounded transition-all duration-300-ease-in-out hover:text-purple-500 hover:bg-white flex items-center align-middle">
+            <svg id="mdi-plus-box-outline" class="w-6 h-6 mr-2 fill-current" viewBox="0 0 24 24">
+                <path d="M19,19V5H5V19H19M19,3A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5A2,2 0 0,1 3,19V5C3,3.89 3.9,3 5,3H19M11,7H13V11H17V13H13V17H11V13H7V11H11V7Z" />
+            </svg>
+            Events Registration
         </a>
     </li>
     <li class="text-lg text-white font-bold">
