@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <?php
+    include '../connection.php';
+    ?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="../js/tailwind3.4.1.js"></script>
@@ -12,6 +15,15 @@
     <script src="../js/defer-script.js" defer></script>
 </head>
 <body>
+    <?php
+    if (isset($_COOKIE['cit-email']) && isset($_COOKIE['cit-password'])) {
+        if ($_COOKIE['cit-type'] === 'user') {
+            header("location: ../user/index.php");
+        }
+    } else {
+        header("location: ../index.php");
+    }
+    ?>
     <nav class="fixed w-full bg-purple-700 flex flex-row shadow shadow-gray-800">
         <img src="../img/nobgcitsclogo.png" class="w-12 h-12 my-2 ml-8">
         <h1 class="text-3xl p-3 font-bold text-white">CITreasury</h1>

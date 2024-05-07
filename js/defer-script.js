@@ -1,7 +1,7 @@
 menuContent = `
 <ul>
     <li class="text-lg text-white font-bold">
-        <a href="index.html" id="dashboard" class="py-2 px-2 rounded transition-all duration-300-ease-in-out hover:text-purple-500 hover:bg-white flex items-center align-middle">
+        <a href="index.php" id="dashboard" class="py-2 px-2 rounded transition-all duration-300-ease-in-out hover:text-purple-500 hover:bg-white flex items-center align-middle">
             <svg id="mdi-view-dashboard-outline" class="w-6 h-6 mr-2 fill-current" viewBox="0 0 24 24">
                 <path d="M19,5V7H15V5H19M9,5V11H5V5H9M19,13V19H15V13H19M9,17V19H5V17H9M21,3H13V9H21V3M11,3H3V13H11V3M21,11H13V21H21V11M11,15H3V21H11V15Z" />
             </svg>
@@ -92,7 +92,7 @@ function logoutAction(button_id) {
             dangerMode: false,
         }).then((willLogout) => {
             if (willLogout) {
-                window.location.href = "../index.html";
+                window.location.href = "../logout.php";
             }
         });
     });
