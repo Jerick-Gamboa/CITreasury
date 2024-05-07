@@ -1,7 +1,7 @@
 menuContent = `
 <ul>
     <li class="text-lg text-white font-bold">
-        <a href="#" id="dashboard" class="py-2 px-2 rounded transition-all duration-300-ease-in-out hover:text-purple-500 hover:bg-white flex items-center align-middle">
+        <a href="index.html" id="dashboard" class="py-2 px-2 rounded transition-all duration-300-ease-in-out hover:text-purple-500 hover:bg-white flex items-center align-middle">
             <svg id="mdi-view-dashboard-outline" class="w-6 h-6 mr-2 fill-current" viewBox="0 0 24 24">
                 <path d="M19,5V7H15V5H19M9,5V11H5V5H9M19,13V19H15V13H19M9,17V19H5V17H9M21,3H13V9H21V3M11,3H3V13H11V3M21,11H13V21H21V11M11,15H3V21H11V15Z" />
             </svg>
@@ -19,7 +19,7 @@ menuContent = `
         </ul>
     </li>
     <li class="text-lg text-white font-bold">
-        <a href="#" class="py-2 px-2 rounded transition-all duration-300-ease-in-out hover:text-purple-500 hover:bg-white flex items-center align-middle">
+        <a href="students.html" class="py-2 px-2 rounded transition-all duration-300-ease-in-out hover:text-purple-500 hover:bg-white flex items-center align-middle">
             <svg id="mdi-account-outline" class="w-6 h-6 mr-2 fill-current" viewBox="0 0 24 24">
                 <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,6A2,2 0 0,0 10,8A2,2 0 0,0 12,10A2,2 0 0,0 14,8A2,2 0 0,0 12,6M12,13C14.67,13 20,14.33 20,17V20H4V17C4,14.33 9.33,13 12,13M12,14.9C9.03,14.9 5.9,16.36 5.9,17V18.1H18.1V17C18.1,16.36 14.97,14.9 12,14.9Z" />
             </svg>
@@ -27,7 +27,7 @@ menuContent = `
         </a>
     </li>
     <li class="text-lg text-white font-bold">
-        <a href="#" class="py-2 px-2 rounded transition-all duration-300-ease-in-out hover:text-purple-500 hover:bg-white flex items-center align-middle">
+        <a href="eventslist.html" class="py-2 px-2 rounded transition-all duration-300-ease-in-out hover:text-purple-500 hover:bg-white flex items-center align-middle">
             <svg id="mdi-calendar" class="w-6 h-6 mr-2 fill-current" viewBox="0 0 24 24">
                     <path d="M19,19H5V8H19M16,1V3H8V1H6V3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3H18V1M17,12H12V17H17V12Z" />
             </svg>
@@ -35,7 +35,7 @@ menuContent = `
         </a>
     </li>
     <li class="text-lg text-white font-bold">
-        <a href="#" class="py-2 px-2 rounded transition-all duration-300-ease-in-out hover:text-purple-500 hover:bg-white flex items-center align-middle">
+        <a href="eventsregistration.html" class="py-2 px-2 rounded transition-all duration-300-ease-in-out hover:text-purple-500 hover:bg-white flex items-center align-middle">
             <svg id="mdi-plus-box-outline" class="w-6 h-6 mr-2 fill-current" viewBox="0 0 24 24">
                 <path d="M19,19V5H5V19H19M19,3A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5A2,2 0 0,1 3,19V5C3,3.89 3.9,3 5,3H19M11,7H13V11H17V13H13V17H11V13H7V11H11V7Z" />
             </svg>
