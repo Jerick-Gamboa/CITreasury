@@ -100,3 +100,16 @@ function logoutAction(button_id) {
 
 logoutAction("#menu-items-mobile #logout");
 logoutAction("#menu-items #logout");
+
+window.addEventListener('DOMContentLoaded', function() {
+    const menuContainer = document.getElementById('menu-items');
+    const contentContainer = document.querySelector('.bg-red-50');
+    
+    const menuHeight = menuContainer.offsetHeight;
+    menuContainer.style.minHeight = menuHeight + 'px';
+
+    const windowHeight = window.innerHeight;
+    const contentTopOffset = contentContainer.offsetTop;
+    const contentHeight = windowHeight - contentTopOffset;
+    contentContainer.style.minHeight = contentHeight + 'px';
+});

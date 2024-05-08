@@ -31,15 +31,15 @@
             <svg id="mdi-menu" class="w-8 h-8 mr-3 my-4 p-1 float-right fill-current rounded transition-all duration-300-ease-in-out md:hidden hover:bg-white hover:text-purple-700 hover:cursor-pointer" viewBox="0 0 24 24"><path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z" /></svg>
         </div>
     </nav>
-    <div class="flex flex-col md:flex-row bg-purple-500 h-full">
+    <div class="flex flex-col md:flex-row bg-purple-500 min-h-screen">
         <div class="mt-18 md:mt-20 mx-2">
             <div id="menu-items" class="hidden md:inline-block w-64 h-full">
             </div>
         </div>
         <div id="menu-items-mobile" class="fixed block md:hidden h-fit top-16 w-full p-4 bg-purple-500 opacity-95">
         </div>
-        <div class="w-full bg-red-100 h-full lg:h-screen">
-            <div class="mt-24 mx-6">
+        <div class="w-full bg-red-50 px-6 min-h-screen">
+            <div class="mt-24">
                 <h1 class="text-3xl text-purple-800 font-bold mb-5">Dashboard</h1>
                 <div class="flex lg:flex-row flex-col">
                     <div class="w-full bg-green-600 rounded shadow-lg mr-4 mb-4">
