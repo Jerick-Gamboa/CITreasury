@@ -45,25 +45,25 @@
                     <div class="w-full bg-green-600 rounded shadow-lg mr-4 mb-4">
                         <h3 class="mx-3 my-5 text-white">1st Year</h3>
                         <div class="w-full px-3 py-2 bg-green-700 rounded-b">
-                            <a href="#" class="text-sm text-white">View Details</a>
+                            <a href="#" class="text-xs font-bold text-white">View Details</a>
                         </div>
                     </div>
                     <div class="w-full bg-yellow-600 rounded shadow-lg mr-4 mb-4">
                         <h3 class="mx-3 my-5 text-white">2nd Year</h3>
                         <div class="w-full px-3 py-2 bg-yellow-700 rounded-b">
-                            <a href="#" class="text-sm text-white">View Details</a>
+                            <a href="#" class="text-xs font-bold text-white">View Details</a>
                         </div>
                     </div>
                     <div class="w-full bg-red-600 rounded shadow-lg mr-4 mb-4">
                         <h3 class="mx-3 my-5 text-white">3rd Year</h3>
                         <div class="w-full px-3 py-2 bg-red-700 rounded-b">
-                            <a href="#" class="text-sm text-white">View Details</a>
+                            <a href="#" class="text-xs font-bold text-white">View Details</a>
                         </div>
                     </div>
                     <div class="w-full bg-blue-600 rounded shadow-lg mb-4">
                         <h3 class="mx-3 my-5 text-white">4th Year</h3>
                         <div class="w-full px-3 py-2 bg-blue-700 rounded-b">
-                            <a href="#" class="text-sm text-white">View Details</a>
+                            <a href="#" class="text-xs font-bold text-white">View Details</a>
                         </div>
                     </div>
                 </div>
