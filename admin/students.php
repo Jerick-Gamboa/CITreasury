@@ -42,15 +42,24 @@
                 <h1 class="text-3xl text-purple-800 font-bold mb-3">Manage Students</h1>
                 <div class="flex flex-row w-44 md:w-56 p-1 mb-3 border-2 border-custom-purple  focus:border-custom-purplo rounded-lg bg-white">
                   <svg id="mdi-account-search" class="h-6 w-6 mr-1 fill-custom-purple" viewBox="0 0 24 24"><path d="M15.5,12C18,12 20,14 20,16.5C20,17.38 19.75,18.21 19.31,18.9L22.39,22L21,23.39L17.88,20.32C17.19,20.75 16.37,21 15.5,21C13,21 11,19 11,16.5C11,14 13,12 15.5,12M15.5,14A2.5,2.5 0 0,0 13,16.5A2.5,2.5 0 0,0 15.5,19A2.5,2.5 0 0,0 18,16.5A2.5,2.5 0 0,0 15.5,14M10,4A4,4 0 0,1 14,8C14,8.91 13.69,9.75 13.18,10.43C12.32,10.75 11.55,11.26 10.91,11.9L10,12A4,4 0 0,1 6,8A4,4 0 0,1 10,4M2,20V18C2,15.88 5.31,14.14 9.5,14C9.18,14.78 9,15.62 9,16.5C9,17.79 9.38,19 10,20H2Z" /></svg>
-                  <form method="POST">
-                      <input type="text" name="search" placeholder="Search student..." class="w-full focus:outline-none">
+                  <form method="GET">
+                      <input type="text" id="student-search" name="search" placeholder="Search student..." class="w-full focus:outline-none">
                   </form>
                 </div>
             </div>
             <div class="mt-1 mb-5 overflow-x-auto">
                 <table class="border w-full border-black px-1 text-center">
                     <?php
-                    $sql = "SELECT `students`.`student_id`, `students`.`last_name`, `students`.`first_name`, `students`.`year_and_section`, `accounts`.`type` FROM `students` JOIN `accounts` ON `students`.`student_id` = `accounts`.`student_id` WHERE `accounts`.`type` = 'user'";
+                    $sql = "SELECT `students`.`student_id`, `students`.`last_name`, `students`.`first_name`, `students`.`year_and_section` FROM `students` JOIN `accounts` ON `students`.`student_id` = `accounts`.`student_id` WHERE `accounts`.`type` = 'user'";
+                    if(isset($_GET['search'])) {
+                        $search = $_GET['search'];
+                        $sql .= " AND (`students`.`student_id` LIKE '%" . $search . "%' OR `students`.`last_name` LIKE '%" . $search . "%' OR `students`.`first_name` LIKE '%" . $search . "%' OR `students`.`year_and_section` LIKE '%" . $search . "%')";
+                        ?>
+                        <script>
+                            $("#student-search").val("<?php echo $search; ?>");
+                        </script>
+                        <?php
+                    }
                     $result = $conn->query($sql);
                     if ($result->num_rows > 0) {
                         ?>
