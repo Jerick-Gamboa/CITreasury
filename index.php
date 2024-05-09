@@ -13,20 +13,20 @@
     <script src="js/predefined-script.js"></script>
     <link rel="icon" href="img/nobgcitsclogo.png">
 </head>
-<body class="bg-gradient-to-t from-purple-600 to-purple-200 h-screen flex items-center justify-center">
+<body class="bg-gradient-to-t from-custom-purple to-purple-200 h-screen flex items-center justify-center">
     <div class="w-112 bg-white shadow rounded-lg">
         <img src="img/headerlogo.png" class="w-full rounded-t-lg"><br>
         <img src="img/nobgcitsclogo.png" class="w-full p-5 opacity-25">
     </div>
     <div class="absolute">
-        <h1 class="text-purple-900 text-4xl text-center font-bold mb-10 mt-20 opacity-90">SIGN IN</h1>
+        <h1 class="text-custom-purple text-4xl text-center font-bold mb-10 mt-20 opacity-90">SIGN IN</h1>
         <form method="POST">
-            <label for="email" class="text-purple-900 text-md font-bold">Email:</label><br>
-            <input type="email" name="email" class="w-72 px-2 py-1 border-2 border-purple-700 rounded-lg mb-4"><br>
-            <label for="password" class="text-purple-900 text-md font-bold">Password:</label><br>
-            <input type="password" name="password" class="w-72 px-2 py-1 border-2 border-purple-700 rounded-lg"><br>
+            <label for="email" class="text-custom-purple text-md font-bold">Email:</label><br>
+            <input type="email" name="email" class="w-72 px-2 py-1 border-2 border-custom-purple rounded-lg mb-4"><br>
+            <label for="password" class="text-custom-purple text-md font-bold">Password:</label><br>
+            <input type="password" name="password" class="w-72 px-2 py-1 border-2 border-custom-purple rounded-lg"><br>
             <div class="flex items-center justify-center mt-1">
-                <button type="submit" class="mt-5 bg-purple-800 px-10 py-1 rounded text-white font-bold transition-all duration-300-ease-in-out hover:bg-purple-500" name="login">Sign In</button>
+                <button type="submit" class="mt-5 bg-custom-purple px-10 py-1 rounded text-white font-bold transition-all duration-300-ease-in-out hover:bg-purple-500" name="login">Sign In</button>
             </div>
         </form>
     </div>
