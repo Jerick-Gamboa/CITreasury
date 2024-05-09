@@ -130,7 +130,7 @@
                     <label class="ml-1 text-sm">First Name:</label>
                     <input type="text" name="first-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" pattern="[a-zA-Z\s']+" required>
                     <label class="ml-1 text-sm">Middle Initial:</label>
-                    <input type="text" name="middle-initial" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" pattern="[a-zA-Z\s']+">
+                    <input type="text" name="middle-initial" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" maxlength="3" pattern="[a-zA-Z\s']+">
                     <label class="ml-1 text-sm">Year & Section:</label>
                     <input type="text" name="yearsec" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" maxlength="2" pattern="[A-Za-z0-9]+" required>
                     <div class="flex items-center justify-center m-4">
