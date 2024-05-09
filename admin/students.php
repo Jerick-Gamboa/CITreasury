@@ -77,9 +77,6 @@
                             <th class="px-1 border border-black">Student Name</th>
                             <th class="px-1 border border-black">Year & Section</th>
                             <th class="px-1 border border-black">Actions</th>
-                            <script>
-                                const namesArray = [];
-                            </script>
                         </tr>
                         <?php
                         while($row = $result->fetch_assoc()) {
@@ -99,9 +96,6 @@
                                     <button class="px-2 py-1 mb-1 mx-1 bg-red-600 text-white rounded hover:bg-red-500">Delete</button>
                                 </td>
                             </tr>
-                            <script>
-                                namesArray.push(["<?php echo $lastname; ?>", "<?php echo $firstname; ?>"]);
-                            </script>
                             <?php
                         }
                     } else {
@@ -161,7 +155,7 @@
         $firstname = ucwords($_POST['first-name']);
         $mi = ucwords($_POST['middle-initial']);
         $yearsec = strtoupper($_POST['yearsec']);
-        $sql_student = "INSERT INTO `students`(`student_id`, `last_name`, `first_name`, `middle_initial`, `year_and_section`) VALUES ('$sid', '$lastname', '$firstname', '$yearsec')";
+        $sql_student = "INSERT INTO `students`(`student_id`, `last_name`, `first_name`, `middle_initial`, `year_and_section`) VALUES ('$sid', '$lastname', '$firstname', '$mi', '$yearsec')";
         $email = strtolower(str_replace(" ", "", $firstname)) . "." . strtolower(str_replace(" ", "", $lastname)) . "@cbsua.edu.ph";
         $password = "cit-" . $sid;
         $sql_account = "INSERT INTO `accounts`(`email`, `password`, `student_id`, `type`) VALUES ('$email', '$password', '$sid', 'user')";
