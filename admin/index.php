@@ -13,6 +13,7 @@
     <script src="../js/apexcharts.js"></script>
     <script src="../js/predefined-script.js"></script>
     <script src="../js/defer-script.js" defer></script>
+    <title>CITreasury - Dashboard</title>
 </head>
 <body>
     <?php
