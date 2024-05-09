@@ -16,6 +16,15 @@
     <title>CITreasury - Students</title>
 </head>
 <body>
+    <?php
+    if (isset($_COOKIE['cit-email']) && isset($_COOKIE['cit-password'])) {
+        if ($_COOKIE['cit-type'] === 'user') {
+            header("location: ../user/index.php");
+        }
+    } else {
+        header("location: ../index.php");
+    }
+    ?>
     <nav class="fixed w-full bg-custom-purple flex flex-row shadow shadow-gray-800">
         <img src="../img/nobgcitsclogo.png" class="w-12 h-12 my-2 ml-8">
         <h1 class="text-3xl p-3 font-bold text-white">CITreasury</h1>
@@ -35,12 +44,12 @@
         <div class="w-full bg-red-50 px-6 min-h-screen">
             <div class="fixed bottom-10 right-6">
                 <button id="add-student" title="Add New Student">
-                    <svg id="mdi-plus-circle" class="w-16 h-16 fill-green-500 hover:fill-green-600 rounded-full shadow-md shadow-gray-500" viewBox="2 2 20 20"><path d="M17,13H13V17H11V13H7V11H11V7H13V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg>
+                    <svg id="mdi-plus-circle" class="w-16 h-16 fill-green-500 bg-white hover:fill-green-600 rounded-full shadow-md shadow-gray-500" viewBox="2 2 20 20"><path d="M17,13H13V17H11V13H7V11H11V7H13V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg>
                 </button>
             </div>
             <div class="mt-24 flex flex-col lg:flex-row justify-between">
                 <h1 class="text-3xl text-purple-800 font-bold mb-3">Manage Students</h1>
-                <div class="flex flex-row w-44 md:w-56 p-1 mb-3 border-2 border-custom-purple  focus:border-custom-purplo rounded-lg bg-white">
+                <div class="flex flex-row w-56 p-1 mb-3 border-2 border-custom-purple  focus:border-custom-purplo rounded-lg bg-white">
                   <svg id="mdi-account-search" class="h-6 w-6 mr-1 fill-custom-purple" viewBox="0 0 24 24"><path d="M15.5,12C18,12 20,14 20,16.5C20,17.38 19.75,18.21 19.31,18.9L22.39,22L21,23.39L17.88,20.32C17.19,20.75 16.37,21 15.5,21C13,21 11,19 11,16.5C11,14 13,12 15.5,12M15.5,14A2.5,2.5 0 0,0 13,16.5A2.5,2.5 0 0,0 15.5,19A2.5,2.5 0 0,0 18,16.5A2.5,2.5 0 0,0 15.5,14M10,4A4,4 0 0,1 14,8C14,8.91 13.69,9.75 13.18,10.43C12.32,10.75 11.55,11.26 10.91,11.9L10,12A4,4 0 0,1 6,8A4,4 0 0,1 10,4M2,20V18C2,15.88 5.31,14.14 9.5,14C9.18,14.78 9,15.62 9,16.5C9,17.79 9.38,19 10,20H2Z" /></svg>
                   <form method="GET">
                       <input type="text" id="student-search" name="search" placeholder="Search student..." class="w-full focus:outline-none">
@@ -50,8 +59,8 @@
             <div class="mt-1 mb-5 overflow-x-auto">
                 <table class="border w-full border-black px-1 text-center">
                     <?php
-                    $sql = "SELECT `students`.`student_id`, `students`.`last_name`, `students`.`first_name`, `students`.`year_and_section` FROM `students` JOIN `accounts` ON `students`.`student_id` = `accounts`.`student_id` WHERE `accounts`.`type` = 'user'";
-                    if(isset($_GET['search'])) {
+                    $sql = "SELECT * FROM `students` JOIN `accounts` ON `students`.`student_id` = `accounts`.`student_id` WHERE `accounts`.`type` = 'user'";
+                    if (isset($_GET['search'])) {
                         $search = $_GET['search'];
                         $sql .= " AND (`students`.`student_id` LIKE '%" . $search . "%' OR `students`.`last_name` LIKE '%" . $search . "%' OR `students`.`first_name` LIKE '%" . $search . "%' OR `students`.`year_and_section` LIKE '%" . $search . "%')";
                         ?>
@@ -68,17 +77,21 @@
                             <th class="px-1 border border-black">Student Name</th>
                             <th class="px-1 border border-black">Year & Section</th>
                             <th class="px-1 border border-black">Actions</th>
+                            <script>
+                                const namesArray = [];
+                            </script>
                         </tr>
                         <?php
                         while($row = $result->fetch_assoc()) {
                             $sid = $row['student_id'];
                             $lastname = $row['last_name'];
                             $firstname = $row['first_name'];
+                            $mi = !empty($row['middle_initial']) ? $row['middle_initial'] . '.' : "";
                             $yearsec = $row['year_and_section'];
                             ?>
                             <tr>
                                 <td class="px-2 border border-black"><?php echo $sid; ?></td>
-                                <td class="px-2 border border-black"><?php echo $lastname . ', ' . $firstname; ?></td>
+                                <td class="px-2 border border-black"><?php echo $lastname . ', ' . $firstname . ' ' . $mi; ?></td>
                                 <td class="px-2 border border-black"><?php echo $yearsec; ?></td>
                                 <td class="border border-black max-w-56">
                                     <input type="hidden" name="selected-id">
@@ -86,6 +99,9 @@
                                     <button class="px-2 py-1 mb-1 mx-1 bg-red-600 text-white rounded hover:bg-red-500">Delete</button>
                                 </td>
                             </tr>
+                            <script>
+                                namesArray.push(["<?php echo $lastname; ?>", "<?php echo $firstname; ?>"]);
+                            </script>
                             <?php
                         }
                     } else {
@@ -96,33 +112,37 @@
             </div>
         </div>
     </div>
-    <div id="popup-bg" class="fixed top-0 w-full min-h-screen bg-black opacity-50"></div>
-    <div id="popup-item" class="fixed top-0 w-full min-h-screen">
+    <div id="popup-bg" class="fixed top-0 w-full min-h-screen bg-black opacity-50 hidden"></div>
+    <div id="popup-item" class="fixed top-0 w-full min-h-screen hidden">
         <div class="w-full min-h-screen flex items-center justify-center">
-            <div class="m-5 w-full py-3 px-5 sm:w-2/3 lg:w-1/2 xl:1/3 rounded bg-white h-fit shadow-lg shadow-black">
+            <div class="m-5 w-full py-3 px-5 sm:w-1/2 lg:w-1/3 xl:1/4 rounded bg-white h-fit shadow-lg shadow-black">
                 <div class="w-full flex justify-end">
                     <button id="close-popup">
                         <svg id="mdi-close-box-outline" class="mt-2 w-6 h-6 hover:fill-red-500" viewBox="0 0 24 24"><path d="M19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M19,19H5V5H19V19M17,8.4L13.4,12L17,15.6L15.6,17L12,13.4L8.4,17L7,15.6L10.6,12L7,8.4L8.4,7L12,10.6L15.6,7L17,8.4Z" /></svg>
                     </button>
                 </div>
                 <h3 class="text-2xl font-semibold text-custom-purple mb-3">Add Student</h3>
-                <form method="POST" class="">
+                <form method="POST">
                     <label class="ml-1 text-sm">Student ID:</label>
-                    <input type="text" name="student-id" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" maxlength="7" required>
+                    <input type="text" name="student-id" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" maxlength="7" pattern="[0-9-]*" required>
                     <label class="ml-1 text-sm">Last Name:</label>
-                    <input type="text" name="last-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" required>
+                    <input type="text" name="last-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" pattern="[a-zA-Z\s']+" required>
                     <label class="ml-1 text-sm">First Name:</label>
-                    <input type="text" name="first-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" required>
+                    <input type="text" name="first-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" pattern="[a-zA-Z\s']+" required>
+                    <label class="ml-1 text-sm">Middle Initial:</label>
+                    <input type="text" name="middle-initial" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" pattern="[a-zA-Z\s']+">
                     <label class="ml-1 text-sm">Year & Section:</label>
-                    <input type="text" name="yearsec" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" maxlength="2" required>
-                    <div class="w-full flex items-center justify-center m-4">
-                        <button type="submit" class="px-3 py-1 bg-custom-purple rounded text-white font-bold hover:bg-custom-purplo" name="add-new-student">Add Student</button>
+                    <input type="text" name="yearsec" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" maxlength="2" pattern="[A-Za-z0-9]+" required>
+                    <div class="flex items-center justify-center m-4">
+                        <button type="submit" class="px-3 py-1 bg-custom-purple rounded text-base text-white font-bold hover:bg-custom-purplo" name="add-new-student">Add Student</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
     <script type="text/javascript">
+        $("#popup-bg").removeClass("hidden");
+        $("#popup-item").removeClass("hidden");
         $("#popup-bg").hide();
         $("#popup-item").hide();
         $("#add-student").click((event) => {
@@ -137,17 +157,18 @@
     <?php
     if (isset($_POST['add-new-student'])) {
         $sid = $_POST['student-id'];
-        $lastname = $_POST['last-name'];
-        $firstname = $_POST['first-name'];
-        $yearsec = $_POST['yearsec'];
-        $sql_student = "INSERT INTO `students`(`student_id`, `last_name`, `first_name`, `year_and_section`) VALUES ('$sid', '$lastname', '$firstname', '$yearsec')";
-        $email = strtolower($firstname) . "." . strtolower($lastname) . "@cbsua.edu.ph";
+        $lastname = ucwords($_POST['last-name']);
+        $firstname = ucwords($_POST['first-name']);
+        $mi = ucwords($_POST['middle-initial']);
+        $yearsec = strtoupper($_POST['yearsec']);
+        $sql_student = "INSERT INTO `students`(`student_id`, `last_name`, `first_name`, `middle_initial`, `year_and_section`) VALUES ('$sid', '$lastname', '$firstname', '$yearsec')";
+        $email = strtolower(str_replace(" ", "", $firstname)) . "." . strtolower(str_replace(" ", "", $lastname)) . "@cbsua.edu.ph";
         $password = "cit-" . $sid;
         $sql_account = "INSERT INTO `accounts`(`email`, `password`, `student_id`, `type`) VALUES ('$email', '$password', '$sid', 'user')";
         if ($conn->query($sql_student) && $conn->query($sql_account)) {
             ?>
             <script>
-                swal('Student Added Successfully!', '', 'success')
+                swal('Student added successfully!', '', 'success')
                 .then((okay) => {
                     window.location.href = 'students.php';
                 });

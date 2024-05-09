@@ -51,10 +51,11 @@
                     $_SESSION['cit-email'] = $row['email'];
                     $_SESSION['cit-password'] = $row['password'];
                     $_SESSION['cit-type'] = $row['type'];
-
+                    $_SESSION['cit-student-id'] = $row['student_id'];
                     setcookie('cit-email', $_SESSION['cit-email'], time() + (86400 * 30), '/');
                     setcookie('cit-password', password_hash($_SESSION['cit-password'], PASSWORD_DEFAULT), time() + (86400 * 30), '/');
                     setcookie('cit-type', $_SESSION['cit-type'], time() + (86400 * 30), '/');
+                    setcookie('cit-student-id', $_SESSION['cit-student-id'], time() + (86400 * 30), '/');
                     if ($row['type'] === 'admin') {
                         ?>
                         <script>
