@@ -34,17 +34,20 @@
                     <svg id="mdi-plus-circle" class="w-16 h-16 fill-green-500 hover:fill-green-600 rounded-full shadow-md shadow-gray-500" viewBox="2 2 20 20"><path d="M17,13H13V17H11V13H7V11H11V7H13V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg>
                 </a>
             </div>
-            <div class="mt-24 mb-5">
-                <div class="w-full">
-                  <h1 class="text-3xl text-custom-purple font-bold ">Manage Students</h1>
+            <div class="mt-24 flex flex-col lg:flex-row justify-between">
+                <div class="w-full mb-3">
+                  <h1 class="text-3xl text-purple-800 font-bold">Manage Students</h1>
+                </div>
+              <form method="POST">
+                <div class="relative">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 absolute left-0 top-1/2 transform -translate-y-3/4 text-gray-400 ml-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                  <input type="text" name="search" placeholder="Search student..." class="w-44 md:w-56 pr-1 py-1 pl-9 mb-3 border-2 border-custom-purple focus:outline-none focus:border-custom-purplo rounded-lg">
                 </div>
             </div>
-            <div class="mb-5 flex flex-row justify-between">
-              <form method="POST">
-                <input type="text" name="search" placeholder="Search student..." class="w-44 md:w-56 px-2 py-1 border border-black rounded">
-              </form>
-            </div>
-            <div class="mb-5 overflow-scroll">
+            <div class="mt-1 mb-5 overflow-x-auto">
                 <table class="border w-full border-black px-1 text-center">
                   <tr>
                     <th class="px-1 border border-black">Student ID</th>

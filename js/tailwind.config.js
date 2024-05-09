@@ -8,6 +8,9 @@ tailwind.config = {
         'custom-purple': '#621668',
         'custom-purplo': '#8a2791'
       },
+      backgroundImage: {
+        
+      }
     }
   }
 }
