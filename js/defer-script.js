@@ -121,6 +121,7 @@ function clickToShowHide(button_id, target_show_hide) {
 }
 
 clickToShowHide("#mdi-menu", "#menu-items-mobile");
+clickToShowHide("#mdi-menu", "#menu-user-items-mobile");
 // clickToShowHide("#menu-items #dashboard", "#menu-items #dashboard-items");
 // clickToShowHide("#menu-items-mobile #dashboard", "#menu-items-mobile #dashboard-items");
 
