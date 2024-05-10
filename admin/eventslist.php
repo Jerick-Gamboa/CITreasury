@@ -203,10 +203,6 @@
             $("#edit-event-date").val(row.cells[3].innerHTML);
         }
 
-        for (let i=0; i<deleteIds.length; i++) {
-            deleteEvents("#delete-events-" + deleteIds[i], form_id, "#delete-current-" + deleteIds[i]);
-        }
-
         function deleteEvents(button_id, form_id) {
             $(button_id).click((event) => {
                 event.preventDefault();
@@ -226,6 +222,10 @@
                     }
                 });
             });
+        }
+
+        for (let i=0; i<deleteIds.length; i++) {
+            deleteEvents("#delete-events-" + deleteIds[i], "#delete-current-" + deleteIds[i]);
         }
     </script>
     <?php
