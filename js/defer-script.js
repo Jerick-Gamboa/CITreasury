@@ -147,3 +147,5 @@ function logoutAction(button_id) {
 
 logoutAction("#menu-items-mobile #logout");
 logoutAction("#menu-items #logout");
+logoutAction("#menu-user-items-mobile #logout");
+logoutAction("#menu-user-items #logout");
