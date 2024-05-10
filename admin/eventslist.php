@@ -204,7 +204,11 @@
         }
 
         for (let i=0; i<deleteIds.length; i++) {
-            $("#delete-events-" + deleteIds[i]).click((event) => {
+            deleteEvents("#delete-events-" + deleteIds[i], form_id, "#delete-current-" + deleteIds[i]);
+        }
+
+        function deleteEvents(button_id, form_id) {
+            $(button_id).click((event) => {
                 event.preventDefault();
                 swal({
                     title: "Are you sure to delete this event?",
@@ -218,7 +222,7 @@
                     dangerMode: false,
                 }).then((willDelete) => {
                     if (willDelete) {
-                        $("#delete-current-" + deleteIds[i]).submit();
+                        $(form_id).submit();
                     }
                 });
             });

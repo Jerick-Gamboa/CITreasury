@@ -213,8 +213,8 @@
             }
         }
 
-        for (let i=0; i<namesArray.length; i++) {
-            $("#delete-student-" + namesArray[i][0]).click((event) => {
+        function deleteStudent(button_id, form_id) {
+            $(button_id).click((event) => {
                 event.preventDefault();
                 swal({
                     title: "Are you sure to delete this student?",
@@ -228,10 +228,14 @@
                     dangerMode: false,
                 }).then((willDelete) => {
                     if (willDelete) {
-                        $("#delete-current-" + namesArray[i][0]).submit();
+                        $(form_id).submit();
                     }
                 });
             });
+        }
+
+        for (let i=0; i<namesArray.length; i++) {
+            deleteStudent("#delete-student-" + namesArray[i][0], "#delete-current-" + namesArray[i][0])
         }
     </script>
     <?php
