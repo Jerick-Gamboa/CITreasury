@@ -100,7 +100,7 @@
                                         <button class="px-4 py-2 my-1 mx-1 bg-yellow-500 text-white text-sm font-semibold rounded-lg shadow hover:bg-yellow-400" onclick="editRow(this)">Edit</button>
                                         <form method="POST" class="inline-block" id="delete-current">
                                             <input type="hidden" name="eid-to-delete" value="<?php echo $eid; ?>">
-                                            <button id="delete-event" class="px-2 py-2 mb-1 mx-1 bg-red-600 text-white text-sm font-semibold rounded-lg shadow hover:bg-red-500">Delete</button>
+                                            <button type="button" class="delete-event px-2 py-2 mb-1 mx-1 bg-red-600 text-white text-sm font-semibold rounded-lg shadow hover:bg-red-500">Delete</button>
                                         </form>
                                     </td>
                                 </tr>
@@ -201,7 +201,7 @@
             $("#edit-event-date").val(row.cells[3].innerHTML);
         }
 
-        $("#delete-event").click((event) => {
+        $(".delete-event").click((event) => {
             event.preventDefault();
             swal({
                 title: "Are you sure to delete this event?",

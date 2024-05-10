@@ -100,7 +100,7 @@
                                         <button class="px-4 py-2 my-1 mx-1 bg-yellow-500 text-white text-sm font-semibold rounded-lg shadow hover:bg-yellow-400" onclick="editRow(this)">Edit</button>
                                         <form method="POST" class="inline-block" id="delete-current">
                                             <input type="hidden" name="sid-to-delete" value="<?php echo $sid; ?>">
-                                            <button id="delete-student" class="px-2 py-2 mb-1 mx-1 bg-red-600 text-white text-sm font-semibold rounded-lg shadow hover:bg-red-500">Delete</button>
+                                            <button class="delete-student px-2 py-2 mb-1 mx-1 bg-red-600 text-white text-sm font-semibold rounded-lg shadow hover:bg-red-500">Delete</button>
                                         </form>
                                     </td>
                                 </tr>
@@ -213,7 +213,7 @@
             }
         }
 
-        $("#delete-student").click((event) => {
+        $(".delete-student").click((event) => {
             event.preventDefault();
             swal({
                 title: "Are you sure to delete this student?",
