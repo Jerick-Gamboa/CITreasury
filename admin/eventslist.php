@@ -137,7 +137,7 @@
                     <label class="ml-1 text-sm">Event Name:</label>
                     <input type="text" name="event-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" required>
                     <label class="ml-1 text-sm">Event Description:</label>
-                    <input type="text" name="event-desc" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" required>
+                    <textarea name="event-desc" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" required></textarea>
                     <label class="ml-1 text-sm">Event Date:</label>
                     <input type="date" name="event-date" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" required>
                     <label class="ml-1 text-sm">Fee per event (₱):</label>
@@ -165,7 +165,7 @@
                     <label class="ml-1 text-sm">Event Name:</label>
                     <input type="text" id="edit-event-name" name="edit-event-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" required>
                     <label class="ml-1 text-sm">Event Description:</label>
-                    <input type="text" id="edit-event-desc" name="edit-event-desc" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" required>
+                    <textarea id="edit-event-desc" name="edit-event-desc" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" required></textarea> 
                     <label class="ml-1 text-sm">Event Date:</label>
                     <input type="date" id="edit-event-date" name="edit-event-date" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" required>
                     <label class="ml-1 text-sm">Fee per event (₱):</label>
