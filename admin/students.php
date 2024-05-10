@@ -78,6 +78,9 @@
                             <th class="px-1 border border-black">Year & Section</th>
                             <th class="px-1 border border-black">Actions</th>
                         </tr>
+                        <script>
+                            const namesArray = [];
+                        </script>
                         <?php
                         while($row = $result->fetch_assoc()) {
                             $sid = $row['student_id'];
@@ -92,10 +95,13 @@
                                 <td class="px-2 border border-black"><?php echo $yearsec; ?></td>
                                 <td class="border border-black max-w-56">
                                     <input type="hidden" name="selected-id">
-                                    <button class="px-4 py-1 my-1 mx-1 bg-yellow-500 text-white rounded hover:bg-yellow-400">Edit</button>
+                                    <button class="px-4 py-1 my-1 mx-1 bg-yellow-500 text-white rounded hover:bg-yellow-400" onclick="editRow(this)">Edit</button>
                                     <button class="px-2 py-1 mb-1 mx-1 bg-red-600 text-white rounded hover:bg-red-500">Delete</button>
                                 </td>
                             </tr>
+                            <script>
+                                namesArray.push(["<?php echo $sid; ?>", "<?php echo $lastname; ?>", "<?php echo $firstname; ?>", "<?php echo $mi; ?>", "<?php echo $yearsec; ?>"]);
+                            </script>
                             <?php
                         }
                     } else {
@@ -134,6 +140,34 @@
             </div>
         </div>
     </div>
+    <div id="edit-popup-bg" class="fixed top-0 w-full min-h-screen bg-black opacity-50 hidden"></div>
+    <div id="edit-popup-item" class="fixed top-0 w-full min-h-screen hidden">
+        <div class="w-full min-h-screen flex items-center justify-center">
+            <div class="m-5 w-full py-3 px-5 sm:w-1/2 lg:w-1/3 xl:1/4 rounded bg-white h-fit shadow-lg shadow-black">
+                <div class="w-full flex justify-end">
+                    <button id="edit-close-popup">
+                        <svg id="mdi-close-box-outline" class="mt-2 w-6 h-6 hover:fill-red-500" viewBox="0 0 24 24"><path d="M19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M19,19H5V5H19V19M17,8.4L13.4,12L17,15.6L15.6,17L12,13.4L8.4,17L7,15.6L10.6,12L7,8.4L8.4,7L12,10.6L15.6,7L17,8.4Z" /></svg>
+                    </button>
+                </div>
+                <h3 class="text-2xl font-semibold text-custom-purple mb-3">Edit Student</h3>
+                <form method="POST">
+                    <label class="ml-1 text-sm">Student ID:</label>
+                    <input type="text" id="edit-student-id" name="edit-student-id" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" maxlength="7" readonly>
+                    <label class="ml-1 text-sm">Last Name:</label>
+                    <input type="text" id="edit-last-name" name="edit-last-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" pattern="[a-zA-Z\s']+" required>
+                    <label class="ml-1 text-sm">First Name:</label>
+                    <input type="text" id="edit-first-name" name="edit-first-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" pattern="[a-zA-Z\s']+" required>
+                    <label class="ml-1 text-sm">Middle Initial:</label>
+                    <input type="text" id="edit-middle-initial" name="edit-middle-initial" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" maxlength="3" pattern="[a-zA-Z\s']+">
+                    <label class="ml-1 text-sm">Year & Section:</label>
+                    <input type="text" id="edit-yearsec" name="edit-yearsec" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" maxlength="2" pattern="[A-Za-z0-9]+" required>
+                    <div class="flex items-center justify-center m-4">
+                        <button type="submit" class="px-3 py-1 bg-custom-purple rounded text-base text-white font-bold hover:bg-custom-purplo" name="update-this-student">Update Student</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
     <script type="text/javascript">
         $("#popup-bg").removeClass("hidden");
         $("#popup-item").removeClass("hidden");
@@ -147,6 +181,31 @@
                 $("#popup-item").fadeOut(150);
             });
         });
+        $("#edit-popup-bg").removeClass("hidden");
+        $("#edit-popup-item").removeClass("hidden");
+        $("#edit-popup-bg").hide();
+        $("#edit-popup-item").hide();
+
+        function editRow(link) {
+            $("#edit-popup-bg").fadeIn(150);
+            $("#edit-popup-item").delay(150).fadeIn(150);
+            $("#edit-close-popup").click((event) => {
+                $("#edit-popup-bg").fadeOut(150);
+                $("#edit-popup-item").fadeOut(150);
+            });
+            let row = link.parentNode.parentNode;
+            for (let i=0; i<namesArray.length; i++) {
+                if (namesArray[i][0] === row.cells[0].innerHTML) {
+                    $("#edit-student-id").val(namesArray[i][0]);
+                    $("#edit-last-name").val(namesArray[i][1]);
+                    $("#edit-first-name").val(namesArray[i][2]);
+                    let tempMidInit = namesArray[i][3];
+                    $("#edit-middle-initial").val(tempMidInit.substring(0, tempMidInit.length - 1));
+                    $("#edit-yearsec").val(namesArray[i][4]);
+                    break;
+                }
+            }
+        }
     </script>
     <?php
     if (isset($_POST['add-new-student'])) {
@@ -163,6 +222,29 @@
             ?>
             <script>
                 swal('Student added successfully!', '', 'success')
+                .then((okay) => {
+                    window.location.href = 'students.php';
+                });
+            </script>
+            <?php
+        } else {
+            ?><script>swal('Failed to add student!', '', 'error');</script>"<?php
+        }
+    }
+    if (isset($_POST['update-this-student'])) {
+        $sid = $_POST['edit-student-id'];
+        $lastname = ucwords($_POST['edit-last-name']);
+        $firstname = ucwords($_POST['edit-first-name']);
+        $mi = ucwords($_POST['edit-middle-initial']);
+        $yearsec = strtoupper($_POST['edit-yearsec']);
+        $email = strtolower(str_replace(" ", "", $firstname)) . "." . strtolower(str_replace(" ", "", $lastname)) . "@cbsua.edu.ph";
+        $password = "cit-" . $sid;
+        $sqlupdate_account = "UPDATE `accounts` SET `email`='$email', `password`='$password' WHERE `student_id` = '$sid' ";
+        $sqlupdate_student = "UPDATE `students` SET `last_name`= '$lastname', `first_name`= '$firstname', `middle_initial`= '$mi', `year_and_section`= '$yearsec' WHERE `student_id` = '$sid'";
+        if ($conn->query($sqlupdate_account) && $conn->query($sqlupdate_student)) {
+            ?>
+            <script>
+                swal('Student updated successfully!', '', 'success')
                 .then((okay) => {
                     window.location.href = 'students.php';
                 });
