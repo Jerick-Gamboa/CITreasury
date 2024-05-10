@@ -56,7 +56,7 @@
                   </form>
                 </div>
             </div>
-            <div class="mt-1 mb-5 overflow-x-auto">
+            <div class="mt-1 mb-5 overflow-x-auto rounded-lg shadow-lg">
                 <div class="overflow-x-auto rounded-lg border border-black">
                     <table class="w-full px-1 text-center">
                         <?php
@@ -97,9 +97,11 @@
                                     <td class="px-2 border-r border-black"><?php echo $lastname . ', ' . $firstname . ' ' . $mi; ?></td>
                                     <td class="px-2 border-r border-black"><?php echo $yearsec; ?></td>
                                     <td class="max-w-56">
-                                        <input type="hidden" name="selected-id">
                                         <button class="px-4 py-2 my-1 mx-1 bg-yellow-500 text-white text-sm font-semibold rounded-lg shadow hover:bg-yellow-400" onclick="editRow(this)">Edit</button>
-                                        <button class="px-2 py-2 mb-1 mx-1 bg-red-600 text-white text-sm font-semibold rounded-lg shadow hover:bg-red-500">Delete</button>
+                                        <form method="POST" class="inline-block" id="delete-current">
+                                            <input type="hidden" name="sid-to-delete" value="<?php echo $sid; ?>">
+                                            <button id="delete-student" class="px-2 py-2 mb-1 mx-1 bg-red-600 text-white text-sm font-semibold rounded-lg shadow hover:bg-red-500">Delete</button>
+                                        </form>
                                     </td>
                                 </tr>
                                 <script>
@@ -108,7 +110,7 @@
                                 <?php
                             }
                         } else {
-                            ?><h3 class="text-2xl">No students found.</h3><?php
+                            ?><h3 class="p-4">No students found.</h3><?php
                         }
                         ?>
                     </table>
@@ -210,6 +212,25 @@
                 }
             }
         }
+
+        $("#delete-student").click((event) => {
+            event.preventDefault();
+            swal({
+                title: "Are you sure to delete this student?",
+                text: "This action can't be undone.",
+                icon: "info",
+                buttons: true,
+                buttons: {
+                    cancel: 'Cancel',
+                    confirm : {className:'bg-custom-purple'},
+                },
+                dangerMode: false,
+            }).then((willDelete) => {
+                if (willDelete) {
+                    $("#delete-current").submit();
+                }
+            });
+        });
     </script>
     <?php
     if (isset($_POST['add-new-student'])) {
@@ -256,6 +277,19 @@
             <?php
         } else {
             ?><script>swal('Failed to add student!', '', 'error');</script>"<?php
+        }
+    }
+    if (isset($_POST['sid-to-delete'])) {
+        $sqldelete_account = "DELETE FROM `accounts` WHERE `student_id`= '". $_POST['sid-to-delete'] . "'";
+        $sqldelete_student = "DELETE FROM `students` WHERE `student_id`= '". $_POST['sid-to-delete'] . "'";
+        if ($conn->query($sqldelete_account) && $conn->query($sqldelete_student)) {
+            ?>
+            <script>swal('Successfully deleted', '', 'success').then(() => window.location.href = "students.php")</script>
+            <?php
+        } else {
+            ?>
+            <script>swal('Deletion failed', '', 'error');</script>
+            <?php
         }
     }
     ?>
