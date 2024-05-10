@@ -57,58 +57,62 @@
                 </div>
             </div>
             <div class="mt-1 mb-5 overflow-x-auto">
-                <table class="border w-full border-black px-1 text-center">
-                    <?php
-                    $sql = "SELECT * FROM `students` JOIN `accounts` ON `students`.`student_id` = `accounts`.`student_id` WHERE `accounts`.`type` = 'user'";
-                    if (isset($_GET['search'])) {
-                        $search = $_GET['search'];
-                        $sql .= " AND (`students`.`student_id` LIKE '%" . $search . "%' OR `students`.`last_name` LIKE '%" . $search . "%' OR `students`.`first_name` LIKE '%" . $search . "%' OR `students`.`year_and_section` LIKE '%" . $search . "%')";
-                        ?>
-                        <script>
-                            $("#student-search").val("<?php echo $search; ?>");
-                        </script>
+                <div class="overflow-x-auto rounded-lg border border-black">
+                    <table class="w-full px-1 text-center">
                         <?php
-                    }
-                    $result = $conn->query($sql);
-                    if ($result->num_rows > 0) {
-                        ?>
-                        <tr>
-                            <th class="px-1 border border-black">Student ID</th>
-                            <th class="px-1 border border-black">Student Name</th>
-                            <th class="px-1 border border-black">Year & Section</th>
-                            <th class="px-1 border border-black">Actions</th>
-                        </tr>
-                        <script>
-                            const namesArray = [];
-                        </script>
-                        <?php
-                        while($row = $result->fetch_assoc()) {
-                            $sid = $row['student_id'];
-                            $lastname = $row['last_name'];
-                            $firstname = $row['first_name'];
-                            $mi = !empty($row['middle_initial']) ? $row['middle_initial'] . '.' : "";
-                            $yearsec = $row['year_and_section'];
+                        $sql = "SELECT * FROM `students` JOIN `accounts` ON `students`.`student_id` = `accounts`.`student_id` WHERE `accounts`.`type` = 'user'";
+                        if (isset($_GET['search'])) {
+                            $search = $_GET['search'];
+                            $sql .= " AND (`students`.`student_id` LIKE '%" . $search . "%' OR `students`.`last_name` LIKE '%" . $search . "%' OR `students`.`first_name` LIKE '%" . $search . "%' OR `students`.`year_and_section` LIKE '%" . $search . "%')";
                             ?>
-                            <tr>
-                                <td class="px-2 border border-black"><?php echo $sid; ?></td>
-                                <td class="px-2 border border-black"><?php echo $lastname . ', ' . $firstname . ' ' . $mi; ?></td>
-                                <td class="px-2 border border-black"><?php echo $yearsec; ?></td>
-                                <td class="border border-black max-w-56">
-                                    <input type="hidden" name="selected-id">
-                                    <button class="px-4 py-1 my-1 mx-1 bg-yellow-500 text-white rounded hover:bg-yellow-400" onclick="editRow(this)">Edit</button>
-                                    <button class="px-2 py-1 mb-1 mx-1 bg-red-600 text-white rounded hover:bg-red-500">Delete</button>
-                                </td>
-                            </tr>
                             <script>
-                                namesArray.push(["<?php echo $sid; ?>", "<?php echo $lastname; ?>", "<?php echo $firstname; ?>", "<?php echo $mi; ?>", "<?php echo $yearsec; ?>"]);
+                                $("#student-search").val("<?php echo $search; ?>");
                             </script>
                             <?php
                         }
-                    } else {
-                        ?><h3 class="text-2xl">No students found.</h3><?php
-                    }
-                    ?>
-                </table>
+                        $result = $conn->query($sql);
+                        if ($result->num_rows > 0) {
+                            ?>
+                            <thead class="text-white uppercase bg-custom-purplo ">
+                                <tr>
+                                    <th scope="col" class="py-2 border-r border-black">Student ID</th>
+                                    <th scope="col" class="py-2 border-r border-black">Student Name</th>
+                                    <th scope="col" class="py-2 border-r border-black">Year & Section</th>
+                                    <th scope="col" class="py-2">Actions</th>
+                                </tr>
+                            </thead>
+                            <script>
+                                const namesArray = [];
+                            </script>
+                            <?php
+                            while($row = $result->fetch_assoc()) {
+                                $sid = $row['student_id'];
+                                $lastname = $row['last_name'];
+                                $firstname = $row['first_name'];
+                                $mi = !empty($row['middle_initial']) ? $row['middle_initial'] . '.' : "";
+                                $yearsec = $row['year_and_section'];
+                                ?>
+                                <tr class="border-t border-black">
+                                    <td class="px-2 border-r border-black"><?php echo $sid; ?></td>
+                                    <td class="px-2 border-r border-black"><?php echo $lastname . ', ' . $firstname . ' ' . $mi; ?></td>
+                                    <td class="px-2 border-r border-black"><?php echo $yearsec; ?></td>
+                                    <td class="max-w-56">
+                                        <input type="hidden" name="selected-id">
+                                        <button class="px-4 py-1 my-1 mx-1 bg-yellow-500 text-white rounded hover:bg-yellow-400" onclick="editRow(this)">Edit</button>
+                                        <button class="px-2 py-1 mb-1 mx-1 bg-red-600 text-white rounded hover:bg-red-500">Delete</button>
+                                    </td>
+                                </tr>
+                                <script>
+                                    namesArray.push(["<?php echo $sid; ?>", "<?php echo $lastname; ?>", "<?php echo $firstname; ?>", "<?php echo $mi; ?>", "<?php echo $yearsec; ?>"]);
+                                </script>
+                                <?php
+                            }
+                        } else {
+                            ?><h3 class="text-2xl">No students found.</h3><?php
+                        }
+                        ?>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
