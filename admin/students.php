@@ -98,9 +98,9 @@
                                     <td class="px-2 border-r border-black"><?php echo $yearsec; ?></td>
                                     <td class="max-w-56">
                                         <button class="px-4 py-2 my-1 mx-1 bg-yellow-500 text-white text-sm font-semibold rounded-lg shadow hover:bg-yellow-400" onclick="editRow(this)">Edit</button>
-                                        <form method="POST" class="inline-block" id="delete-current">
+                                        <form method="POST" class="inline-block" id="delete-current-<?php echo str_replace(" ", "", $sid) ?>">
                                             <input type="hidden" name="sid-to-delete" value="<?php echo $sid; ?>">
-                                            <button class="delete-student px-2 py-2 mb-1 mx-1 bg-red-600 text-white text-sm font-semibold rounded-lg shadow hover:bg-red-500">Delete</button>
+                                            <button id="delete-student-<?php echo str_replace(" ", "", $sid) ?>" class="px-2 py-2 mb-1 mx-1 bg-red-600 text-white text-sm font-semibold rounded-lg shadow hover:bg-red-500">Delete</button>
                                         </form>
                                     </td>
                                 </tr>
@@ -213,24 +213,26 @@
             }
         }
 
-        $(".delete-student").click((event) => {
-            event.preventDefault();
-            swal({
-                title: "Are you sure to delete this student?",
-                text: "This action can't be undone.",
-                icon: "info",
-                buttons: true,
-                buttons: {
-                    cancel: 'Cancel',
-                    confirm : {className:'bg-custom-purple'},
-                },
-                dangerMode: false,
-            }).then((willDelete) => {
-                if (willDelete) {
-                    $("#delete-current").submit();
-                }
+        for (let i=0; i<namesArray.length; i++) {
+            $("#delete-student-" + namesArray[i][0]).click((event) => {
+                event.preventDefault();
+                swal({
+                    title: "Are you sure to delete this student?",
+                    text: "This action can't be undone.",
+                    icon: "info",
+                    buttons: true,
+                    buttons: {
+                        cancel: 'Cancel',
+                        confirm : {className:'bg-custom-purple'},
+                    },
+                    dangerMode: false,
+                }).then((willDelete) => {
+                    if (willDelete) {
+                        $("#delete-current-" + namesArray[i][0]).submit();
+                    }
+                });
             });
-        });
+        }
     </script>
     <?php
     if (isset($_POST['add-new-student'])) {

@@ -83,6 +83,7 @@
                                 </tr>
                             </thead>
                             <script>
+                                const deleteIds = [];
                             </script>
                             <?php
                             while($row = $result->fetch_assoc()) {
@@ -98,13 +99,14 @@
                                     <td class="px-2 border-r border-black"><?php echo $eventdate; ?></td>
                                     <td class="max-w-56">
                                         <button class="px-4 py-2 my-1 mx-1 bg-yellow-500 text-white text-sm font-semibold rounded-lg shadow hover:bg-yellow-400" onclick="editRow(this)">Edit</button>
-                                        <form method="POST" class="inline-block" id="delete-current">
+                                        <form method="POST" class="inline-block" id="delete-current-<?php echo str_replace(" ", "", $eid) ?>">
                                             <input type="hidden" name="eid-to-delete" value="<?php echo $eid; ?>">
-                                            <button type="button" class="delete-event px-2 py-2 mb-1 mx-1 bg-red-600 text-white text-sm font-semibold rounded-lg shadow hover:bg-red-500">Delete</button>
+                                            <button type="button" id="delete-events-<?php echo str_replace(" ", "", $eid) ?>" class="px-2 py-2 mb-1 mx-1 bg-red-600 text-white text-sm font-semibold rounded-lg shadow hover:bg-red-500">Delete</button>
                                         </form>
                                     </td>
                                 </tr>
                                 <script>
+                                    deleteIds.push("<?php echo str_replace(" ", "", $eid) ?>");
                                 </script>
                                 <?php
                             }
@@ -155,7 +157,7 @@
                 <h3 class="text-2xl font-semibold text-custom-purple mb-3">Edit Event</h3>
                 <form method="POST">
                     <label class="ml-1 text-sm">Event ID:</label>
-                    <input type="text" id="edit-event-id" name="edit-event-id" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" required>
+                    <input type="text" id="edit-event-id" name="edit-event-id" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" readonly>
                     <label class="ml-1 text-sm">Event Name:</label>
                     <input type="text" id="edit-event-name" name="edit-event-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" required>
                     <label class="ml-1 text-sm">Event Description:</label>
@@ -201,24 +203,26 @@
             $("#edit-event-date").val(row.cells[3].innerHTML);
         }
 
-        $(".delete-event").click((event) => {
-            event.preventDefault();
-            swal({
-                title: "Are you sure to delete this event?",
-                text: "This action can't be undone.",
-                icon: "info",
-                buttons: true,
-                buttons: {
-                    cancel: 'Cancel',
-                    confirm : {className:'bg-custom-purple'},
-                },
-                dangerMode: false,
-            }).then((willDelete) => {
-                if (willDelete) {
-                    $("#delete-current").submit();
-                }
+        for (let i=0; i<deleteIds.length; i++) {
+            $("#delete-events-" + deleteIds[i]).click((event) => {
+                event.preventDefault();
+                swal({
+                    title: "Are you sure to delete this event?",
+                    text: "This action can't be undone.",
+                    icon: "info",
+                    buttons: true,
+                    buttons: {
+                        cancel: 'Cancel',
+                        confirm : {className:'bg-custom-purple'},
+                    },
+                    dangerMode: false,
+                }).then((willDelete) => {
+                    if (willDelete) {
+                        $("#delete-current-" + deleteIds[i]).submit();
+                    }
+                });
             });
-        });
+        }
     </script>
     <?php
     if (isset($_POST['add-new-event'])) {
@@ -260,7 +264,7 @@
         }
     }
     if (isset($_POST['eid-to-delete'])) {
-        $sqldelete_event = "DELETE FROM `events` WHERE `event_id`= '". $_POST['eid-to-delete'] . "'";
+        $sqldelete_event = "DELETE FROM `events` WHERE `event_id` = '". $_POST['eid-to-delete'] . "'";
         if ($conn->query($sqldelete_event)) {
             ?>
             <script>swal('Event successfully deleted', '', 'success').then(() => window.location.href = "eventslist.php")</script>
