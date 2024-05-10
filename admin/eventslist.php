@@ -75,11 +75,12 @@
                             ?>
                             <thead class="text-white uppercase bg-custom-purplo ">
                                 <tr>
-                                    <th scope="col" class="py-2 border-r border-black">Event ID</th>
-                                    <th scope="col" class="py-2 border-r border-black">Event Name</th>
-                                    <th scope="col" class="py-2 border-r border-black">Event Description</th>
-                                    <th scope="col" class="py-2 border-r border-black">Event Date</th>
-                                    <th scope="col" class="py-2">Actions</th>
+                                    <th scope="col" class="p-2 border-r border-black">Event ID</th>
+                                    <th scope="col" class="p-2 border-r border-black">Event Name</th>
+                                    <th scope="col" class="p-2 border-r border-black">Event Description</th>
+                                    <th scope="col" class="p-2 border-r border-black">Event Date</th>
+                                    <th scope="col" class="p-2 border-r border-black">Event Fee (₱)</th>
+                                    <th scope="col" class="p-2">Actions</th>
                                 </tr>
                             </thead>
                             <script>
@@ -91,12 +92,14 @@
                                 $eventname = $row['event_name'];
                                 $eventdesc = $row['event_description'];
                                 $eventdate = $row['event_date'];
+                                $feeperevent = $row['fee_per_event'];
                                 ?>
                                 <tr class="border-t border-black">
                                     <td class="px-2 border-r border-black"><?php echo $eid; ?></td>
                                     <td class="px-2 border-r border-black"><?php echo $eventname; ?></td>
                                     <td class="px-2 border-r border-black"><?php echo $eventdesc; ?></td>
                                     <td class="px-2 border-r border-black"><?php echo $eventdate; ?></td>
+                                    <td class="px-2 border-r border-black"><?php echo $feeperevent; ?></td>
                                     <td class="max-w-56">
                                         <button class="px-4 py-2 my-1 mx-1 bg-yellow-500 text-white text-sm font-semibold rounded-lg shadow hover:bg-yellow-400" onclick="editRow(this)">Edit</button>
                                         <form method="POST" class="inline-block" id="delete-current-<?php echo str_replace(" ", "", $eid) ?>">
@@ -138,6 +141,8 @@
                     <input type="text" name="event-desc" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" required>
                     <label class="ml-1 text-sm">Event Date:</label>
                     <input type="date" name="event-date" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" required>
+                    <label class="ml-1 text-sm">Fee per event (₱):</label>
+                    <input type="number" id="fee-per-event" name="fee-per-event" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" required>
                     <div class="flex items-center justify-center m-4">
                         <button type="submit" class="px-3 py-2 bg-custom-purple rounded-lg text-base text-white font-bold hover:bg-custom-purplo" name="add-new-event">Add Event</button>
                     </div>
@@ -164,6 +169,8 @@
                     <input type="text" id="edit-event-desc" name="edit-event-desc" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" required>
                     <label class="ml-1 text-sm">Event Date:</label>
                     <input type="date" id="edit-event-date" name="edit-event-date" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" required>
+                    <label class="ml-1 text-sm">Fee per event (₱):</label>
+                    <input type="number" id="edit-fee-per-event" name="edit-fee-per-event" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" required>
                     <div class="flex items-center justify-center m-4">
                         <button type="submit" class="px-3 py-2 bg-custom-purple rounded-lg text-base text-white font-bold hover:bg-custom-purplo" name="update-this-event">Update Event</button>
                     </div>
@@ -201,6 +208,7 @@
             $("#edit-event-name").val(row.cells[1].innerHTML);
             $("#edit-event-desc").val(row.cells[2].innerHTML);
             $("#edit-event-date").val(row.cells[3].innerHTML);
+            $("#edit-fee-per-event").val(row.cells[4].innerHTML);
         }
 
         function deleteEvents(button_id, form_id) {
@@ -234,7 +242,8 @@
         $eventname = ucwords($_POST['event-name']);
         $eventdesc = $_POST['event-desc'];
         $eventdate = $_POST['event-date'];
-        $sql_event = "INSERT INTO `events`(`event_id`, `event_name`, `event_description`, `event_date`) VALUES ('$eid', '$eventname', '$eventdesc', '$eventdate')";
+        $feeperevent = $_POST['fee-per-event'];
+        $sql_event = "INSERT INTO `events`(`event_id`, `event_name`, `event_description`, `event_date`, `fee_per_event`) VALUES ('$eid', '$eventname', '$eventdesc', '$eventdate', '$feeperevent')";
         if ($conn->query($sql_event)) {
             ?>
             <script>
@@ -253,7 +262,8 @@
         $eventname = ucwords($_POST['edit-event-name']);
         $eventdesc = $_POST['edit-event-desc'];
         $eventdate = $_POST['edit-event-date'];
-        $sqlupdate_event = "UPDATE `events` SET `event_name`='$eventname', `event_description`='$eventdesc', `event_date`='$eventdate' WHERE `event_id` = '$eid'";
+        $feeperevent = $_POST['edit-fee-per-event'];
+        $sqlupdate_event = "UPDATE `events` SET `event_name`='$eventname', `event_description`='$eventdesc', `event_date`='$eventdate', `fee_per_event`='$feeperevent' WHERE `event_id` = '$eid'";
         if ($conn->query($sqlupdate_event)) {
             ?>
             <script>

@@ -75,10 +75,10 @@
                             ?>
                             <thead class="text-white uppercase bg-custom-purplo ">
                                 <tr>
-                                    <th scope="col" class="py-2 border-r border-black">Student ID</th>
-                                    <th scope="col" class="py-2 border-r border-black">Student Name</th>
-                                    <th scope="col" class="py-2 border-r border-black">Year & Section</th>
-                                    <th scope="col" class="py-2">Actions</th>
+                                    <th scope="col" class="p-2 border-r border-black">Student ID</th>
+                                    <th scope="col" class="p-2 border-r border-black">Student Name</th>
+                                    <th scope="col" class="p-2 border-r border-black">Year & Section</th>
+                                    <th scope="col" class="p-2">Actions</th>
                                 </tr>
                             </thead>
                             <script>
