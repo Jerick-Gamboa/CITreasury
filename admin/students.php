@@ -268,8 +268,7 @@
         $mi = ucwords($_POST['edit-middle-initial']);
         $yearsec = strtoupper($_POST['edit-yearsec']);
         $email = strtolower(str_replace(" ", "", $firstname)) . "." . strtolower(str_replace(" ", "", $lastname)) . "@cbsua.edu.ph";
-        $password = "cit-" . $sid;
-        $sqlupdate_account = "UPDATE `accounts` SET `email`='$email', `password`='$password' WHERE `student_id` = '$sid' ";
+        $sqlupdate_account = "UPDATE `accounts` SET `email`='$email' WHERE `student_id` = '$sid' ";
         $sqlupdate_student = "UPDATE `students` SET `last_name`= '$lastname', `first_name`= '$firstname', `middle_initial`= '$mi', `year_and_section`= '$yearsec' WHERE `student_id` = '$sid'";
         if ($conn->query($sqlupdate_account) && $conn->query($sqlupdate_student)) {
             ?>
