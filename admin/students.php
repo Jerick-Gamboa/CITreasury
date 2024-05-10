@@ -235,7 +235,7 @@
         }
 
         for (let i=0; i<namesArray.length; i++) {
-            deleteStudent("#delete-student-" + namesArray[i][0], "#delete-current-" + namesArray[i][0])
+            deleteStudent("#delete-student-" + namesArray[i][0], "#delete-current-" + namesArray[i][0]);
         }
     </script>
     <?php
