@@ -98,8 +98,8 @@
                                     <td class="px-2 border-r border-black"><?php echo $yearsec; ?></td>
                                     <td class="max-w-56">
                                         <input type="hidden" name="selected-id">
-                                        <button class="px-4 py-1 my-1 mx-1 bg-yellow-500 text-white rounded hover:bg-yellow-400" onclick="editRow(this)">Edit</button>
-                                        <button class="px-2 py-1 mb-1 mx-1 bg-red-600 text-white rounded hover:bg-red-500">Delete</button>
+                                        <button class="px-4 py-2 my-1 mx-1 bg-yellow-500 text-white text-sm font-semibold rounded-lg shadow hover:bg-yellow-400" onclick="editRow(this)">Edit</button>
+                                        <button class="px-2 py-2 mb-1 mx-1 bg-red-600 text-white text-sm font-semibold rounded-lg shadow hover:bg-red-500">Delete</button>
                                     </td>
                                 </tr>
                                 <script>
@@ -138,7 +138,7 @@
                     <label class="ml-1 text-sm">Year & Section:</label>
                     <input type="text" name="yearsec" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" maxlength="2" pattern="[A-Za-z0-9]+" required>
                     <div class="flex items-center justify-center m-4">
-                        <button type="submit" class="px-3 py-1 bg-custom-purple rounded text-base text-white font-bold hover:bg-custom-purplo" name="add-new-student">Add Student</button>
+                        <button type="submit" class="px-3 py-2 bg-custom-purple rounded-lg text-base text-white font-bold hover:bg-custom-purplo" name="add-new-student">Add Student</button>
                     </div>
                 </form>
             </div>
@@ -166,7 +166,7 @@
                     <label class="ml-1 text-sm">Year & Section:</label>
                     <input type="text" id="edit-yearsec" name="edit-yearsec" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" maxlength="2" pattern="[A-Za-z0-9]+" required>
                     <div class="flex items-center justify-center m-4">
-                        <button type="submit" class="px-3 py-1 bg-custom-purple rounded text-base text-white font-bold hover:bg-custom-purplo" name="update-this-student">Update Student</button>
+                        <button type="submit" class="px-3 py-2 bg-custom-purple rounded-lg text-base text-white font-bold hover:bg-custom-purplo" name="update-this-student">Update Student</button>
                     </div>
                 </form>
             </div>
@@ -204,7 +204,7 @@
                     $("#edit-last-name").val(namesArray[i][1]);
                     $("#edit-first-name").val(namesArray[i][2]);
                     let tempMidInit = namesArray[i][3];
-                    $("#edit-middle-initial").val(tempMidInit.substring(0, tempMidInit.length - 1));
+                    $("#edit-middle-initial").val(tempMidInit.replace(".", ""));
                     $("#edit-yearsec").val(namesArray[i][4]);
                     break;
                 }
