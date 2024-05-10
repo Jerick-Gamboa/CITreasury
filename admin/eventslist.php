@@ -7,7 +7,6 @@
     <script src="../js/tailwind.config.js"></script>
     <script src="../js/sweetalert.min.js"></script>
     <script src="../js/jquery-3.7.1.min.js"></script>
-    <script src="../js/apexcharts.js"></script>
     <script src="../js/predefined-script.js"></script>
     <script src="../js/defer-script.js" defer></script>
     <?php
@@ -215,7 +214,7 @@
             $(button_id).click((event) => {
                 event.preventDefault();
                 swal({
-                    title: "Are you sure to delete this event?",
+                    title: "Delete this event?",
                     text: "This action can't be undone.",
                     icon: "info",
                     buttons: true,

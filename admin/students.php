@@ -216,7 +216,7 @@
             $(button_id).click((event) => {
                 event.preventDefault();
                 swal({
-                    title: "Are you sure to delete this student?",
+                    title: "Delete this student?",
                     text: "This action can't be undone.",
                     icon: "info",
                     buttons: true,
