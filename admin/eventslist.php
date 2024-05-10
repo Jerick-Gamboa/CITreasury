@@ -43,7 +43,7 @@
         </div>
         <div class="w-full bg-red-50 px-6 min-h-screen">
             <div class="fixed bottom-10 right-6">
-                <button id="add-student" title="Add New Event">
+                <button id="add-event" title="Add New Event">
                     <svg id="mdi-plus-circle" class="w-16 h-16 fill-green-500 bg-white hover:fill-green-600 rounded-full shadow-md shadow-gray-500" viewBox="2 2 20 20"><path d="M17,13H13V17H11V13H7V11H11V7H13V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg>
                 </button>
             </div>
@@ -52,7 +52,7 @@
                 <div class="flex flex-row w-56 p-1 mb-3 border-2 border-custom-purple  focus:border-custom-purplo rounded-lg bg-white">
                   <svg id="mdi-calendar-search" class="h-6 w-6 mr-1 fill-custom-purple" viewBox="0 0 24 24"><path d="M15.5,12C18,12 20,14 20,16.5C20,17.38 19.75,18.21 19.31,18.9L22.39,22L21,23.39L17.88,20.32C17.19,20.75 16.37,21 15.5,21C13,21 11,19 11,16.5C11,14 13,12 15.5,12M15.5,14A2.5,2.5 0 0,0 13,16.5A2.5,2.5 0 0,0 15.5,19A2.5,2.5 0 0,0 18,16.5A2.5,2.5 0 0,0 15.5,14M19,8H5V19H9.5C9.81,19.75 10.26,20.42 10.81,21H5C3.89,21 3,20.1 3,19V5C3,3.89 3.89,3 5,3H6V1H8V3H16V1H18V3H19A2,2 0 0,1 21,5V13.03C20.5,12.22 19.8,11.54 19,11V8Z" /></svg>
                   <form method="GET">
-                      <input type="text" id="student-search" name="search" placeholder="Search event..." class="w-full focus:outline-none">
+                      <input type="text" id="event-search" name="search" placeholder="Search event..." class="w-full focus:outline-none">
                   </form>
                 </div>
             </div>
@@ -66,7 +66,7 @@
                             $sql .= " WHERE (`event_id` LIKE '%" . $search . "%' OR `event_name` LIKE '%" . $search . "%' OR `event_description` LIKE '%" . $search . "%' OR `event_date` LIKE '%" . $search . "%')";
                             ?>
                             <script>
-                                $("#student-search").val("<?php echo $search; ?>");
+                                $("#event-search").val("<?php echo $search; ?>");
                             </script>
                             <?php
                         }
@@ -174,7 +174,7 @@
         $("#popup-item").removeClass("hidden");
         $("#popup-bg").hide();
         $("#popup-item").hide();
-        $("#add-student").click((event) => {
+        $("#add-event").click((event) => {
             $("#popup-bg").fadeIn(150);
             $("#popup-item").delay(150).fadeIn(150);
             $("#close-popup").click((event) => {
