@@ -219,10 +219,10 @@
                     icon: "info",
                     buttons: true,
                     buttons: {
-                        cancel: 'Cancel',
-                        confirm : {className:'bg-custom-purple'},
+                        cancel: 'No',
+                        confirm : {text: "Yes", className:'bg-custom-purple'},
                     },
-                    dangerMode: false,
+                    dangerMode: true,
                 }).then((willDelete) => {
                     if (willDelete) {
                         $(form_id).submit();
