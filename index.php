@@ -42,6 +42,11 @@ include 'connection.php';
     }
     if (isset($_POST['login'])) {
         $email = $_POST['email'];
+        ?>
+        <script>
+            $("#email").val("<?php echo $email ?>");
+        </script>
+        <?php
         $password = $_POST['password'];
         $sql = "SELECT * FROM `accounts` WHERE `email` = ?";
         $stmt = $conn->prepare($sql);
