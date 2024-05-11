@@ -35,7 +35,7 @@ menuContent = `
         </a>
     </li>
     <li class="text-white font-bold">
-        <a href="eventsregistration.html" class="py-2 px-2 rounded transition-all duration-300-ease-in-out hover:text-custom-purplo hover:bg-white flex items-center align-middle">
+        <a href="eventsregistration.php" class="py-2 px-2 rounded transition-all duration-300-ease-in-out hover:text-custom-purplo hover:bg-white flex items-center align-middle">
             <svg id="mdi-plus-box-outline" class="w-6 h-6 mr-2 fill-current" viewBox="0 0 24 24">
                 <path d="M19,19V5H5V19H19M19,3A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5A2,2 0 0,1 3,19V5C3,3.89 3.9,3 5,3H19M11,7H13V11H17V13H13V17H11V13H7V11H11V7Z" />
             </svg>
