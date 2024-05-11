@@ -108,7 +108,7 @@
                                         <button class="px-4 py-2 my-1 mx-1 bg-yellow-500 text-white text-sm font-semibold rounded-lg shadow hover:bg-yellow-400" onclick="editRow(this)">Edit</button>
                                         <form method="POST" class="inline-block" id="delete-current-<?php echo str_replace(" ", "", $eid) ?>">
                                             <input type="hidden" name="eid-to-delete" value="<?php echo $eid; ?>">
-                                            <button type="button" id="delete-events-<?php echo str_replace(" ", "", $eid) ?>" class="px-2 py-2 mb-1 mx-1 bg-red-600 text-white text-sm font-semibold rounded-lg shadow hover:bg-red-500">Delete</button>
+                                            <button type="button" id="delete-event-<?php echo str_replace(" ", "", $eid) ?>" class="px-2 py-2 mb-1 mx-1 bg-red-600 text-white text-sm font-semibold rounded-lg shadow hover:bg-red-500">Delete</button>
                                         </form>
                                     </td>
                                 </tr>
@@ -237,7 +237,7 @@
         }
 
         for (let i=0; i<deleteIds.length; i++) {
-            deleteEvent("#delete-events-" + deleteIds[i], "#delete-current-" + deleteIds[i]);
+            deleteEvent("#delete-event-" + deleteIds[i], "#delete-current-" + deleteIds[i]);
         }
     </script>
     <?php
