@@ -25,7 +25,7 @@
             <input type="email" name="email" class="w-72 px-2 py-1 border-2 border-custom-purple rounded-lg mb-4" required><br>
             <label for="password" class="text-custom-purple text-md font-bold">Password:</label><br>
             <input type="password" name="password" class="w-72 px-2 py-1 border-2 border-custom-purple rounded-lg" required><br>
-            <div class="flex items-center justify-center mt-1">
+            <div class="flex items-center justify-center mt-2">
                 <button type="submit" class="mt-5 bg-custom-purple px-10 py-2 rounded-lg text-white font-bold transition-all duration-300-ease-in-out hover:bg-purple-500" name="login">Sign In</button>
             </div>
         </form>
