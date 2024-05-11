@@ -243,15 +243,14 @@ include '../connection.php';
         $firstname = ucwords($_POST['first-name']);
         $mi = ucwords($_POST['middle-initial']);
         $yearsec = strtoupper($_POST['yearsec']);
+        $email = strtolower(str_replace(" ", "", $firstname)) . "." . strtolower(str_replace(" ", "", $lastname)) . "@cbsua.edu.ph";
+        $password = "cit-" . $sid;
 
         $sql_student = "INSERT INTO `students`(`student_id`, `last_name`, `first_name`, `middle_initial`, `year_and_section`) VALUES (?, ?, ?, ?, ?)";
         $stmt_student = $conn->prepare($sql_student);
 
         $sql_account = "INSERT INTO `accounts`(`email`, `password`, `student_id`, `type`) VALUES (?, ?, ?, 'user')";
         $stmt_account = $conn->prepare($sql_account);
-
-        $email = strtolower(str_replace(" ", "", $firstname)) . "." . strtolower(str_replace(" ", "", $lastname)) . "@cbsua.edu.ph";
-        $password = "cit-" . $sid;
 
         $stmt_student->bind_param("sssss", $sid, $lastname, $firstname, $mi, $yearsec);
         $stmt_account->bind_param("sss", $email, $password, $sid);
