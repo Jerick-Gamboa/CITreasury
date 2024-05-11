@@ -139,17 +139,17 @@ include '../connection.php';
                 <h3 class="text-2xl font-semibold text-custom-purple mb-3">Add Event</h3>
                 <form method="POST">
                     <label class="ml-1 text-sm">Event ID:</label>
-                    <input type="text" name="event-id" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" required>
+                    <input type="text" name="event-id" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
                     <label class="ml-1 text-sm">Event Name:</label>
-                    <input type="text" name="event-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" required>
+                    <input type="text" name="event-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
                     <label class="ml-1 text-sm">Event Description:</label>
-                    <textarea name="event-desc" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" required></textarea>
+                    <textarea name="event-desc" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required></textarea>
                     <label class="ml-1 text-sm">Event Date:</label>
-                    <input type="date" name="event-date" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" required>
+                    <input type="date" name="event-date" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
                     <label class="ml-1 text-sm">Fee per event (₱):</label>
-                    <input type="number" id="fee-per-event" name="fee-per-event" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" required>
+                    <input type="number" id="fee-per-event" name="fee-per-event" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
                     <div class="flex items-center justify-center m-4">
-                        <button type="submit" class="px-3 py-2 bg-custom-purple rounded-lg text-base text-white font-bold hover:bg-custom-purplo" name="add-new-event">Add Event</button>
+                        <button type="submit" class="px-3 py-2 bg-custom-purple rounded-lg focus:outline-none focus:border-purple-500 text-base text-white font-bold hover:bg-custom-purplo" name="add-new-event">Add Event</button>
                     </div>
                 </form>
             </div>
@@ -167,17 +167,17 @@ include '../connection.php';
                 <h3 class="text-2xl font-semibold text-custom-purple mb-3">Edit Event</h3>
                 <form method="POST">
                     <label class="ml-1 text-sm">Event ID:</label>
-                    <input type="text" id="edit-event-id" name="edit-event-id" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" readonly>
+                    <input type="text" id="edit-event-id" name="edit-event-id" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" readonly>
                     <label class="ml-1 text-sm">Event Name:</label>
-                    <input type="text" id="edit-event-name" name="edit-event-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" required>
+                    <input type="text" id="edit-event-name" name="edit-event-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
                     <label class="ml-1 text-sm">Event Description:</label>
-                    <textarea id="edit-event-desc" name="edit-event-desc" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" required></textarea> 
+                    <textarea id="edit-event-desc" name="edit-event-desc" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required></textarea> 
                     <label class="ml-1 text-sm">Event Date:</label>
-                    <input type="date" id="edit-event-date" name="edit-event-date" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" required>
+                    <input type="date" id="edit-event-date" name="edit-event-date" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
                     <label class="ml-1 text-sm">Fee per event (₱):</label>
-                    <input type="number" id="edit-fee-per-event" name="edit-fee-per-event" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" required>
+                    <input type="number" id="edit-fee-per-event" name="edit-fee-per-event" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
                     <div class="flex items-center justify-center m-4">
-                        <button type="submit" class="px-3 py-2 bg-custom-purple rounded-lg text-base text-white font-bold hover:bg-custom-purplo" name="update-this-event">Update Event</button>
+                        <button type="submit" class="px-3 py-2 bg-custom-purple rounded-lg focus:outline-none focus:border-purple-500 text-base text-white font-bold hover:bg-custom-purplo" name="update-this-event">Update Event</button>
                     </div>
                 </form>
             </div>

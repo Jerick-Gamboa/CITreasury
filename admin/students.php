@@ -49,7 +49,7 @@ include '../connection.php';
             </div>
             <div class="mt-24 flex flex-col lg:flex-row justify-between">
                 <h1 class="text-3xl text-custom-purplo font-bold mb-3">Manage Students</h1>
-                <div class="flex flex-row w-56 p-1 mb-3 border-2 border-custom-purple  focus:border-custom-purplo rounded-lg bg-white">
+                <div class="flex flex-row w-56 p-1 mb-3 border-2 border-custom-purple focus:border-custom-purplo rounded-lg bg-white">
                     <svg id="mdi-account-search" class="h-6 w-6 mr-1 fill-custom-purple" viewBox="0 0 24 24"><path d="M15.5,12C18,12 20,14 20,16.5C20,17.38 19.75,18.21 19.31,18.9L22.39,22L21,23.39L17.88,20.32C17.19,20.75 16.37,21 15.5,21C13,21 11,19 11,16.5C11,14 13,12 15.5,12M15.5,14A2.5,2.5 0 0,0 13,16.5A2.5,2.5 0 0,0 15.5,19A2.5,2.5 0 0,0 18,16.5A2.5,2.5 0 0,0 15.5,14M10,4A4,4 0 0,1 14,8C14,8.91 13.69,9.75 13.18,10.43C12.32,10.75 11.55,11.26 10.91,11.9L10,12A4,4 0 0,1 6,8A4,4 0 0,1 10,4M2,20V18C2,15.88 5.31,14.14 9.5,14C9.18,14.78 9,15.62 9,16.5C9,17.79 9.38,19 10,20H2Z" /></svg>
                     <form method="GET">
                         <input type="text" id="student-search" name="search" placeholder="Search student..." class="w-full focus:outline-none">
@@ -135,17 +135,17 @@ include '../connection.php';
                 <h3 class="text-2xl font-semibold text-custom-purple mb-3">Add Student</h3>
                 <form method="POST">
                     <label class="ml-1 text-sm">Student ID:</label>
-                    <input type="text" name="student-id" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" maxlength="7" pattern="[0-9-]*" required>
+                    <input type="text" name="student-id" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" maxlength="7" pattern="[0-9-]*" required>
                     <label class="ml-1 text-sm">Last Name:</label>
-                    <input type="text" name="last-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" pattern="[a-zA-Z\s']+" required>
+                    <input type="text" name="last-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" pattern="[a-zA-Z\s']+" required>
                     <label class="ml-1 text-sm">First Name:</label>
-                    <input type="text" name="first-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" pattern="[a-zA-Z\s']+" required>
+                    <input type="text" name="first-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" pattern="[a-zA-Z\s']+" required>
                     <label class="ml-1 text-sm">Middle Initial:</label>
-                    <input type="text" name="middle-initial" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" maxlength="3" pattern="[a-zA-Z\s']+">
+                    <input type="text" name="middle-initial" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" maxlength="3" pattern="[a-zA-Z\s']+">
                     <label class="ml-1 text-sm">Year & Section:</label>
-                    <input type="text" name="yearsec" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" maxlength="2" pattern="[A-Za-z0-9]+" required>
+                    <input type="text" name="yearsec" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" maxlength="2" pattern="[A-Za-z0-9]+" required>
                     <div class="flex items-center justify-center m-4">
-                        <button type="submit" class="px-3 py-2 bg-custom-purple rounded-lg text-base text-white font-bold hover:bg-custom-purplo" name="add-new-student">Add Student</button>
+                        <button type="submit" class="px-3 py-2 bg-custom-purple rounded-lg focus:outline-none focus:border-purple-500 text-base text-white font-bold hover:bg-custom-purplo" name="add-new-student">Add Student</button>
                     </div>
                 </form>
             </div>
@@ -163,17 +163,17 @@ include '../connection.php';
                 <h3 class="text-2xl font-semibold text-custom-purple mb-3">Edit Student</h3>
                 <form method="POST">
                     <label class="ml-1 text-sm">Student ID:</label>
-                    <input type="text" id="edit-student-id" name="edit-student-id" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" maxlength="7" readonly>
+                    <input type="text" id="edit-student-id" name="edit-student-id" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" maxlength="7" readonly>
                     <label class="ml-1 text-sm">Last Name:</label>
-                    <input type="text" id="edit-last-name" name="edit-last-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" pattern="[a-zA-Z\s']+" required>
+                    <input type="text" id="edit-last-name" name="edit-last-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" pattern="[a-zA-Z\s']+" required>
                     <label class="ml-1 text-sm">First Name:</label>
-                    <input type="text" id="edit-first-name" name="edit-first-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" pattern="[a-zA-Z\s']+" required>
+                    <input type="text" id="edit-first-name" name="edit-first-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" pattern="[a-zA-Z\s']+" required>
                     <label class="ml-1 text-sm">Middle Initial:</label>
-                    <input type="text" id="edit-middle-initial" name="edit-middle-initial" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" maxlength="3" pattern="[a-zA-Z\s']+">
+                    <input type="text" id="edit-middle-initial" name="edit-middle-initial" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" maxlength="3" pattern="[a-zA-Z\s']+">
                     <label class="ml-1 text-sm">Year & Section:</label>
-                    <input type="text" id="edit-yearsec" name="edit-yearsec" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 bg-purple-100" maxlength="2" pattern="[A-Za-z0-9]+" required>
+                    <input type="text" id="edit-yearsec" name="edit-yearsec" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" maxlength="2" pattern="[A-Za-z0-9]+" required>
                     <div class="flex items-center justify-center m-4">
-                        <button type="submit" class="px-3 py-2 bg-custom-purple rounded-lg text-base text-white font-bold hover:bg-custom-purplo" name="update-this-student">Update Student</button>
+                        <button type="submit" class="px-3 py-2 bg-custom-purple rounded-lg focus:outline-none focus:border-purple-500 text-base text-white font-bold hover:bg-custom-purplo" name="update-this-student">Update Student</button>
                     </div>
                 </form>
             </div>
