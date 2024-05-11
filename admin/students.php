@@ -211,29 +211,8 @@ include '../connection.php';
             }
         }
 
-        function deleteStudent(button_id, form_id) {
-            $(button_id).click((event) => {
-                event.preventDefault();
-                swal({
-                    title: "Delete this student?",
-                    text: "This action can't be undone.",
-                    icon: "info",
-                    buttons: true,
-                    buttons: {
-                        cancel: 'No',
-                        confirm : {text: "Yes", className:'bg-custom-purple'},
-                    },
-                    dangerMode: true,
-                }).then((willDelete) => {
-                    if (willDelete) {
-                        $(form_id).submit();
-                    }
-                });
-            });
-        }
-
         for (let i=0; i<namesArray.length; i++) {
-            deleteStudent("#delete-student-" + namesArray[i][0], "#delete-current-" + namesArray[i][0]);
+            deleteData("#delete-student-" + namesArray[i][0], "#delete-current-" + namesArray[i][0], "Delete this student?", "This action can't be undone.");
         }
     </script>
     <?php

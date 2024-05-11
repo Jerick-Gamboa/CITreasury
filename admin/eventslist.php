@@ -216,29 +216,8 @@ include '../connection.php';
             $("#edit-fee-per-event").val(row.cells[4].innerHTML);
         }
 
-        function deleteEvent(button_id, form_id) {
-            $(button_id).click((event) => {
-                event.preventDefault();
-                swal({
-                    title: "Delete this event?",
-                    text: "This action can't be undone.",
-                    icon: "info",
-                    buttons: true,
-                    buttons: {
-                        cancel: 'No',
-                        confirm : {text: "Yes", className:'bg-custom-purple'},
-                    },
-                    dangerMode: true,
-                }).then((willDelete) => {
-                    if (willDelete) {
-                        $(form_id).submit();
-                    }
-                });
-            });
-        }
-
         for (let i=0; i<deleteIds.length; i++) {
-            deleteEvent("#delete-event-" + deleteIds[i], "#delete-current-" + deleteIds[i]);
+            deleteData("#delete-event-" + deleteIds[i], "#delete-current-" + deleteIds[i], "Delete this event?", "This action can't be undone.");
         }
     </script>
     <?php
