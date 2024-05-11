@@ -10,8 +10,21 @@
     <script src="../js/apexcharts.js"></script>
     <script src="../js/predefined-script.js"></script>
     <script src="../js/defer-script.js" defer></script>
+    <?php
+    include '../connection.php';
+    ?>
+    <title>CITreasury - Events</title>
 </head>
 <body>
+    <?php
+    if (isset($_COOKIE['cit-email']) && isset($_COOKIE['cit-password'])) {
+        if ($_COOKIE['cit-type'] === 'user') {
+            header("location: ../user/index.php");
+        }
+    } else {
+        header("location: ../index.php");
+    }
+    ?>
     <nav class="fixed w-full bg-custom-purple flex flex-row shadow shadow-gray-800">
         <img src="../img/nobgcitsclogo.png" class="w-12 h-12 my-2 ml-8">
         <h1 class="text-3xl p-3 font-bold text-white">CITreasury</h1>
