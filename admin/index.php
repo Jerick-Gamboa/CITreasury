@@ -1,11 +1,12 @@
 <!DOCTYPE html>
+<?php
+include '../connection.php';
+?>
 <html lang="en">
 <head>
-    <?php
-    include '../connection.php';
-    ?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../img/nobgcitsclogo.png">
     <script src="../js/tailwind3.4.1.js"></script>
     <script src="../js/tailwind.config.js"></script>
     <script src="../js/sweetalert.min.js"></script>

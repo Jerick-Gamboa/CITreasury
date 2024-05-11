@@ -1,17 +1,18 @@
 <!DOCTYPE html>
+<?php
+include '../connection.php';
+?>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../img/nobgcitsclogo.png">
     <script src="../js/tailwind3.4.1.js"></script>
     <script src="../js/tailwind.config.js"></script>
     <script src="../js/sweetalert.min.js"></script>
     <script src="../js/jquery-3.7.1.min.js"></script>
     <script src="../js/predefined-script.js"></script>
     <script src="../js/defer-script.js" defer></script>
-    <?php
-    include '../connection.php';
-    ?>
     <title>CITreasury - Students</title>
 </head>
 <body>

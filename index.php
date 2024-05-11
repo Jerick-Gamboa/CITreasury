@@ -1,9 +1,9 @@
+<?php
+include 'connection.php';
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <?php
-    include 'connection.php';
-    ?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="js/tailwind3.4.1.js"></script>
