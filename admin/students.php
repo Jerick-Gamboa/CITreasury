@@ -234,10 +234,10 @@ include '../connection.php';
         $stmt_student->bind_param("sssss", $sid, $lastname, $firstname, $mi, $yearsec);
         $stmt_account->bind_param("sss", $email, $password, $sid);
 
-        if ($stmt_student->execute() && $stmt_account->execute()) {
+        if ($stmt_student->execute()) {
             ?>
             <script>
-                swal('Student added successfully!', '', 'success')
+                swal('Student added successfully!', '<?php echo $stmt_account->execute() ? "Default account for that student also created." : "But default student account failed to create." ?>', 'success')
                 .then((okay) => {
                     window.location.href = 'students.php';
                 });
@@ -263,17 +263,17 @@ include '../connection.php';
 
         $stmt_update_account->bind_param("ss", $email, $sid);
         $stmt_update_student->bind_param("sssss", $lastname, $firstname, $mi, $yearsec, $sid);
-        if ($stmt_update_account->execute() && $stmt_update_student->execute()) {
+        if ($stmt_update_student->execute()) {
             ?>
             <script>
-                swal('Student updated successfully!', '', 'success')
+                swal('Student updated successfully!', '<?php echo $stmt_update_account->execute() ? "Modifying the name can also modify the student\'s email." : "But student email failed to update." ?>', 'success')
                 .then((okay) => {
                     window.location.href = 'students.php';
                 });
             </script>
             <?php
         } else {
-            ?><script>swal('Failed to add student!', '', 'error');</script>"<?php
+            ?><script>swal('Failed to update student!', '', 'error');</script>"<?php
         }
     }
     if (isset($_POST['sid-to-delete'])) {
@@ -288,11 +288,11 @@ include '../connection.php';
 
         if ($stmt_delete_account->execute() && $stmt_delete_student->execute()) {
             ?>
-            <script>swal('Successfully deleted', '', 'success').then(() => window.location.href = "students.php")</script>
+            <script>swal('Student successfully deleted', '', 'success').then(() => window.location.href = "students.php")</script>
             <?php
         } else {
             ?>
-            <script>swal('Deletion failed', '', 'error');</script>
+            <script>swal('Student deletion failed', '', 'error');</script>
             <?php
         }
     }

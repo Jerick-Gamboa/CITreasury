@@ -275,7 +275,7 @@ include '../connection.php';
             <?php
         } else {
             ?>
-            <script>swal('Deletion failed', '', 'error');</script>
+            <script>swal('Event deletion failed', '', 'error');</script>
             <?php
         }
     }
