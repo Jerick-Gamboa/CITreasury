@@ -174,41 +174,34 @@
         </div>
     </div>
     <script type="text/javascript">
-        $("#popup-bg").removeClass("hidden");
-        $("#popup-item").removeClass("hidden");
-        $("#popup-bg").hide();
-        $("#popup-item").hide();
+        $("#popup-bg, #popup-item, #edit-popup-bg, #edit-popup-item").removeClass("hidden");
+        $("#popup-bg, #popup-item, #edit-popup-bg, #edit-popup-item").hide();
         $("#add-student").click((event) => {
             $("#popup-bg").fadeIn(150);
             $("#popup-item").delay(150).fadeIn(150);
             $("#close-popup").click((event) => {
-                $("#popup-bg").fadeOut(150);
-                $("#popup-item").fadeOut(150);
+                $("#popup-bg, #popup-item").fadeOut(150);
             });
         });
-        $("#edit-popup-bg").removeClass("hidden");
-        $("#edit-popup-item").removeClass("hidden");
-        $("#edit-popup-bg").hide();
-        $("#edit-popup-item").hide();
 
         function editRow(link) {
             $("#edit-popup-bg").fadeIn(150);
             $("#edit-popup-item").delay(150).fadeIn(150);
-            $("#edit-close-popup").click((event) => {
-                $("#edit-popup-bg").fadeOut(150);
-                $("#edit-popup-item").fadeOut(150);
+            $("#edit-close-popup").click(function() {
+                $("#edit-popup-bg, #edit-popup-item").fadeOut(150);
             });
-            let row = link.parentNode.parentNode;
-            for (let i=0; i<namesArray.length; i++) {
-                if (namesArray[i][0] === row.cells[0].innerHTML) {
-                    $("#edit-student-id").val(namesArray[i][0]);
-                    $("#edit-last-name").val(namesArray[i][1]);
-                    $("#edit-first-name").val(namesArray[i][2]);
-                    let tempMidInit = namesArray[i][3];
-                    $("#edit-middle-initial").val(tempMidInit.replace(".", ""));
-                    $("#edit-yearsec").val(namesArray[i][4]);
-                    break;
-                }
+            
+            var row = $(link).closest("tr");
+            var studentId = row.find("td:eq(0)").text();
+            var studentData = namesArray.find(function(student) {
+                return student[0] === studentId;
+            });
+            if (studentData) {
+                $("#edit-student-id").val(studentData[0]);
+                $("#edit-last-name").val(studentData[1]);
+                $("#edit-first-name").val(studentData[2]);
+                $("#edit-middle-initial").val(studentData[3].replace(".", ""));
+                $("#edit-yearsec").val(studentData[4]);
             }
         }
 
