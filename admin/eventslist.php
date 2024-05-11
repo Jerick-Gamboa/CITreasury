@@ -243,7 +243,7 @@ include '../connection.php';
     </script>
     <?php
     if (isset($_POST['add-new-event'])) {
-        $eid = $_POST['event-id'];
+        $eid = str_replace(" ", "", $_POST['event-id']);
         $eventname = ucwords($_POST['event-name']);
         $eventdesc = $_POST['event-desc'];
         $eventdate = $_POST['event-date'];
@@ -265,7 +265,7 @@ include '../connection.php';
         }
     }
     if (isset($_POST['update-this-event'])) {
-        $eid = $_POST['edit-event-id'];
+        $eid = str_replace(" ", "", $_POST['edit-event-id']);
         $eventname = ucwords($_POST['edit-event-name']);
         $eventdesc = $_POST['edit-event-desc'];
         $eventdate = $_POST['edit-event-date'];
