@@ -215,7 +215,7 @@
             $("#edit-fee-per-event").val(row.cells[4].innerHTML);
         }
 
-        function deleteEvents(button_id, form_id) {
+        function deleteEvent(button_id, form_id) {
             $(button_id).click((event) => {
                 event.preventDefault();
                 swal({
@@ -237,7 +237,7 @@
         }
 
         for (let i=0; i<deleteIds.length; i++) {
-            deleteEvents("#delete-events-" + deleteIds[i], "#delete-current-" + deleteIds[i]);
+            deleteEvent("#delete-events-" + deleteIds[i], "#delete-current-" + deleteIds[i]);
         }
     </script>
     <?php
