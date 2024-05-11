@@ -61,15 +61,20 @@
                         <?php
                         $sql = "SELECT * FROM `students` JOIN `accounts` ON `students`.`student_id` = `accounts`.`student_id` WHERE `accounts`.`type` = 'user'";
                         if (isset($_GET['search'])) {
-                            $search = $_GET['search'];
-                            $sql .= " AND (`students`.`student_id` LIKE '%" . $search . "%' OR `students`.`last_name` LIKE '%" . $search . "%' OR `students`.`first_name` LIKE '%" . $search . "%' OR `students`.`year_and_section` LIKE '%" . $search . "%')";
+                            $search = '%' . $_GET['search'] . '%';
+                            $sql .= " AND (`students`.`student_id` LIKE ? OR `students`.`last_name` LIKE ? OR `students`.`first_name` LIKE ? OR `students`.`year_and_section` LIKE ?)";
                             ?>
                             <script>
-                                $("#student-search").val("<?php echo $search; ?>");
+                                $("#student-search").val("<?php echo htmlspecialchars($_GET['search']); ?>");
                             </script>
                             <?php
                         }
-                        $result = $conn->query($sql);
+                        $stmt = $conn->prepare($sql);
+                        if (isset($search)) {
+                            $stmt->bind_param("ssss", $search, $search, $search, $search);
+                        }
+                        $stmt->execute();
+                        $result = $stmt->get_result();
                         if ($result->num_rows > 0) {
                             ?>
                             <thead class="text-white uppercase bg-custom-purplo ">
@@ -301,7 +306,7 @@
 
         $stmt_delete_account->bind_param("s", $_POST['sid-to-delete']);
         $stmt_delete_student->bind_param("s", $_POST['sid-to-delete']);
-        
+
         if ($stmt_delete_account->execute() && $stmt_delete_student->execute()) {
             ?>
             <script>swal('Successfully deleted', '', 'success').then(() => window.location.href = "students.php")</script>

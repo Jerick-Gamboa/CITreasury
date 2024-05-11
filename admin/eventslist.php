@@ -61,15 +61,20 @@
                         <?php
                         $sql = "SELECT * FROM `events`";
                         if (isset($_GET['search'])) {
-                            $search = $_GET['search'];
-                            $sql .= " WHERE (`event_id` LIKE '%" . $search . "%' OR `event_name` LIKE '%" . $search . "%' OR `event_description` LIKE '%" . $search . "%' OR `event_date` LIKE '%" . $search . "%')";
+                            $search = '%' . $_GET['search'] . '%';
+                            $sql .= " WHERE (`event_id` LIKE ? OR `event_name` LIKE ? OR `event_description` LIKE ? OR `event_date` LIKE ?)";
                             ?>
                             <script>
-                                $("#event-search").val("<?php echo $search; ?>");
+                                $("#event-search").val("<?php echo htmlspecialchars($_GET['search']); ?>");
                             </script>
                             <?php
                         }
-                        $result = $conn->query($sql);
+                        $stmt = $conn->prepare($sql);
+                        if (isset($search)) {
+                            $stmt->bind_param("ssss", $search, $search, $search, $search);
+                        }
+                        $stmt->execute();
+                        $result = $stmt->get_result();
                         if ($result->num_rows > 0) {
                             ?>
                             <thead class="text-white uppercase bg-custom-purplo ">
