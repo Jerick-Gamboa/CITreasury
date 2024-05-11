@@ -238,7 +238,7 @@ include '../connection.php';
     </script>
     <?php
     if (isset($_POST['add-new-student'])) {
-        $sid = str_replace(" ", "", $_POST['student-id'])
+        $sid = str_replace(" ", "", $_POST['student-id']);
         $lastname = ucwords($_POST['last-name']);
         $firstname = ucwords($_POST['first-name']);
         $mi = ucwords($_POST['middle-initial']);
