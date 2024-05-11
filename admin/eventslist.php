@@ -242,8 +242,10 @@
         $eventdesc = $_POST['event-desc'];
         $eventdate = $_POST['event-date'];
         $feeperevent = $_POST['fee-per-event'];
-        $sql_event = "INSERT INTO `events`(`event_id`, `event_name`, `event_description`, `event_date`, `fee_per_event`) VALUES ('$eid', '$eventname', '$eventdesc', '$eventdate', '$feeperevent')";
-        if ($conn->query($sql_event)) {
+        $sql_event = "INSERT INTO `events`(`event_id`, `event_name`, `event_description`, `event_date`, `fee_per_event`) VALUES (?, ?, ?, ?, ?)";
+        $stmt_event = $conn->prepare($sql_event);
+        $stmt_event->bind_param("ssssi", $eid, $eventname, $eventdesc, $eventdate, $feeperevent);
+        if ($stmt_event->execute()) {
             ?>
             <script>
                 swal('Event added successfully!', '', 'success')
@@ -262,8 +264,10 @@
         $eventdesc = $_POST['edit-event-desc'];
         $eventdate = $_POST['edit-event-date'];
         $feeperevent = $_POST['edit-fee-per-event'];
-        $sqlupdate_event = "UPDATE `events` SET `event_name`='$eventname', `event_description`='$eventdesc', `event_date`='$eventdate', `fee_per_event`='$feeperevent' WHERE `event_id` = '$eid'";
-        if ($conn->query($sqlupdate_event)) {
+        $sqlupdate_event = "UPDATE `events` SET `event_name`=?, `event_description`=?, `event_date`=?, `fee_per_event`=? WHERE `event_id` = ?";
+        $stmt_update_event = $conn->prepare($sqlupdate_event);
+        $stmt_update_event->bind_param("sssis", $eventname, $eventdesc, $eventdate, $feeperevent, $eid);
+        if ($stmt_update_event->execute()) {
             ?>
             <script>
                 swal('Event updated successfully!', '', 'success')
@@ -277,8 +281,10 @@
         }
     }
     if (isset($_POST['eid-to-delete'])) {
-        $sqldelete_event = "DELETE FROM `events` WHERE `event_id` = '". $_POST['eid-to-delete'] . "'";
-        if ($conn->query($sqldelete_event)) {
+        $sqldelete_event = "DELETE FROM `events` WHERE `event_id` = ?";
+        $stmt_delete_event = $conn->prepare($sqldelete_event);
+        $stmt_delete_event->bind_param("s", $_POST['eid-to-delete']);
+        if ($stmt_delete_event->execute()) {
             ?>
             <script>swal('Event successfully deleted', '', 'success').then(() => window.location.href = "eventslist.php")</script>
             <?php

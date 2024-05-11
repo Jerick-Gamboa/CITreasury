@@ -237,11 +237,20 @@
         $firstname = ucwords($_POST['first-name']);
         $mi = ucwords($_POST['middle-initial']);
         $yearsec = strtoupper($_POST['yearsec']);
-        $sql_student = "INSERT INTO `students`(`student_id`, `last_name`, `first_name`, `middle_initial`, `year_and_section`) VALUES ('$sid', '$lastname', '$firstname', '$mi', '$yearsec')";
+
+        $sql_student = "INSERT INTO `students`(`student_id`, `last_name`, `first_name`, `middle_initial`, `year_and_section`) VALUES (?, ?, ?, ?, ?)";
+        $stmt_student = $conn->prepare($sql_student);
+
+        $sql_account = "INSERT INTO `accounts`(`email`, `password`, `student_id`, `type`) VALUES (?, ?, ?, 'user')";
+        $stmt_account = $conn->prepare($sql_account);
+
         $email = strtolower(str_replace(" ", "", $firstname)) . "." . strtolower(str_replace(" ", "", $lastname)) . "@cbsua.edu.ph";
         $password = "cit-" . $sid;
-        $sql_account = "INSERT INTO `accounts`(`email`, `password`, `student_id`, `type`) VALUES ('$email', '$password', '$sid', 'user')";
-        if ($conn->query($sql_student) && $conn->query($sql_account)) {
+
+        $stmt_student->bind_param("sssss", $sid, $lastname, $firstname, $mi, $yearsec);
+        $stmt_account->bind_param("sss", $email, $password, $sid);
+
+        if ($stmt_student->execute() && $stmt_account->execute()) {
             ?>
             <script>
                 swal('Student added successfully!', '', 'success')
@@ -261,9 +270,16 @@
         $mi = ucwords($_POST['edit-middle-initial']);
         $yearsec = strtoupper($_POST['edit-yearsec']);
         $email = strtolower(str_replace(" ", "", $firstname)) . "." . strtolower(str_replace(" ", "", $lastname)) . "@cbsua.edu.ph";
-        $sqlupdate_account = "UPDATE `accounts` SET `email`='$email' WHERE `student_id` = '$sid' ";
-        $sqlupdate_student = "UPDATE `students` SET `last_name`= '$lastname', `first_name`= '$firstname', `middle_initial`= '$mi', `year_and_section`= '$yearsec' WHERE `student_id` = '$sid'";
-        if ($conn->query($sqlupdate_account) && $conn->query($sqlupdate_student)) {
+
+        $sqlupdate_account = "UPDATE `accounts` SET `email`=? WHERE `student_id` = ?";
+        $stmt_update_account = $conn->prepare($sqlupdate_account);
+
+        $sqlupdate_student = "UPDATE `students` SET `last_name`= ?, `first_name`= ?, `middle_initial`= ?, `year_and_section`= ? WHERE `student_id` = ?";
+        $stmt_update_student = $conn->prepare($sqlupdate_student);
+
+        $stmt_update_account->bind_param("ss", $email, $sid);
+        $stmt_update_student->bind_param("sssss", $lastname, $firstname, $mi, $yearsec, $sid);
+        if ($stmt_update_account->execute() && $stmt_update_student->execute()) {
             ?>
             <script>
                 swal('Student updated successfully!', '', 'success')
@@ -277,9 +293,16 @@
         }
     }
     if (isset($_POST['sid-to-delete'])) {
-        $sqldelete_account = "DELETE FROM `accounts` WHERE `student_id`= '". $_POST['sid-to-delete'] . "'";
-        $sqldelete_student = "DELETE FROM `students` WHERE `student_id`= '". $_POST['sid-to-delete'] . "'";
-        if ($conn->query($sqldelete_account) && $conn->query($sqldelete_student)) {
+        $sqldelete_account = "DELETE FROM `accounts` WHERE `student_id`= ?";
+        $stmt_delete_account = $conn->prepare($sqldelete_account);
+
+        $sqldelete_student = "DELETE FROM `students` WHERE `student_id`= ?";
+        $stmt_delete_student = $conn->prepare($sqldelete_student);
+
+        $stmt_delete_account->bind_param("s", $_POST['sid-to-delete']);
+        $stmt_delete_student->bind_param("s", $_POST['sid-to-delete']);
+        
+        if ($stmt_delete_account->execute() && $stmt_delete_student->execute()) {
             ?>
             <script>swal('Successfully deleted', '', 'success').then(() => window.location.href = "students.php")</script>
             <?php
