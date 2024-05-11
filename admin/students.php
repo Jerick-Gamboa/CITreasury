@@ -214,8 +214,8 @@
                     icon: "info",
                     buttons: true,
                     buttons: {
-                        cancel: 'Cancel',
-                        confirm : {className:'bg-custom-purple'},
+                        cancel: 'No',
+                        confirm : {text: "Yes", className:'bg-custom-purple'},
                     },
                     dangerMode: true,
                 }).then((willDelete) => {
