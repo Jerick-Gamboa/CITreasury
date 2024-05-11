@@ -22,7 +22,7 @@ include 'connection.php';
         <h1 class="text-custom-purple text-4xl text-center font-bold mb-10 mt-20 opacity-90">SIGN IN</h1>
         <form method="POST">
             <label for="email" class="text-custom-purple text-md font-bold">Email:</label><br>
-            <input type="email" name="email" class="w-72 px-2 py-1 border-2 border-custom-purple rounded-lg mb-4" required><br>
+            <input type="email" name="email" id="email" class="w-72 px-2 py-1 border-2 border-custom-purple rounded-lg mb-4" required><br>
             <label for="password" class="text-custom-purple text-md font-bold">Password:</label><br>
             <input type="password" name="password" class="w-72 px-2 py-1 border-2 border-custom-purple rounded-lg" required><br>
             <div class="flex items-center justify-center mt-2">
