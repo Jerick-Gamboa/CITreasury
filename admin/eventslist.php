@@ -43,7 +43,7 @@ include '../connection.php';
         </div>
         <div class="w-full bg-red-50 px-6 min-h-screen">
             <div class="fixed bottom-10 right-6">
-                <button id="add-event" title="Add New Event">
+                <button id="add-event" class="focus:outline-none" title="Add New Event">
                     <svg id="mdi-plus-circle" class="w-16 h-16 fill-green-500 bg-white hover:fill-green-600 rounded-full shadow-md shadow-gray-500" viewBox="2 2 20 20"><path d="M17,13H13V17H11V13H7V11H11V7H13V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg>
                 </button>
             </div>
