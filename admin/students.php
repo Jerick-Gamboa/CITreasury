@@ -102,10 +102,10 @@ include '../connection.php';
                                     <td class="px-2 border-r border-black bg-purple-100"><?php echo $lastname . ', ' . $firstname . ' ' . $mi; ?></td>
                                     <td class="px-2 border-r border-black bg-purple-100"><?php echo $yearsec; ?></td>
                                     <td class="max-w-56 bg-purple-100">
-                                        <button class="px-4 py-2 my-1 mx-1 bg-yellow-500 text-white text-sm font-semibold rounded-lg shadow hover:bg-yellow-400" onclick="editRow(this)">Edit</button>
+                                        <button class="px-4 py-2 my-1 mx-1 bg-yellow-500 text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-yellow-400" onclick="editRow(this)">Edit</button>
                                         <form method="POST" class="inline-block" id="delete-current-<?php echo str_replace(" ", "", $sid) ?>">
                                             <input type="hidden" name="sid-to-delete" value="<?php echo $sid; ?>">
-                                            <button id="delete-student-<?php echo str_replace(" ", "", $sid) ?>" class="px-2 py-2 mb-1 mx-1 bg-red-600 text-white text-sm font-semibold rounded-lg shadow hover:bg-red-500">Delete</button>
+                                            <button id="delete-student-<?php echo str_replace(" ", "", $sid) ?>" class="px-2 py-2 mb-1 mx-1 bg-red-600 text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-red-500">Delete</button>
                                         </form>
                                     </td>
                                 </tr>
@@ -128,7 +128,7 @@ include '../connection.php';
         <div class="w-full min-h-screen flex items-center justify-center">
             <div class="m-5 w-full py-3 px-5 sm:w-1/2 lg:w-1/3 xl:1/4 rounded bg-white h-fit shadow-lg shadow-black">
                 <div class="w-full flex justify-end">
-                    <button id="close-popup">
+                    <button class="focus:outline-none" id="close-popup">
                         <svg id="mdi-close-box-outline" class="mt-2 w-6 h-6 hover:fill-red-500" viewBox="0 0 24 24"><path d="M19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M19,19H5V5H19V19M17,8.4L13.4,12L17,15.6L15.6,17L12,13.4L8.4,17L7,15.6L10.6,12L7,8.4L8.4,7L12,10.6L15.6,7L17,8.4Z" /></svg>
                     </button>
                 </div>
@@ -156,7 +156,7 @@ include '../connection.php';
         <div class="w-full min-h-screen flex items-center justify-center">
             <div class="m-5 w-full py-3 px-5 sm:w-1/2 lg:w-1/3 xl:1/4 rounded bg-white h-fit shadow-lg shadow-black">
                 <div class="w-full flex justify-end">
-                    <button id="edit-close-popup">
+                    <button class="focus:outline-none" id="edit-close-popup">
                         <svg id="mdi-close-box-outline" class="mt-2 w-6 h-6 hover:fill-red-500" viewBox="0 0 24 24"><path d="M19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M19,19H5V5H19V19M17,8.4L13.4,12L17,15.6L15.6,17L12,13.4L8.4,17L7,15.6L10.6,12L7,8.4L8.4,7L12,10.6L15.6,7L17,8.4Z" /></svg>
                     </button>
                 </div>
