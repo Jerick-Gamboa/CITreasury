@@ -32,22 +32,19 @@ include 'connection.php';
     </div>
     <?php
     if (isset($_COOKIE['cit-student-id'])) {
-        $sql_admin = "SELECT `student_id` FROM `accounts` WHERE `type` = 'admin' AND `student_id` = ?";
-        $stmt_admin = $conn->prepare($sql_admin);
-        $stmt_admin->bind_param("s", $_COOKIE['cit-student-id']);
-        $stmt_admin->execute();
-        $result_admin = $stmt_admin->get_result();
-
-        $sql_user = "SELECT `student_id` FROM `accounts` WHERE `type` = 'user' AND `student_id` = ?";
-        $stmt_user = $conn->prepare($sql_user);
-        $stmt_user->bind_param("s", $_COOKIE['cit-student-id']);
-        $stmt_user->execute();
-        $result_user = $stmt_user->get_result();
-
-        if ($result_admin->num_rows > 0) {
-            header("location: admin/");
-        } else if ($result_user->num_rows > 0) {
-            header("location: user/");
+        $sql = "SELECT `type` FROM `accounts` WHERE `student_id` = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $_COOKIE['cit-student-id']);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            $type = $row['type'];
+            if ($type === 'admin') {
+                header("location: admin/");
+            } elseif ($type === 'user') {
+                header("location: user/");
+            }
         }
     }
     if (isset($_POST['login'])) {
