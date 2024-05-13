@@ -23,8 +23,7 @@ include '../connection.php';
         $stmt_admin = $conn->prepare($sql_admin);
         $stmt_admin->bind_param("s", $_COOKIE['cit-student-id']);
         $stmt_admin->execute();
-        $result_admin = $stmt_admin->get_result();
-        if ($result_admin->num_rows > 0) {
+        if ($stmt_admin->get_result()->num_rows > 0) {
             header("location: ../admin/");
         }
     } else {
