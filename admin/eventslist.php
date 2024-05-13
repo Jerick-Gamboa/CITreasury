@@ -234,7 +234,7 @@ include '../connection.php';
             ?>
             <script>
                 swal('Event added successfully!', '', 'success')
-                .then((okay) => {
+                .then(() => {
                     window.location.href = 'eventslist.php';
                 });
             </script>
@@ -256,7 +256,7 @@ include '../connection.php';
             ?>
             <script>
                 swal('Event updated successfully!', '', 'success')
-                .then((okay) => {
+                .then(() => {
                     window.location.href = 'eventslist.php';
                 });
             </script>
@@ -271,7 +271,11 @@ include '../connection.php';
         $stmt_delete_event->bind_param("s", $_POST['eid-to-delete']);
         if ($stmt_delete_event->execute()) {
             ?>
-            <script>swal('Event successfully deleted', '', 'success').then(() => window.location.href = "eventslist.php")</script>
+            <script>
+                swal('Event successfully deleted', '', 'success')
+                .then(() => {
+                    window.location.href = "eventslist.php"
+                });</script>
             <?php
         } else {
             ?>

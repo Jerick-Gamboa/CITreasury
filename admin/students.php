@@ -238,7 +238,7 @@ include '../connection.php';
             ?>
             <script>
                 swal('Student added successfully!', '<?php echo $stmt_account->execute() ? "Default account for that student also created." : "But default student account failed to create." ?>', 'success')
-                .then((okay) => {
+                .then(() => {
                     window.location.href = 'students.php';
                 });
             </script>
@@ -267,7 +267,7 @@ include '../connection.php';
             ?>
             <script>
                 swal('Student updated successfully!', '<?php echo $stmt_update_account->execute() ? "Modifying the name can also modify the student\'s email." : "But student email failed to update." ?>', 'success')
-                .then((okay) => {
+                .then(() => {
                     window.location.href = 'students.php';
                 });
             </script>
@@ -288,7 +288,11 @@ include '../connection.php';
 
         if ($stmt_delete_account->execute() && $stmt_delete_student->execute()) {
             ?>
-            <script>swal('Student successfully deleted', '', 'success').then(() => window.location.href = "students.php")</script>
+            <script>
+                swal('Student successfully deleted', '', 'success')
+                .then(() => {
+                    window.location.href = "students.php"
+                });</script>
             <?php
         } else {
             ?>
