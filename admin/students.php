@@ -199,7 +199,7 @@ include '../connection.php';
             
             var row = $(link).closest("tr");
             var studentId = row.find("td:eq(0)").text();
-            var studentData = namesArray.find(function(student) {
+            var studentData = namesArray.find((student) => {
                 return student[0] === studentId;
             });
             if (studentData) {
