@@ -31,13 +31,23 @@ include 'connection.php';
         </form>
     </div>
     <?php
-    if (isset($_COOKIE['cit-email']) && isset($_COOKIE['cit-password'])) {
-        if ($_COOKIE['cit-type'] === 'admin') {
-            header("location: admin/index.php");
-        } else if ($_COOKIE['cit-type'] === 'user') {
-            header("location: user/index.php");
-        } else {
-            header("location: index.php");
+    if (isset($_COOKIE['cit-student-id'])) {
+        $sql_admin = "SELECT `student_id` FROM `accounts` WHERE `type` = 'admin' AND `student_id` = ?";
+        $stmt_admin = $conn->prepare($sql_admin);
+        $stmt_admin->bind_param("s", $_COOKIE['cit-student-id']);
+        $stmt_admin->execute();
+        $result_admin = $stmt_admin->get_result();
+
+        $sql_user = "SELECT `student_id` FROM `accounts` WHERE `type` = 'user' AND `student_id` = ?";
+        $stmt_user = $conn->prepare($sql_user);
+        $stmt_user->bind_param("s", $_COOKIE['cit-student-id']);
+        $stmt_user->execute();
+        $result_user = $stmt_user->get_result();
+
+        if ($result_admin->num_rows > 0) {
+            header("location: admin/");
+        } else if ($result_user->num_rows > 0) {
+            header("location: user/");
         }
     }
     if (isset($_POST['login'])) {
@@ -56,13 +66,7 @@ include 'connection.php';
         if ($result->num_rows > 0) {
             if ($row = $result->fetch_assoc()) {
                 if ($row['password'] === $password) {
-                    $_SESSION['cit-email'] = $row['email'];
-                    $_SESSION['cit-password'] = $row['password'];
-                    $_SESSION['cit-type'] = $row['type'];
                     $_SESSION['cit-student-id'] = $row['student_id'];
-                    setcookie('cit-email', $_SESSION['cit-email'], time() + (86400 * 30), '/');
-                    setcookie('cit-password', password_hash($_SESSION['cit-password'], PASSWORD_DEFAULT), time() + (86400 * 30), '/');
-                    setcookie('cit-type', $_SESSION['cit-type'], time() + (86400 * 30), '/');
                     setcookie('cit-student-id', $_SESSION['cit-student-id'], time() + (86400 * 30), '/');
                     if ($row['type'] === 'admin') {
                         ?>
