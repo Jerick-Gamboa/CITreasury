@@ -17,12 +17,16 @@ include '../connection.php';
 </head>
 <body>
     <?php
-    if (isset($_COOKIE['cit-email']) && isset($_COOKIE['cit-password'])) {
-        if ($_COOKIE['cit-type'] !== 'admin') {
-            header("location: ../user/index.php");
+    if (isset($_COOKIE['cit-student-id'])) {
+        $sql_user = "SELECT `student_id` FROM `accounts` WHERE `type` = 'user' AND `student_id` = ?";
+        $stmt_user = $conn->prepare($sql_user);
+        $stmt_user->bind_param("s", $_COOKIE['cit-student-id']);
+        $stmt_user->execute();
+        if ($stmt_user->get_result()->num_rows > 0) {
+            header("location: ../user/");
         }
     } else {
-        header("location: ../index.php");
+        header("location: ../");
     }
     ?>
     <nav class="fixed w-full bg-custom-purple flex flex-row shadow shadow-gray-800">
