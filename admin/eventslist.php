@@ -184,22 +184,15 @@ include '../connection.php';
         </div>
     </div>
     <script type="text/javascript">
-        $("#popup-bg").removeClass("hidden");
-        $("#popup-item").removeClass("hidden");
-        $("#popup-bg").hide();
-        $("#popup-item").hide();
+        $("#popup-bg, #popup-item, #edit-popup-bg, #edit-popup-item").removeClass("hidden");
+        $("#popup-bg, #popup-item, #edit-popup-bg, #edit-popup-item").hide();
         $("#add-event").click((event) => {
             $("#popup-bg").fadeIn(150);
             $("#popup-item").delay(150).fadeIn(150);
             $("#close-popup").click((event) => {
-                $("#popup-bg").fadeOut(150);
-                $("#popup-item").fadeOut(150);
+                $("#popup-bg, #popup-item").fadeOut(150);
             });
         });
-        $("#edit-popup-bg").removeClass("hidden");
-        $("#edit-popup-item").removeClass("hidden");
-        $("#edit-popup-bg").hide();
-        $("#edit-popup-item").hide();
 
         function editRow(link) {
             $("#edit-popup-bg").fadeIn(150);
