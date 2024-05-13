@@ -18,10 +18,8 @@ include '../connection.php';
 </head>
 <body>
     <?php
-    if (isset($_COOKIE['cit-email']) && isset($_COOKIE['cit-password'])) {
-        if ($_COOKIE['cit-type'] === 'admin') {
-            header("location: ../admin/index.php");
-        }
+    if (isset($_COOKIE['cit-email']) && isset($_COOKIE['cit-password']) && $_COOKIE['cit-type'] === 'admin') {
+        header("location: ../admin/index.php");
     } else {
         header("location: ../index.php");
     }
