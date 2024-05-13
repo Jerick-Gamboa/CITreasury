@@ -27,8 +27,8 @@ include '../connection.php';
         if ($result->num_rows > 0) {
             $row = $result->fetch_assoc();
             $type = $row['type'];
-            if ($type === 'user') {
-                header("location: ../user/");
+            if ($type === 'admin') {
+                header("location: ../admin/");
             }
         } else {
             header("location: ../");

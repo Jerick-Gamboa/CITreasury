@@ -18,12 +18,19 @@ include '../connection.php';
 <body>
     <?php
     if (isset($_COOKIE['cit-student-id'])) {
-        $sql_user = "SELECT `student_id` FROM `accounts` WHERE `type` = 'user' AND `student_id` = ?";
-        $stmt_user = $conn->prepare($sql_user);
-        $stmt_user->bind_param("s", $_COOKIE['cit-student-id']);
-        $stmt_user->execute();
-        if ($stmt_user->get_result()->num_rows > 0) {
-            header("location: ../user/");
+        $sql = "SELECT `type` FROM `accounts` WHERE `student_id` = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $_COOKIE['cit-student-id']);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            $type = $row['type'];
+            if ($type === 'user') {
+                header("location: ../user/");
+            }
+        } else {
+            header("location: ../");
         }
     } else {
         header("location: ../");
