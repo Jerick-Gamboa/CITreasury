@@ -72,19 +72,23 @@ include 'connection.php';
                         ?>
                         <script>
                             swal('Login Successful!', 'Welcome admin!', 'success')
-                            .then((okay) => {
+                            .then(() => {
                                 window.location.href = 'admin/index.php';
+                            });
+                        </script>
+                        <?php
+                    } elseif ($row['type'] === 'user') {
+                        ?>
+                        <script>
+                            swal('Login Successful!', 'Welcome user!', 'success')
+                            .then(() => {
+                                window.location.href = 'user/index.php';
                             });
                         </script>
                         <?php
                     } else {
                         ?>
-                        <script>
-                            swal('Login Successful!', 'Welcome user!', 'success')
-                            .then((okay) => {
-                                window.location.href = 'user/index.php';
-                            });
-                        </script>
+                        <script> swal('Invalid account', '', 'error');</script>
                         <?php
                     }
                     
