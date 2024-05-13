@@ -19,12 +19,19 @@ include '../connection.php';
 <body>
     <?php
     if (isset($_COOKIE['cit-student-id'])) {
-        $sql_admin = "SELECT `student_id` FROM `accounts` WHERE `type` = 'admin' AND `student_id` = ?";
-        $stmt_admin = $conn->prepare($sql_admin);
-        $stmt_admin->bind_param("s", $_COOKIE['cit-student-id']);
-        $stmt_admin->execute();
-        if ($stmt_admin->get_result()->num_rows > 0) {
-            header("location: ../admin/");
+        $sql = "SELECT `type` FROM `accounts` WHERE `student_id` = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $_COOKIE['cit-student-id']);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            $type = $row['type'];
+            if ($type === 'user') {
+                header("location: ../user/");
+            }
+        } else {
+            header("location: ../");
         }
     } else {
         header("location: ../");
