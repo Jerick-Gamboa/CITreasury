@@ -19,7 +19,7 @@ include '../connection.php';
 <body>
     <?php
     if (isset($_COOKIE['cit-email']) && isset($_COOKIE['cit-password'])) {
-        if ($_COOKIE['cit-type'] === 'user') {
+        if ($_COOKIE['cit-type'] !== 'admin') {
             header("location: ../user/index.php");
         }
     } else {
