@@ -54,58 +54,152 @@ include '../connection.php';
         <div id="menu-items-mobile" class="fixed block md:hidden h-fit top-16 w-full p-4 bg-custom-purplo opacity-95">
         </div>
         <div class="w-full bg-red-50 px-6 min-h-screen">
-            <div class="mt-24 mb-5">
-                <div class="w-full">
-                  <h1 class="text-3xl text-purple-800 font-bold ">Event Registration</h1>
+            <?php
+            # If event id is found in URL query
+            if (isset($_GET['event-id'])) {
+            ?>
+            <div class="mt-24 flex flex-col lg:flex-row justify-between">
+                <h1 class="text-3xl text-custom-purplo font-bold mb-3"><?php echo $_GET['event-id']; ?></h1>
+                <div class="flex flex-row w-56 p-1 mb-3 border-2 border-custom-purple  focus:border-custom-purplo rounded-lg bg-white">
+                    <svg id="mdi-calendar-search" class="h-6 w-6 mr-1 fill-custom-purple" viewBox="0 0 24 24"><path d="M15.5,12C18,12 20,14 20,16.5C20,17.38 19.75,18.21 19.31,18.9L22.39,22L21,23.39L17.88,20.32C17.19,20.75 16.37,21 15.5,21C13,21 11,19 11,16.5C11,14 13,12 15.5,12M15.5,14A2.5,2.5 0 0,0 13,16.5A2.5,2.5 0 0,0 15.5,19A2.5,2.5 0 0,0 18,16.5A2.5,2.5 0 0,0 15.5,14M19,8H5V19H9.5C9.81,19.75 10.26,20.42 10.81,21H5C3.89,21 3,20.1 3,19V5C3,3.89 3.89,3 5,3H6V1H8V3H16V1H18V3H19A2,2 0 0,1 21,5V13.03C20.5,12.22 19.8,11.54 19,11V8Z" /></svg>
+                    <form method="GET">
+                        <input type="text" id="event-search" name="search" placeholder="Search event..." class="w-full focus:outline-none">
+                  </form>
                 </div>
             </div>
-            <div class="w-full bg-white p-8 h-fit rounded flex flex-col justify-center items-center">
-                <form method="POST" class="w-full flex flex-col justify-center items-center">
-                    <fieldset class="w-full border-2 border-black rounded p-3 mb-3">
-                        <legend>Event</legend>
-                        <div class="flex flex-row mb-3">
-                            <label for="event-id" class="w-28 mr-3">Event ID:</label>
-                            <select name="event-id" defaultValue="" class="w-full px-2 py-1 border border-black rounded">
-                                <option value="" hidden>-</option>
-                                <option>INTRAMS</option>
-                            </select>
-                        </div>
-                        <div class="flex flex-row">
-                            <label for="event-name" class="w-28 mr-3">Event Name:</label>
-                            <input type="text" name="event-name" class="w-full px-2 py-1 border border-black rounded" readonly>
-                        </div>
-                    </fieldset>
-                    <fieldset class="w-full border-2 border-black rounded p-3">
-                        <legend>Student</legend>
-                        <div class="flex flex-row mb-3">
-                            <label for="student-id" class="w-28 mr-3">Student ID:</label>
-                            <input type="text" name="student-id" class="w-full px-2 py-1 border border-black rounded">
-                        </div>
-                        <div class="flex flex-row">
-                            <label for="student-name" class="w-28 mr-3">Student Name:</label>
-                            <input type="text" name="student-name" class="w-full px-2 py-1 border border-black rounded" readonly>
-                        </div>
-                    </fieldset>
-                    <fieldset class="w-full border-2 border-black rounded p-3">
-                        <legend>Fees</legend>
-                        <div class="flex flex-row mb-3">
-                            <label for="student-id" class="w-28 mr-3">Total Fees:</label>
-                            <input type="text" name="student-id" class="w-full px-2 py-1 border border-black rounded">
-                        </div>
-                        <div class="flex flex-row mb-3">
-                            <label for="student-name" class="w-28 mr-3">Advance Fee:</label>
-                            <input type="text" name="student-name" class="w-full px-2 py-1 border border-black rounded" readonly>
-                        </div>
-                        <div class="flex flex-row">
-                            <label for="student-name" class="w-28 mr-3">Balance:</label>
-                            <input type="text" name="student-name" class="w-full px-2 py-1 border border-black rounded" readonly>
-                        </div>
-                    </fieldset>
-                    <div class="mt-3">
-                        <button type="submit" class="px-5 py-2 my-2 mx-1 bg-green-600 text-white rounded hover:bg-green-500">Register to Event</button>
-                    </div>
-                </form>
+            <div class="mt-1 mb-5 overflow-x-auto rounded-lg shadow-lg">
+                <div class="overflow-x-auto rounded-lg border border-black">
+                    <table class="w-full px-1 text-center">
+                        <?php
+                        $sql = "SELECT *  FROM `students` JOIN `registrations` ON `students`.`student_id` = `registrations`.`student_id` AND `registrations`.`event_id` = ? ";
+                        $stmt = $conn->prepare($sql);
+                        $stmt->bind_param("s", $_GET['event-id']);
+                        $stmt->execute();
+                        $result = $stmt->get_result();
+                        if ($result->num_rows > 0) {
+                            ?>
+                            <thead class="text-white uppercase bg-custom-purplo ">
+                                <tr>
+                                    <th scope="col" class="p-2 border-r border-black">Student ID</th>
+                                    <th scope="col" class="p-2 border-r border-black">Student Name</th>
+                                    <th scope="col" class="p-2 border-r border-black">Student Description</th>
+                                    <th scope="col" class="p-2 border-r border-black">Event Date</th>
+                                    <th scope="col" class="p-2 border-r border-black">Event Fee (₱)</th>
+                                    <th scope="col" class="p-2">Actions</th>
+                                </tr>
+                            </thead>
+                            <script>
+                                const deleteIds = [];
+                            </script>
+                            <?php
+                            while($row = $result->fetch_assoc()) {
+                                $sid = $row['student_id'];
+                                $lastname = $row['last_name'];
+                                $firstname = $row['first_name'];
+                                $mi = !empty($row['middle_initial']) ? $row['middle_initial'] . '.' : "";
+                                $yearsec = $row['year_and_section'];
+                                ?>
+                                <tr class="border-t border-black">
+                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $eid; ?></td>
+                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $eventname; ?></td>
+                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $eventdesc; ?></td>
+                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $eventdate; ?></td>
+                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $feeperevent; ?></td>
+                                    <td class="max-w-56 bg-purple-100">
+                                        <button class="px-4 py-2 my-1 mx-1 bg-yellow-500 text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-yellow-400" onclick="editRow(this)">Edit</button>
+                                        <form method="POST" class="inline-block" id="delete-current-<?php echo str_replace(" ", "", $eid) ?>">
+                                            <input type="hidden" name="eid-to-delete" value="<?php echo $eid; ?>">
+                                            <button type="button" id="delete-event-<?php echo str_replace(" ", "", $eid) ?>" class="px-2 py-2 mb-1 mx-1 bg-red-600 text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-red-500">Delete</button>
+                                        </form>
+                                        <button class="px-3 py-2 my-1 mx-1 bg-blue-500 text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-blue-400">View</button>
+                                    </td>
+                                </tr>
+                                <script>
+                                    deleteIds.push("<?php echo str_replace(" ", "", $eid) ?>");
+                                </script>
+                                <?php
+                            }
+                        } else {
+                            ?><h3 class="p-4">No registrations found.</h3><?php
+                        }
+                        ?>
+                    </table>
+                </div>
             </div>
+            <?php
+            } else {
+            # If event id is not found in URL query
+            ?>
+            <div class="mt-24 flex flex-col lg:flex-row justify-between">
+                <h1 class="text-3xl text-custom-purplo font-bold mb-3">Manage Registrations</h1>
+                <div class="flex flex-row w-56 p-1 mb-3 border-2 border-custom-purple  focus:border-custom-purplo rounded-lg bg-white">
+                    <svg id="mdi-calendar-search" class="h-6 w-6 mr-1 fill-custom-purple" viewBox="0 0 24 24"><path d="M15.5,12C18,12 20,14 20,16.5C20,17.38 19.75,18.21 19.31,18.9L22.39,22L21,23.39L17.88,20.32C17.19,20.75 16.37,21 15.5,21C13,21 11,19 11,16.5C11,14 13,12 15.5,12M15.5,14A2.5,2.5 0 0,0 13,16.5A2.5,2.5 0 0,0 15.5,19A2.5,2.5 0 0,0 18,16.5A2.5,2.5 0 0,0 15.5,14M19,8H5V19H9.5C9.81,19.75 10.26,20.42 10.81,21H5C3.89,21 3,20.1 3,19V5C3,3.89 3.89,3 5,3H6V1H8V3H16V1H18V3H19A2,2 0 0,1 21,5V13.03C20.5,12.22 19.8,11.54 19,11V8Z" /></svg>
+                    <form method="GET">
+                        <input type="text" id="event-search" name="search" placeholder="Search event..." class="w-full focus:outline-none">
+                  </form>
+                </div>
+            </div>
+            <div class="mt-1 mb-5 overflow-x-auto rounded-lg shadow-lg">
+                <div class="overflow-x-auto rounded-lg border border-black">
+                    <table class="w-full px-1 text-center">
+                        <?php
+                        $sql = "SELECT * FROM `events`";
+                        $stmt = $conn->prepare($sql);
+                        $stmt->execute();
+                        $result = $stmt->get_result();
+                        if ($result->num_rows > 0) {
+                            ?>
+                            <thead class="text-white uppercase bg-custom-purplo ">
+                                <tr>
+                                    <th scope="col" class="p-2 border-r border-black">Event ID</th>
+                                    <th scope="col" class="p-2 border-r border-black">Event Name</th>
+                                    <th scope="col" class="p-2 border-r border-black">Event Description</th>
+                                    <th scope="col" class="p-2 border-r border-black">Event Date</th>
+                                    <th scope="col" class="p-2 border-r border-black">Event Fee (₱)</th>
+                                    <th scope="col" class="p-2">Actions</th>
+                                </tr>
+                            </thead>
+                            <script>
+                                const deleteIds = [];
+                            </script>
+                            <?php
+                            while($row = $result->fetch_assoc()) {
+                                $eid = $row['event_id'];
+                                $eventname = $row['event_name'];
+                                $eventdesc = $row['event_description'];
+                                $eventdate = $row['event_date'];
+                                $feeperevent = $row['fee_per_event'];
+                                ?>
+                                <tr class="border-t border-black">
+                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $eid; ?></td>
+                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $eventname; ?></td>
+                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $eventdesc; ?></td>
+                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $eventdate; ?></td>
+                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $feeperevent; ?></td>
+                                    <td class="max-w-56 bg-purple-100">
+                                        <button class="px-4 py-2 my-1 mx-1 bg-yellow-500 text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-yellow-400" onclick="editRow(this)">Edit</button>
+                                        <form method="POST" class="inline-block" id="delete-current-<?php echo str_replace(" ", "", $eid) ?>">
+                                            <input type="hidden" name="eid-to-delete" value="<?php echo $eid; ?>">
+                                            <button type="button" id="delete-event-<?php echo str_replace(" ", "", $eid) ?>" class="px-2 py-2 mb-1 mx-1 bg-red-600 text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-red-500">Delete</button>
+                                        </form>
+                                        <button class="px-3 py-2 my-1 mx-1 bg-blue-500 text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-blue-400">View</button>
+                                    </td>
+                                </tr>
+                                <script>
+                                    deleteIds.push("<?php echo str_replace(" ", "", $eid) ?>");
+                                </script>
+                                <?php
+                            }
+                        } else {
+                            ?><h3 class="p-4">No registrations found.</h3><?php
+                        }
+                        ?>
+                    </table>
+                </div>
+            </div>
+            <?php
+            }
+            ?>
         </div>
     </div>
 </body>

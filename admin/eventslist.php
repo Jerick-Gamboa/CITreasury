@@ -117,12 +117,12 @@ include '../connection.php';
                                     <td class="px-2 border-r border-black bg-purple-100"><?php echo $eventdate; ?></td>
                                     <td class="px-2 border-r border-black bg-purple-100"><?php echo $feeperevent; ?></td>
                                     <td class="max-w-56 bg-purple-100">
+                                        <a href="eventsregistration.php?event-id=<?php echo $eid ?>"><button class="px-3 py-2 my-1 mx-1 bg-blue-500 text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-blue-400">View</button></a>
                                         <button class="px-4 py-2 my-1 mx-1 bg-yellow-500 text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-yellow-400" onclick="editRow(this)">Edit</button>
-                                        <form method="POST" class="inline-block" id="delete-current-<?php echo str_replace(" ", "", $eid) ?>">
+                                        <form method="POST" class="inline-block mt-1" id="delete-current-<?php echo str_replace(" ", "", $eid) ?>">
                                             <input type="hidden" name="eid-to-delete" value="<?php echo $eid; ?>">
                                             <button type="button" id="delete-event-<?php echo str_replace(" ", "", $eid) ?>" class="px-2 py-2 mb-1 mx-1 bg-red-600 text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-red-500">Delete</button>
                                         </form>
-                                        <button class="px-3 py-2 my-1 mx-1 bg-blue-500 text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-blue-400">View</button>
                                     </td>
                                 </tr>
                                 <script>
