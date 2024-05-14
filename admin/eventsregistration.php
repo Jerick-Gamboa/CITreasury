@@ -58,12 +58,17 @@ include '../connection.php';
             # If event id is found in URL query
             if (isset($_GET['event-id'])) {
             ?>
+            <div class="fixed bottom-10 right-6">
+                <button id="register-a-student" class="focus:outline-none" title="Register a Student">
+                    <svg id="mdi-plus-circle" class="w-16 h-16 fill-green-500 bg-white hover:fill-green-600 rounded-full shadow-md shadow-gray-500" viewBox="2 2 20 20"><path d="M17,13H13V17H11V13H7V11H11V7H13V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg>
+                </button>
+            </div>
             <div class="mt-24 flex flex-col lg:flex-row justify-between">
                 <h1 class="text-3xl text-custom-purplo font-bold mb-3"><?php echo $_GET['event-id']; ?></h1>
                 <div class="flex flex-row w-56 p-1 mb-3 border-2 border-custom-purple  focus:border-custom-purplo rounded-lg bg-white">
-                    <svg id="mdi-calendar-search" class="h-6 w-6 mr-1 fill-custom-purple" viewBox="0 0 24 24"><path d="M15.5,12C18,12 20,14 20,16.5C20,17.38 19.75,18.21 19.31,18.9L22.39,22L21,23.39L17.88,20.32C17.19,20.75 16.37,21 15.5,21C13,21 11,19 11,16.5C11,14 13,12 15.5,12M15.5,14A2.5,2.5 0 0,0 13,16.5A2.5,2.5 0 0,0 15.5,19A2.5,2.5 0 0,0 18,16.5A2.5,2.5 0 0,0 15.5,14M19,8H5V19H9.5C9.81,19.75 10.26,20.42 10.81,21H5C3.89,21 3,20.1 3,19V5C3,3.89 3.89,3 5,3H6V1H8V3H16V1H18V3H19A2,2 0 0,1 21,5V13.03C20.5,12.22 19.8,11.54 19,11V8Z" /></svg>
+                    <svg id="mdi-account-search" class="h-6 w-6 mr-1 fill-custom-purple" viewBox="0 0 24 24"><path d="M15.5,12C18,12 20,14 20,16.5C20,17.38 19.75,18.21 19.31,18.9L22.39,22L21,23.39L17.88,20.32C17.19,20.75 16.37,21 15.5,21C13,21 11,19 11,16.5C11,14 13,12 15.5,12M15.5,14A2.5,2.5 0 0,0 13,16.5A2.5,2.5 0 0,0 15.5,19A2.5,2.5 0 0,0 18,16.5A2.5,2.5 0 0,0 15.5,14M10,4A4,4 0 0,1 14,8C14,8.91 13.69,9.75 13.18,10.43C12.32,10.75 11.55,11.26 10.91,11.9L10,12A4,4 0 0,1 6,8A4,4 0 0,1 10,4M2,20V18C2,15.88 5.31,14.14 9.5,14C9.18,14.78 9,15.62 9,16.5C9,17.79 9.38,19 10,20H2Z" /></svg>
                     <form method="GET">
-                        <input type="text" id="event-search" name="search" placeholder="Search event..." class="w-full focus:outline-none">
+                        <input type="text" id="event-search" name="search" placeholder="Search registered..." class="w-full focus:outline-none">
                   </form>
                 </div>
             </div>
@@ -71,7 +76,7 @@ include '../connection.php';
                 <div class="overflow-x-auto rounded-lg border border-black">
                     <table class="w-full px-1 text-center">
                         <?php
-                        $sql = "SELECT *  FROM `students` JOIN `registrations` ON `students`.`student_id` = `registrations`.`student_id` AND `registrations`.`event_id` = ? ";
+                        $sql = "SELECT `students`.*  FROM `students` JOIN `registrations` ON `students`.`student_id` = `registrations`.`student_id` AND `registrations`.`event_id` = ? ";
                         $stmt = $conn->prepare($sql);
                         $stmt->bind_param("s", $_GET['event-id']);
                         $stmt->execute();
@@ -100,11 +105,9 @@ include '../connection.php';
                                 $yearsec = $row['year_and_section'];
                                 ?>
                                 <tr class="border-t border-black">
-                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $eid; ?></td>
-                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $eventname; ?></td>
-                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $eventdesc; ?></td>
-                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $eventdate; ?></td>
-                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $feeperevent; ?></td>
+                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $sid; ?></td>
+                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $lastname . ', ' . $firstname . ' ' . $mi; ?></td>
+                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $yearsec; ?></td>
                                     <td class="max-w-56 bg-purple-100">
                                         <button class="px-4 py-2 my-1 mx-1 bg-yellow-500 text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-yellow-400" onclick="editRow(this)">Edit</button>
                                         <form method="POST" class="inline-block" id="delete-current-<?php echo str_replace(" ", "", $eid) ?>">
@@ -130,6 +133,11 @@ include '../connection.php';
             } else {
             # If event id is not found in URL query
             ?>
+            <div class="fixed bottom-10 right-6">
+                <button id="add-new-registration" class="focus:outline-none" title="Register a Student">
+                    <svg id="mdi-plus-circle" class="w-16 h-16 fill-green-500 bg-white hover:fill-green-600 rounded-full shadow-md shadow-gray-500" viewBox="2 2 20 20"><path d="M17,13H13V17H11V13H7V11H11V7H13V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg>
+                </button>
+            </div>
             <div class="mt-24 flex flex-col lg:flex-row justify-between">
                 <h1 class="text-3xl text-custom-purplo font-bold mb-3">Manage Registrations</h1>
                 <div class="flex flex-row w-56 p-1 mb-3 border-2 border-custom-purple  focus:border-custom-purplo rounded-lg bg-white">
