@@ -270,10 +270,11 @@ include '../connection.php';
     if (isset($_POST['eid-to-delete'])) {
         $sqldelete_reg = "DELETE FROM `registrations` WHERE `event_id` = ?";
         $stmt_delete_reg = $conn->prepare($sqldelete_reg);
-        $stmt_delete_reg->bind_param("s", $_POST['eid-to-delete']);
-        
+
         $sqldelete_event = "DELETE FROM `events` WHERE `event_id` = ?";
         $stmt_delete_event = $conn->prepare($sqldelete_event);
+
+        $stmt_delete_reg->bind_param("s", $_POST['eid-to-delete']);
         $stmt_delete_event->bind_param("s", $_POST['eid-to-delete']);
 
         if ($stmt_delete_reg->execute() && $stmt_delete_event->execute()) {
