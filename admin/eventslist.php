@@ -150,8 +150,6 @@ include '../connection.php';
                 </div>
                 <h3 class="text-2xl font-semibold text-custom-purple mb-3">Add Event</h3>
                 <form method="POST">
-                    <label class="ml-1 text-sm">Event ID:</label>
-                    <input type="text" name="event-id" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
                     <label class="ml-1 text-sm">Event Name:</label>
                     <input type="text" name="event-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
                     <label class="ml-1 text-sm">Event Description:</label>
@@ -227,14 +225,13 @@ include '../connection.php';
     </script>
     <?php
     if (isset($_POST['add-new-event'])) {
-        $eid = str_replace(" ", "", $_POST['event-id']);
         $eventname = ucwords($_POST['event-name']);
         $eventdesc = $_POST['event-desc'];
         $eventdate = $_POST['event-date'];
         $feeperevent = $_POST['fee-per-event'];
-        $sql_event = "INSERT INTO `events`(`event_id`, `event_name`, `event_description`, `event_date`, `fee_per_event`) VALUES (?, ?, ?, ?, ?)";
+        $sql_event = "INSERT INTO `events`(`event_name`, `event_description`, `event_date`, `fee_per_event`) VALUES (?, ?, ?, ?)";
         $stmt_event = $conn->prepare($sql_event);
-        $stmt_event->bind_param("ssssi", $eid, $eventname, $eventdesc, $eventdate, $feeperevent);
+        $stmt_event->bind_param("sssi", $eventname, $eventdesc, $eventdate, $feeperevent);
         if ($stmt_event->execute()) {
             ?>
             <script>
