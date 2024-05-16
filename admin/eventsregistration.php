@@ -85,7 +85,7 @@ include '../connection.php';
                 <div class="overflow-x-auto rounded-lg border border-black">
                     <table class="w-full px-1 text-center">
                         <?php
-                        $sql = "SELECT `students`.*, `registrations`.`registration_date`, `events`.`fee_per_event`, `events`.`fee_per_event`-`registrations`.`advance_fee` AS `balance` FROM `students` JOIN `registrations` ON `students`.`student_id` = `registrations`.`student_id` JOIN `events` ON `events`.`event_id` = `registrations`.`event_id` AND `registrations`.`event_id` = ? WHERE `events`.`fee_per_event`-`registrations`.`advance_fee` != 0";
+                        $sql = "SELECT `students`.*, `registrations`.`registration_date`, `events`.`fee_per_event`, `events`.`fee_per_event`-`registrations`.`paid_fees` AS `balance` FROM `students` JOIN `registrations` ON `students`.`student_id` = `registrations`.`student_id` JOIN `events` ON `events`.`event_id` = `registrations`.`event_id` AND `registrations`.`event_id` = ? WHERE `events`.`fee_per_event`-`registrations`.`paid_fees` != 0";
                         $stmt = $conn->prepare($sql);
                         $stmt->bind_param("s", $_GET['event-id']);
                         $stmt->execute();
@@ -138,77 +138,8 @@ include '../connection.php';
             } else {
             # If event id is not found in URL query
             ?>
-            <div class="fixed bottom-10 right-6">
-                <button id="add-new-registration" class="focus:outline-none" title="Register a Student">
-                    <svg id="mdi-plus-circle" class="w-16 h-16 fill-green-500 bg-white hover:fill-green-600 rounded-full shadow-md shadow-gray-500" viewBox="2 2 20 20"><path d="M17,13H13V17H11V13H7V11H11V7H13V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg>
-                </button>
-            </div>
             <div class="mt-24 flex flex-col lg:flex-row justify-between">
-                <h1 class="text-3xl text-custom-purplo font-bold mb-3">Manage Registrations</h1>
-                <div class="flex flex-row w-56 p-1 mb-3 border-2 border-custom-purple  focus:border-custom-purplo rounded-lg bg-white">
-                    <svg id="mdi-calendar-search" class="h-6 w-6 mr-1 fill-custom-purple" viewBox="0 0 24 24"><path d="M15.5,12C18,12 20,14 20,16.5C20,17.38 19.75,18.21 19.31,18.9L22.39,22L21,23.39L17.88,20.32C17.19,20.75 16.37,21 15.5,21C13,21 11,19 11,16.5C11,14 13,12 15.5,12M15.5,14A2.5,2.5 0 0,0 13,16.5A2.5,2.5 0 0,0 15.5,19A2.5,2.5 0 0,0 18,16.5A2.5,2.5 0 0,0 15.5,14M19,8H5V19H9.5C9.81,19.75 10.26,20.42 10.81,21H5C3.89,21 3,20.1 3,19V5C3,3.89 3.89,3 5,3H6V1H8V3H16V1H18V3H19A2,2 0 0,1 21,5V13.03C20.5,12.22 19.8,11.54 19,11V8Z" /></svg>
-                    <form method="GET">
-                        <input type="text" id="event-search" name="search" placeholder="Search event..." class="w-full focus:outline-none">
-                  </form>
-                </div>
-            </div>
-            <div class="mt-1 mb-5 overflow-x-auto rounded-lg shadow-lg">
-                <div class="overflow-x-auto rounded-lg border border-black">
-                    <table class="w-full px-1 text-center">
-                        <?php
-                        $sql = "SELECT * FROM `events`";
-                        $stmt = $conn->prepare($sql);
-                        $stmt->execute();
-                        $result = $stmt->get_result();
-                        if ($result->num_rows > 0) {
-                            ?>
-                            <thead class="text-white uppercase bg-custom-purplo ">
-                                <tr>
-                                    <th scope="col" class="p-2 border-r border-black">Event ID</th>
-                                    <th scope="col" class="p-2 border-r border-black">Event Name</th>
-                                    <th scope="col" class="p-2 border-r border-black">Event Description</th>
-                                    <th scope="col" class="p-2 border-r border-black">Event Date</th>
-                                    <th scope="col" class="p-2 border-r border-black">Event Fee (₱)</th>
-                                    <th scope="col" class="p-2">Actions</th>
-                                </tr>
-                            </thead>
-                            <script>
-                                const deleteIds = [];
-                            </script>
-                            <?php
-                            while($row = $result->fetch_assoc()) {
-                                $eid = $row['event_id'];
-                                $eventname = $row['event_name'];
-                                $eventdesc = $row['event_description'];
-                                $eventdate = $row['event_date'];
-                                $feeperevent = $row['fee_per_event'];
-                                ?>
-                                <tr class="border-t border-black">
-                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $eid; ?></td>
-                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $eventname; ?></td>
-                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $eventdesc; ?></td>
-                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $eventdate; ?></td>
-                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $feeperevent; ?></td>
-                                    <td class="max-w-56 bg-purple-100">
-                                        <button class="px-4 py-2 my-1 mx-1 bg-yellow-500 text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-yellow-400" onclick="editRow(this)">Edit</button>
-                                        <form method="POST" class="inline-block" id="delete-current-<?php echo str_replace(" ", "", $eid) ?>">
-                                            <input type="hidden" name="eid-to-delete" value="<?php echo $eid; ?>">
-                                            <button type="button" id="delete-event-<?php echo str_replace(" ", "", $eid) ?>" class="px-2 py-2 mb-1 mx-1 bg-red-600 text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-red-500">Delete</button>
-                                        </form>
-                                        <button class="px-3 py-2 my-1 mx-1 bg-blue-500 text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-blue-400">View</button>
-                                    </td>
-                                </tr>
-                                <script>
-                                    deleteIds.push("<?php echo str_replace(" ", "", $eid) ?>");
-                                </script>
-                                <?php
-                            }
-                        } else {
-                            ?><h3 class="p-4">No registrations found.</h3><?php
-                        }
-                        ?>
-                    </table>
-                </div>
+                rgsefathrs
             </div>
             <?php
             }
@@ -298,7 +229,7 @@ include '../connection.php';
     if (isset($_POST['collect-this-fee'])) {
         $sid = $_POST['collect-student-id'];
         $collectamount = $_POST['collect-amount'];
-        $sqlupdate_collect = "UPDATE `registrations` SET `advance_fee` = (`advance_fee` + ?) WHERE `event_id` = ? AND `student_id` = ? ";
+        $sqlupdate_collect = "UPDATE `registrations` SET `paid_fees` = (`paid_fees` + ?) WHERE `event_id` = ? AND `student_id` = ? ";
         $stmt_update_collect = $conn->prepare($sqlupdate_collect);
         $stmt_update_collect->bind_param("iss", $collectamount, $_GET['event-id'], $sid);
         if ($stmt_update_collect->execute()) {
@@ -317,7 +248,7 @@ include '../connection.php';
     if (isset($_POST['register-this-student'])) {
         $sid = $_POST['register-student-id'];
         $advancefee = $_POST['register-advance-fee'];
-        $sql_register = "INSERT INTO `registrations`(`event_id`, `student_id`, `registration_date`, `advance_fee`) VALUES (?, ?, NOW(), ?)";
+        $sql_register = "INSERT INTO `registrations`(`event_id`, `student_id`, `registration_date`, `paid_fees`) VALUES (?, ?, NOW(), ?)";
         $stmt_register = $conn->prepare($sql_register);
         $stmt_register->bind_param("ssi", $_GET['event-id'], $sid, $advancefee);
         if ($stmt_register->execute()) {

@@ -45,6 +45,21 @@ include '../connection.php';
         </div>
     </nav>
     <div class="flex flex-col md:flex-row bg-custom-purplo min-h-screen">
+        <?php
+        function getQueryString($conn, $sql, $target) {
+            $stmt = $conn->prepare($sql);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            if ($row = $result->fetch_assoc()) {
+                return $row[$target];
+            }
+            return "--";
+        }
+        $totalfirstyear = getQueryString($conn, "SELECT COUNT(`student_id`) FROM `students` WHERE `year_and_section` LIKE '1%'", "COUNT(`student_id`)");
+        $totalsecondyear = getQueryString($conn, "SELECT COUNT(`student_id`) FROM `students` WHERE `year_and_section` LIKE '2%'", "COUNT(`student_id`)");
+        $totalthirdyear = getQueryString($conn, "SELECT COUNT(`student_id`) FROM `students` WHERE `year_and_section` LIKE '3%'", "COUNT(`student_id`)");
+        $totalfourthyear = getQueryString($conn, "SELECT COUNT(`student_id`) FROM `students` WHERE `year_and_section` LIKE '4%'", "COUNT(`student_id`)");
+        ?>
         <div class="mt-18 md:mt-20 mx-2">
             <div id="menu-items" class="hidden md:inline-block w-64 h-full">
             </div>
@@ -56,27 +71,30 @@ include '../connection.php';
                 <h1 class="text-3xl text-custom-purplo font-bold mb-5">Dashboard</h1>
                 <div class="flex lg:flex-row flex-col">
                     <div class="w-full bg-green-600 rounded shadow-lg mr-4 mb-4">
-                        <h3 class="mx-3 my-5 text-white">1st Year</h3>
+                        <div class="w-full flex flex-row justify-between items-center">
+                            <h3 class="mx-3 my-5 text-white">Total Students</h3>
+                            <h2 class="mx-3 my-5 text-4xl font-bold text-white"><?php echo getQueryString($conn, "SELECT COUNT(`student_id`) FROM `students`", "COUNT(`student_id`)"); ?></h2>
+                        </div>
                         <div class="w-full px-3 py-2 bg-green-700 rounded-b">
-                            <a href="#" class="text-xs font-bold text-white">View Details</a>
+                            <p class="text-xs font-bold text-white">Total Number of Students in CIT</p>
                         </div>
                     </div>
                     <div class="w-full bg-yellow-600 rounded shadow-lg mr-4 mb-4">
-                        <h3 class="mx-3 my-5 text-white">2nd Year</h3>
+                        <div class="w-full flex flex-row justify-between items-center">
+                            <h3 class="mx-3 my-5 text-white">Total Fees</h3>
+                            <h2 class="mx-3 my-5 text-4xl font-bold text-white">₱ <?php echo getQueryString($conn, "SELECT SUM(`paid_fees`) FROM `registrations`", "SUM(`paid_fees`)"); ?></h2>
+                        </div>
                         <div class="w-full px-3 py-2 bg-yellow-700 rounded-b">
-                            <a href="#" class="text-xs font-bold text-white">View Details</a>
+                            <p class="text-xs font-bold text-white">Total Amount Collected </p>
                         </div>
                     </div>
                     <div class="w-full bg-red-600 rounded shadow-lg mr-4 mb-4">
-                        <h3 class="mx-3 my-5 text-white">3rd Year</h3>
-                        <div class="w-full px-3 py-2 bg-red-700 rounded-b">
-                            <a href="#" class="text-xs font-bold text-white">View Details</a>
+                        <div class="w-full flex flex-row justify-between items-center">
+                            <h3 class="mx-3 my-5 text-white">Number of Events</h3>
+                            <h2 class="mx-3 my-5 text-4xl font-bold text-white"><?php echo getQueryString($conn, "SELECT COUNT(`event_id`) FROM `events`", "COUNT(`event_id`)"); ?></h2>
                         </div>
-                    </div>
-                    <div class="w-full bg-blue-600 rounded shadow-lg mb-4">
-                        <h3 class="mx-3 my-5 text-white">4th Year</h3>
-                        <div class="w-full px-3 py-2 bg-blue-700 rounded-b">
-                            <a href="#" class="text-xs font-bold text-white">View Details</a>
+                        <div class="w-full px-3 py-2 bg-red-700 rounded-b">
+                            <p class="text-xs font-bold text-white">Total Number of Events</p>
                         </div>
                     </div>
                 </div>
@@ -84,11 +102,11 @@ include '../connection.php';
             </div>
         </div>
     </div>
-    <script type="text/javascript">  
+    <script type="text/javascript">
         const getChartOptions = () => {
           return {
-            series: [320, 46],
-            colors: ["#DD00DD", "#16BDCA"],
+            series: [<?php echo $totalfirstyear; ?>, <?php echo $totalsecondyear; ?>, <?php echo $totalthirdyear; ?>, <?php echo $totalfourthyear; ?>],
+            colors: ["#16a34a", "#ca8a04", "#dc2626", "#16BDCA"],
             chart: {
               height: 320,
               width: "100%",
@@ -130,7 +148,7 @@ include '../connection.php';
                 },
               },
             },
-            labels: ["Without Sanctions", "With Sanctions"],
+            labels: ["1st Year", "2nd Year", "3rd Year", "4th Year"],
             dataLabels: {
               enabled: false,
             },

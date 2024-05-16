@@ -56,7 +56,7 @@ CREATE TABLE `registrations` (
   `event_id` int(5) NOT NULL,
   `student_id` varchar(7) NOT NULL,
   `registration_date` date NOT NULL,
-  `advance_fee` int(11) NOT NULL,
+  `paid_fees` int(11) NOT NULL,
   PRIMARY KEY (`registration_id`),
   KEY `registrations_event_id_events_event_id` (`event_id`),
   KEY `registrations_student_id_students_student_id` (`student_id`),
