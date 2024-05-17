@@ -85,7 +85,7 @@ include '../connection.php';
                 <div class="overflow-x-auto rounded-lg border border-black">
                     <table class="w-full px-1 text-center">
                         <?php
-                        $sql = "SELECT `students`.*, `registrations`.`registration_date`, `events`.`fee_per_event`, `events`.`fee_per_event`-`registrations`.`paid_fees` AS `balance` FROM `students` JOIN `registrations` ON `students`.`student_id` = `registrations`.`student_id` JOIN `events` ON `events`.`event_id` = `registrations`.`event_id` AND `registrations`.`event_id` = ? WHERE `events`.`fee_per_event`-`registrations`.`paid_fees` != 0";
+                        $sql = "SELECT `students`.*, `registrations`.`registration_date`, `events`.`fee_per_event`, `events`.`fee_per_event`-`registrations`.`paid_fees` AS `balance` FROM `students` JOIN `registrations` ON `students`.`student_id` = `registrations`.`student_id` JOIN `events` ON `events`.`event_id` = `registrations`.`event_id` AND `registrations`.`event_id` = ? ORDER BY `paid_fees` DESC ";
                         $stmt = $conn->prepare($sql);
                         $stmt->bind_param("s", $_GET['event-id']);
                         $stmt->execute();
@@ -122,7 +122,7 @@ include '../connection.php';
                                     <td class="px-2 border-r border-black bg-purple-100"><?php echo $totalfee; ?></td>
                                     <td class="px-2 border-r border-black bg-purple-100"><?php echo $balance; ?></td>
                                     <td class="max-w-56 bg-purple-100">
-                                        <button class="px-3 py-2 my-1 mx-1 bg-green-500 text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-green-400" onclick='collect(this)'>Collect Fee</button>
+                                        <button class="px-3 py-2 my-1 mx-1 bg-green-500 text-white text-sm font-semibold rounded-lg focus:outline-none disabled:bg-gray-300 shadow hover:bg-green-400" onclick='collect(this)' <?php if ($balance == 0) echo 'disabled'; ?>>Collect Fee</button>
                                     </td>
                                 </tr>
                                 <?php
@@ -145,7 +145,7 @@ include '../connection.php';
                 <div class="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                     <?php
                     $colors = ['red', 'green', 'blue', 'yellow', 'indigo', 'purple', 'pink'];
-                    $sql_event = "SELECT * FROM `events`";
+                    $sql_event = "SELECT `events`.*, COALESCE(`registration_counts`.`registration_count`, 0) AS `registration_count` FROM `events` LEFT JOIN (SELECT `event_id`, COUNT(*) AS `registration_count` FROM `registrations` GROUP BY `event_id`) `registration_counts` ON `events`.`event_id` = `registration_counts`.`event_id`";
                     $stmt_event = $conn->prepare($sql_event);
                     $stmt_event->execute();
                     $result_event = $stmt_event->get_result();
@@ -155,13 +155,21 @@ include '../connection.php';
                             $randomColor = $colors[$i];
                             ?>
                             <div class="w-full bg-<?php echo $randomColor; ?>-600 rounded shadow-lg">
-                                <div class="w-full flex flex-row justify-between items-center">
-                                    <h3 class="mx-3 my-5 text-2xl text-white">
+                                <div class="w-full px-3 pt-3 flex flex-row justify-between items-center">
+                                    <h3 class="text-2xl text-white font-semibold">
                                         <?php echo $row_event['event_name']; ?>
                                     </h3>
-                                    <h2 class="mx-3 my-5 text-4xl font-bold text-white">
+                                    <h2 class="text-4xl font-bold text-white">
                                         ₱ <?php echo $row_event['fee_per_event']; ?>
                                     </h2>
+                                </div>
+                                <div class="w-full px-3 py-2 text-white">
+                                    <p class="my-1 text-sm font-bold">
+                                        Total Registered: <?php echo $row_event['registration_count']; ?>
+                                    </p>
+                                    <p class="my-1 text-xs">
+                                        Date: <?php echo $row_event['event_date']; ?>
+                                    </p>
                                 </div>
                                 <div class="w-full px-3 py-2 bg-<?php echo $randomColor; ?>-700 rounded-b">
                                     <a href="eventsregistration.php?event-id=<?php echo $row_event['event_id']; ?>" class="text-xs font-bold text-white">View Registrations</a>
