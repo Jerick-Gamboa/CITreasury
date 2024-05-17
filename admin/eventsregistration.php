@@ -139,43 +139,42 @@ include '../connection.php';
             # If event id is not found in URL query
             ?>
             <div class="mt-24 flex flex-col lg:flex-row justify-between">
-                rgsefathrs
+                <h1 id="event-title" class="text-3xl text-custom-purplo font-bold mb-5">Manage Registrations</h1>
             </div>
-            <div class="container mx-auto p-4">
+            <div class="container mx-auto">
                 <div class="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-                    <div class="w-full bg-red-600 rounded shadow-lg">
-                        <div class="w-full flex flex-row justify-between items-center">
-                            <h3 class="mx-3 my-5 text-white">Number of Events</h3>
-                            <h2 class="mx-3 my-5 text-4xl font-bold text-white">
-                                90
-                            </h2>
-                        </div>
-                        <div class="w-full px-3 py-2 bg-red-700 rounded-b">
-                            <p class="text-xs font-bold text-white">Total Number of Events</p>
-                        </div>
-                    </div>
-                    <div class="w-full bg-red-600 rounded shadow-lg">
-                        <div class="w-full flex flex-row justify-between items-center">
-                            <h3 class="mx-3 my-5 text-white">Number of Events</h3>
-                            <h2 class="mx-3 my-5 text-4xl font-bold text-white">
-                                90
-                            </h2>
-                        </div>
-                        <div class="w-full px-3 py-2 bg-red-700 rounded-b">
-                            <p class="text-xs font-bold text-white">Total Number of Events</p>
-                        </div>
-                    </div>
-                    <div class="w-full bg-red-600 rounded shadow-lg">
-                        <div class="w-full flex flex-row justify-between items-center">
-                            <h3 class="mx-3 my-5 text-white">Number of Events</h3>
-                            <h2 class="mx-3 my-5 text-4xl font-bold text-white">
-                                90
-                            </h2>
-                        </div>
-                        <div class="w-full px-3 py-2 bg-red-700 rounded-b">
-                            <p class="text-xs font-bold text-white">Total Number of Events</p>
-                        </div>
-                    </div>
+                    <?php
+                    $colors = ['red', 'green', 'blue', 'yellow', 'indigo', 'purple', 'pink'];
+                    $sql_event = "SELECT * FROM `events`";
+                    $stmt_event = $conn->prepare($sql_event);
+                    $stmt_event->execute();
+                    $result_event = $stmt_event->get_result();
+                    if ($result_event->num_rows > 0) {
+                        $i = 0;
+                        while ($row_event = $result_event->fetch_assoc()) {
+                            $randomColor = $colors[$i];
+                            ?>
+                            <div class="w-full bg-<?php echo $randomColor; ?>-600 rounded shadow-lg">
+                                <div class="w-full flex flex-row justify-between items-center">
+                                    <h3 class="mx-3 my-5 text-2xl text-white">
+                                        <?php echo $row_event['event_name']; ?>
+                                    </h3>
+                                    <h2 class="mx-3 my-5 text-4xl font-bold text-white">
+                                        ₱ <?php echo $row_event['fee_per_event']; ?>
+                                    </h2>
+                                </div>
+                                <div class="w-full px-3 py-2 bg-<?php echo $randomColor; ?>-700 rounded-b">
+                                    <a href="eventsregistration.php?event-id=<?php echo $row_event['event_id']; ?>" class="text-xs font-bold text-white">View Registrations</a>
+                                </div>
+                            </div>
+                            <?php
+                            $i++;
+                            if ($i == sizeof($colors)) {
+                                $i=0;
+                            }
+                        }
+                    }
+                    ?>
                 </div>
             </div>
             <?php
