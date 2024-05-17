@@ -141,6 +141,43 @@ include '../connection.php';
             <div class="mt-24 flex flex-col lg:flex-row justify-between">
                 rgsefathrs
             </div>
+            <div class="container mx-auto p-4">
+                <div class="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                    <div class="w-full bg-red-600 rounded shadow-lg">
+                        <div class="w-full flex flex-row justify-between items-center">
+                            <h3 class="mx-3 my-5 text-white">Number of Events</h3>
+                            <h2 class="mx-3 my-5 text-4xl font-bold text-white">
+                                90
+                            </h2>
+                        </div>
+                        <div class="w-full px-3 py-2 bg-red-700 rounded-b">
+                            <p class="text-xs font-bold text-white">Total Number of Events</p>
+                        </div>
+                    </div>
+                    <div class="w-full bg-red-600 rounded shadow-lg">
+                        <div class="w-full flex flex-row justify-between items-center">
+                            <h3 class="mx-3 my-5 text-white">Number of Events</h3>
+                            <h2 class="mx-3 my-5 text-4xl font-bold text-white">
+                                90
+                            </h2>
+                        </div>
+                        <div class="w-full px-3 py-2 bg-red-700 rounded-b">
+                            <p class="text-xs font-bold text-white">Total Number of Events</p>
+                        </div>
+                    </div>
+                    <div class="w-full bg-red-600 rounded shadow-lg">
+                        <div class="w-full flex flex-row justify-between items-center">
+                            <h3 class="mx-3 my-5 text-white">Number of Events</h3>
+                            <h2 class="mx-3 my-5 text-4xl font-bold text-white">
+                                90
+                            </h2>
+                        </div>
+                        <div class="w-full px-3 py-2 bg-red-700 rounded-b">
+                            <p class="text-xs font-bold text-white">Total Number of Events</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <?php
             }
             ?>
