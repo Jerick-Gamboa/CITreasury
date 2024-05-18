@@ -95,7 +95,17 @@ include '../connection.php';
                     <table class="w-full px-1 text-center">
                         <?php
                         $eventId = $_GET['event-id'];
-                        $sql = "SELECT `students`.*, `registrations`.`registration_date`, `events`.`fee_per_event`, `events`.`fee_per_event` - `registrations`.`paid_fees` AS `balance` 
+                        $sql = "SELECT  `students`.*, `registrations`.`registration_date`, 
+                                    CASE 
+                                        WHEN `events`.`event_date` < CURDATE() AND (`events`.`fee_per_event` - `registrations`.`paid_fees`) <> 0 AND `registrations`.`registration_date` < `events`.`event_date` 
+                                        THEN `events`.`fee_per_event` + `events`.`sanction_fee`
+                                        ELSE `events`.`fee_per_event`
+                                    END AS `total_fee`, 
+                                    CASE 
+                                        WHEN `events`.`event_date` < CURDATE() AND (`events`.`fee_per_event` - `registrations`.`paid_fees`) <> 0 AND `registrations`.`registration_date` < `events`.`event_date` 
+                                        THEN (`events`.`fee_per_event` + `events`.`sanction_fee`) - `registrations`.`paid_fees`
+                                        ELSE `events`.`fee_per_event` - `registrations`.`paid_fees`
+                                    END AS `balance`
                                 FROM `students` 
                                 JOIN `registrations` ON `students`.`student_id` = `registrations`.`student_id` 
                                 JOIN `events` ON `events`.`event_id` = `registrations`.`event_id` 
@@ -139,7 +149,7 @@ include '../connection.php';
                                 $mi = !empty($row['middle_initial']) ? $row['middle_initial'] . '.' : "";
                                 $yearsec = $row['year_and_section'];
                                 $regdate = $row['registration_date'];
-                                $totalfee = $row['fee_per_event'];
+                                $totalfee = $row['total_fee'];
                                 $balance = $row['balance'];
                                 ?>
                                 <tr class="border-t border-black">
@@ -150,7 +160,7 @@ include '../connection.php';
                                     <td class="px-2 border-r border-black bg-purple-100"><?php echo $totalfee; ?></td>
                                     <td class="px-2 border-r border-black bg-purple-100"><?php echo $balance; ?></td>
                                     <td class="max-w-56 bg-purple-100">
-                                        <button class="px-3 py-2 my-1 mx-1 bg-green-500 text-white text-sm font-semibold rounded-lg focus:outline-none disabled:bg-gray-400 shadow hover:bg-green-400" onclick='collect(this)' <?php if ($balance === 0) echo 'disabled'; ?>>Collect Fee</button> <!-- Disable button if balance is zero -->
+                                        <button class="px-3 py-2 my-1 mx-1 bg-green-500 text-white text-sm font-semibold rounded-lg focus:outline-none disabled:bg-gray-400 shadow hover:bg-green-400" onclick='collect(this)' <?php if ($balance <= 0) echo 'disabled'; ?>>Collect Fee</button> <!-- Disable button if balance is zero -->
                                     </td>
                                 </tr>
                                 <?php

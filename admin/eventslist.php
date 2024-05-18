@@ -104,6 +104,7 @@ include '../connection.php';
                                     <th scope="col" class="p-2 border-r border-black">Event Description</th>
                                     <th scope="col" class="p-2 border-r border-black">Event Date</th>
                                     <th scope="col" class="p-2 border-r border-black">Event Fee (₱)</th>
+                                    <th scope="col" class="p-2 border-r border-black">Sanction Fee (₱)</th>
                                     <th scope="col" class="p-2">Actions</th>
                                 </tr>
                             </thead>
@@ -117,6 +118,7 @@ include '../connection.php';
                                 $eventdesc = $row['event_description'];
                                 $eventdate = $row['event_date'];
                                 $feeperevent = $row['fee_per_event'];
+                                $sanctionfee = $row['sanction_fee'];
                                 ?>
                                 <tr class="border-t border-black">
                                     <td class="px-2 border-r border-black bg-purple-100"><?php echo $eid; ?></td>
@@ -124,6 +126,7 @@ include '../connection.php';
                                     <td class="px-2 border-r border-black bg-purple-100"><?php echo $eventdesc; ?></td>
                                     <td class="px-2 border-r border-black bg-purple-100"><?php echo $eventdate; ?></td>
                                     <td class="px-2 border-r border-black bg-purple-100"><?php echo $feeperevent; ?></td>
+                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $sanctionfee; ?></td>
                                     <td class="max-w-56 bg-purple-100">
                                         <a href="eventsregistration.php?event-id=<?php echo $eid ?>"><button class="px-3 py-2 my-1 mx-1 bg-blue-500 text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-blue-400">View</button></a>
                                         <button class="px-4 py-2 my-1 mx-1 bg-yellow-500 text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-yellow-400" onclick="editRow(this)">Edit</button>
@@ -168,6 +171,8 @@ include '../connection.php';
                     <input type="date" name="event-date" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
                     <label class="ml-1 text-sm">Fee per event (₱):</label>
                     <input type="number" id="fee-per-event" name="fee-per-event" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
+                    <label class="ml-1 text-sm">Sanction Fee (₱):</label>
+                    <input type="number" id="sanction-fee" name="sanction-fee" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
                     <div class="flex items-center justify-center m-4">
                         <button type="submit" class="px-3 py-2 bg-custom-purple rounded-lg focus:outline-none focus:border-purple-500 text-base text-white font-bold hover:bg-custom-purplo" name="add-new-event">Add Event</button>
                     </div>
@@ -198,6 +203,8 @@ include '../connection.php';
                     <input type="date" id="edit-event-date" name="edit-event-date" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
                     <label class="ml-1 text-sm">Fee per event (₱):</label>
                     <input type="number" id="edit-fee-per-event" name="edit-fee-per-event" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
+                    <label class="ml-1 text-sm">Sanction Fee (₱):</label>
+                    <input type="number" id="edit-sanction-fee" name="edit-sanction-fee" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
                     <div class="flex items-center justify-center m-4">
                         <button type="submit" class="px-3 py-2 bg-custom-purple rounded-lg focus:outline-none focus:border-purple-500 text-base text-white font-bold hover:bg-custom-purplo" name="update-this-event">Update Event</button>
                     </div>
@@ -232,6 +239,7 @@ include '../connection.php';
             $("#edit-event-desc").val(row.cells[2].innerHTML);
             $("#edit-event-date").val(row.cells[3].innerHTML);
             $("#edit-fee-per-event").val(row.cells[4].innerHTML);
+            $("#edit-sanction-fee").val(row.cells[5].innerHTML);
         }
 
         // Apply deletion of data using event-id to each unique form id and button id
@@ -246,9 +254,10 @@ include '../connection.php';
         $eventdesc = $_POST['event-desc'];
         $eventdate = $_POST['event-date'];
         $feeperevent = $_POST['fee-per-event'];
-        $sql_event = "INSERT INTO `events`(`event_name`, `event_description`, `event_date`, `fee_per_event`) VALUES (?, ?, ?, ?)";
+        $sanctionfee = $_POST['sanction-fee'];
+        $sql_event = "INSERT INTO `events`(`event_name`, `event_description`, `event_date`, `fee_per_event`, `sanction_fee`) VALUES (?, ?, ?, ?, ?)";
         $stmt_event = $conn->prepare($sql_event);
-        $stmt_event->bind_param("sssi", $eventname, $eventdesc, $eventdate, $feeperevent);
+        $stmt_event->bind_param("sssii", $eventname, $eventdesc, $eventdate, $feeperevent, $sanctionfee);
         if ($stmt_event->execute()) {
             ?>
             <script>
@@ -269,9 +278,10 @@ include '../connection.php';
         $eventdesc = $_POST['edit-event-desc'];
         $eventdate = $_POST['edit-event-date'];
         $feeperevent = $_POST['edit-fee-per-event'];
-        $sqlupdate_event = "UPDATE `events` SET `event_name`=?, `event_description`=?, `event_date`=?, `fee_per_event`=? WHERE `event_id` = ?";
+        $sanctionfee = $_POST['edit-sanction-fee'];
+        $sqlupdate_event = "UPDATE `events` SET `event_name`=?, `event_description`=?, `event_date`=?, `fee_per_event`=?, `sanction_fee`=? WHERE `event_id` = ?";
         $stmt_update_event = $conn->prepare($sqlupdate_event);
-        $stmt_update_event->bind_param("sssii", $eventname, $eventdesc, $eventdate, $feeperevent, $eid);
+        $stmt_update_event->bind_param("sssiii", $eventname, $eventdesc, $eventdate, $feeperevent, $sanctionfee, $eid);
         if ($stmt_update_event->execute()) {
             ?>
             <script>
