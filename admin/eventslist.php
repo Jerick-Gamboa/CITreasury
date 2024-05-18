@@ -253,7 +253,7 @@ include '../connection.php';
         $feeperevent = $_POST['edit-fee-per-event'];
         $sqlupdate_event = "UPDATE `events` SET `event_name`=?, `event_description`=?, `event_date`=?, `fee_per_event`=? WHERE `event_id` = ?";
         $stmt_update_event = $conn->prepare($sqlupdate_event);
-        $stmt_update_event->bind_param("sssis", $eventname, $eventdesc, $eventdate, $feeperevent, $eid);
+        $stmt_update_event->bind_param("sssii", $eventname, $eventdesc, $eventdate, $feeperevent, $eid);
         if ($stmt_update_event->execute()) {
             ?>
             <script>
@@ -274,8 +274,8 @@ include '../connection.php';
         $sqldelete_event = "DELETE FROM `events` WHERE `event_id` = ?";
         $stmt_delete_event = $conn->prepare($sqldelete_event);
 
-        $stmt_delete_reg->bind_param("s", $_POST['eid-to-delete']);
-        $stmt_delete_event->bind_param("s", $_POST['eid-to-delete']);
+        $stmt_delete_reg->bind_param("i", $_POST['eid-to-delete']);
+        $stmt_delete_event->bind_param("i", $_POST['eid-to-delete']);
 
         if ($stmt_delete_reg->execute() && $stmt_delete_event->execute()) {
             ?>
