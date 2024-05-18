@@ -181,6 +181,8 @@ include '../connection.php';
                                 $i=0;
                             }
                         }
+                    } else {
+                        ?><p>No events found.</p><?php
                     }
                     ?>
                 </div>
