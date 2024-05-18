@@ -275,7 +275,7 @@ include '../connection.php';
         $collectamount = $_POST['collect-amount'];
         $sqlupdate_collect = "UPDATE `registrations` SET `paid_fees` = (`paid_fees` + ?) WHERE `event_id` = ? AND `student_id` = ? ";
         $stmt_update_collect = $conn->prepare($sqlupdate_collect);
-        $stmt_update_collect->bind_param("iss", $collectamount, $_GET['event-id'], $sid);
+        $stmt_update_collect->bind_param("iis", $collectamount, $_GET['event-id'], $sid);
         if ($stmt_update_collect->execute()) {
             ?>
             <script>
@@ -292,10 +292,18 @@ include '../connection.php';
     if (isset($_POST['register-this-student'])) {
         $sid = $_POST['register-student-id'];
         $advancefee = $_POST['register-advance-fee'];
+
+        $sql_verify_register = "SELECT * FROM `registrations` WHERE `event_id` = ? AND `student_id` = ?";
+        $stmt_verify_register = $conn->prepare($sql_verify_register);
+        $stmt_verify_register->bind_param("is", $_GET['event-id'], $sid);
+
         $sql_register = "INSERT INTO `registrations`(`event_id`, `student_id`, `registration_date`, `paid_fees`) VALUES (?, ?, NOW(), ?)";
         $stmt_register = $conn->prepare($sql_register);
-        $stmt_register->bind_param("ssi", $_GET['event-id'], $sid, $advancefee);
-        if ($stmt_register->execute()) {
+        $stmt_register->bind_param("isi", $_GET['event-id'], $sid, $advancefee);
+
+        if ($stmt_verify_register->execute() && $stmt_verify_register->get_result()->num_rows > 0) {
+            ?><script>swal('You cant register a student twice in the event!', '', 'error');</script><?php
+        } elseif ($stmt_register->execute()) {
             ?>
             <script>
                 swal('Student registered successfully!', '', 'success')
@@ -305,7 +313,7 @@ include '../connection.php';
             </script>
             <?php
         } else {
-            ?><script>swal('Failed to register student!', '', 'error');</script>"<?php
+            ?><script>swal('Failed to register student!', '', 'error');</script><?php
         }
     }
     ?>

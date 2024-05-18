@@ -51,6 +51,9 @@ include '../connection.php';
             $stmt->execute();
             $result = $stmt->get_result();
             if ($row = $result->fetch_assoc()) {
+                if ($row[$target] === NULL) {
+                    return "0";
+                }
                 return $row[$target];
             }
             return "--";
