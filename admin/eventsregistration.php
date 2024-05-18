@@ -85,7 +85,7 @@ include '../connection.php';
                 <div class="overflow-x-auto rounded-lg border border-black">
                     <table class="w-full px-1 text-center">
                         <?php
-                        $sql = "SELECT `students`.*, `registrations`.`registration_date`, `events`.`fee_per_event`, `events`.`fee_per_event`-`registrations`.`paid_fees` AS `balance` FROM `students` JOIN `registrations` ON `students`.`student_id` = `registrations`.`student_id` JOIN `events` ON `events`.`event_id` = `registrations`.`event_id` AND `registrations`.`event_id` = ? ORDER BY `paid_fees` DESC ";
+                        $sql = "SELECT `students`.*, `registrations`.`registration_date`, `events`.`fee_per_event`, `events`.`fee_per_event`-`registrations`.`paid_fees` AS `balance` FROM `students` JOIN `registrations` ON `students`.`student_id` = `registrations`.`student_id` JOIN `events` ON `events`.`event_id` = `registrations`.`event_id` AND `registrations`.`event_id` = ? ORDER BY `balance` DESC ";
                         $stmt = $conn->prepare($sql);
                         $stmt->bind_param("s", $_GET['event-id']);
                         $stmt->execute();
@@ -122,7 +122,7 @@ include '../connection.php';
                                     <td class="px-2 border-r border-black bg-purple-100"><?php echo $totalfee; ?></td>
                                     <td class="px-2 border-r border-black bg-purple-100"><?php echo $balance; ?></td>
                                     <td class="max-w-56 bg-purple-100">
-                                        <button class="px-3 py-2 my-1 mx-1 bg-green-500 text-white text-sm font-semibold rounded-lg focus:outline-none disabled:bg-gray-300 shadow hover:bg-green-400" onclick='collect(this)' <?php if ($balance == 0) echo 'disabled'; ?>>Collect Fee</button>
+                                        <button class="px-3 py-2 my-1 mx-1 bg-green-500 text-white text-sm font-semibold rounded-lg focus:outline-none disabled:bg-gray-400 shadow hover:bg-green-400" onclick='collect(this)' <?php if ($balance == 0) echo 'disabled'; ?>>Collect Fee</button>
                                     </td>
                                 </tr>
                                 <?php
@@ -215,7 +215,7 @@ include '../connection.php';
                     <label class="ml-1 text-sm">Collected Amount (₱):</label>
                     <input type="number" id="collect-amount" name="collect-amount" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
                     <div class="flex items-center justify-center m-4">
-                        <button type="submit" class="px-3 py-2 bg-custom-purple rounded-lg focus:outline-none focus:border-purple-500 text-base text-white font-bold hover:bg-custom-purplo" name="collect-this-fee">Collect Fee</button>
+                        <button type="submit" class="px-3 py-2 bg-custom-purple rounded-lg focus:outline-none focus:border-purple-500 text-base text-white font-bold disabled:bg-gray-400 hover:bg-custom-purplo" id="collect-this-fee" name="collect-this-fee" disabled>Collect Fee</button>
                     </div>
                 </form>
             </div>
@@ -266,6 +266,22 @@ include '../connection.php';
             $("#collect-student-id").val(row.cells[0].innerHTML);
             $("#collect-total-fee").val(row.cells[4].innerHTML);
             $("#collect-balance").val(row.cells[5].innerHTML);
+
+            $("#collect-amount").on('input', () => {
+                let collectAmount = parseFloat($("#collect-amount").val());
+                let currentBalance = parseFloat(row.cells[5].innerHTML);
+
+                if (isNaN(collectAmount) || collectAmount > currentBalance || collectAmount <= 0) {
+                    $("#collect-this-fee").prop('disabled', true);
+                } else {
+                    $("#collect-this-fee").prop('disabled', false);
+                }
+
+                $("#collect-balance").val(currentBalance - parseFloat($("#collect-amount").val()));
+                if ($("#collect-amount").val() === "") {
+                    $("#collect-balance").val(row.cells[5].innerHTML);
+                }
+            });
         }
     </script>
     <?php
