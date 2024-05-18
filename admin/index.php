@@ -59,6 +59,7 @@ include '../connection.php';
             <div class="mt-24">
                 <h1 class="text-3xl text-custom-purplo font-bold mb-5">Dashboard</h1>
                 <?php
+                # Create a function to display first data in sql query
                 function getQueryString($conn, $sql, $target) {
                     $stmt = $conn->prepare($sql);
                     $stmt->execute();
@@ -112,7 +113,7 @@ include '../connection.php';
     <script type="text/javascript">
         const getChartOptions = () => {
           return {
-            series: [<?php echo $totalfirstyear; ?>, <?php echo $totalsecondyear; ?>, <?php echo $totalthirdyear; ?>, <?php echo $totalfourthyear; ?>],
+            series: [<?php echo $totalfirstyear; ?>, <?php echo $totalsecondyear; ?>, <?php echo $totalthirdyear; ?>, <?php echo $totalfourthyear; ?>], // Display all students
             colors: ["#16a34a", "#ca8a04", "#dc2626", "#16BDCA"],
             chart: {
               height: 320,

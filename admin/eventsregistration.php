@@ -77,6 +77,7 @@ include '../connection.php';
                 $stmt_title->execute();
                 $result_title = $stmt_title->get_result();
                 if ($row_title = $result_title->fetch_assoc()) {
+                    # Set event name in title using event-id in URL query
                     ?><h1 id="event-title" class="text-3xl text-custom-purplo font-bold mb-3"><?php echo $row_title['event_name']; ?></h1><?php
                 }
                 ?>
@@ -90,6 +91,7 @@ include '../connection.php';
             </div>
             <div class="mt-1 mb-5 overflow-x-auto rounded-lg shadow-lg">
                 <div class="overflow-x-auto rounded-lg border border-black">
+                    <!-- Table of Registered Students -->
                     <table class="w-full px-1 text-center">
                         <?php
                         $sql = "SELECT `students`.*, `registrations`.`registration_date`, `events`.`fee_per_event`, `events`.`fee_per_event`-`registrations`.`paid_fees` AS `balance` FROM `students` JOIN `registrations` ON `students`.`student_id` = `registrations`.`student_id` JOIN `events` ON `events`.`event_id` = `registrations`.`event_id` AND `registrations`.`event_id` = ? ORDER BY `balance` DESC ";
@@ -129,12 +131,12 @@ include '../connection.php';
                                     <td class="px-2 border-r border-black bg-purple-100"><?php echo $totalfee; ?></td>
                                     <td class="px-2 border-r border-black bg-purple-100"><?php echo $balance; ?></td>
                                     <td class="max-w-56 bg-purple-100">
-                                        <button class="px-3 py-2 my-1 mx-1 bg-green-500 text-white text-sm font-semibold rounded-lg focus:outline-none disabled:bg-gray-400 shadow hover:bg-green-400" onclick='collect(this)' <?php if ($balance == 0) echo 'disabled'; ?>>Collect Fee</button>
+                                        <button class="px-3 py-2 my-1 mx-1 bg-green-500 text-white text-sm font-semibold rounded-lg focus:outline-none disabled:bg-gray-400 shadow hover:bg-green-400" onclick='collect(this)' <?php if ($balance === 0) echo 'disabled'; ?>>Collect Fee</button> <!-- Disable button if balance is zero -->
                                     </td>
                                 </tr>
                                 <?php
                             }
-                        } else {
+                        } else { // If query returned no results, display this
                             ?><h3 class="p-4">No registrations found.</h3><?php
                         }
                         ?>
@@ -143,7 +145,7 @@ include '../connection.php';
             </div>
             <?php
             } else {
-            # If event id is not found in URL query
+            # If event id is not found in URL query, default landing page of eventregistrations.php
             ?>
             <div class="mt-24 flex flex-col lg:flex-row justify-between">
                 <h1 id="event-title" class="text-3xl text-custom-purplo font-bold mb-5">Manage Registrations</h1>
@@ -161,6 +163,7 @@ include '../connection.php';
                         while ($row_event = $result_event->fetch_assoc()) {
                             $randomColor = $colors[$i];
                             ?>
+                            <!-- Card of Events -->
                             <div class="w-full bg-<?php echo $randomColor; ?>-600 rounded shadow-lg">
                                 <div class="w-full px-3 pt-3 flex flex-row justify-between items-center">
                                     <h3 class="text-2xl text-white font-semibold">
@@ -179,7 +182,7 @@ include '../connection.php';
                                     </p>
                                 </div>
                                 <div class="w-full px-3 py-2 bg-<?php echo $randomColor; ?>-700 rounded-b">
-                                    <a href="eventsregistration.php?event-id=<?php echo $row_event['event_id']; ?>" class="text-xs font-bold text-white">View Registrations</a>
+                                    <a href="eventsregistration.php?event-id=<?php echo $row_event['event_id']; ?>" class="text-xs font-bold text-white">View Registrations</a> <!-- Add URL query with event-id -->
                                 </div>
                             </div>
                             <?php
@@ -202,7 +205,9 @@ include '../connection.php';
     <?php
     if (isset($_GET['event-id'])) {
     ?>
+    <!-- Darken Background for Modal, hidden by default -->
     <div id="collect-popup-bg" class="fixed top-0 w-full min-h-screen bg-black opacity-50 hidden"></div>
+    <!-- Popup Modal For Collecting Fees, hidden by default -->
     <div id="collect-popup-item" class="fixed top-0 w-full min-h-screen hidden">
         <div class="w-full min-h-screen flex items-center justify-center">
             <div class="m-5 w-full py-3 px-5 sm:w-1/2 lg:w-1/3 xl:1/4 rounded bg-white h-fit shadow-lg shadow-black">
@@ -228,7 +233,9 @@ include '../connection.php';
             </div>
         </div>
     </div>
+    <!-- Darken Background for Modal, hidden by default -->
     <div id="register-popup-bg" class="fixed top-0 w-full min-h-screen bg-black opacity-50 hidden"></div>
+    <!-- Popup Modal For Registration, hidden by default  -->
     <div id="register-popup-item" class="fixed top-0 w-full min-h-screen hidden">
         <div class="w-full min-h-screen flex items-center justify-center">
             <div class="m-5 w-full py-3 px-5 sm:w-1/2 lg:w-1/3 xl:1/4 rounded bg-white h-fit shadow-lg shadow-black">
@@ -254,16 +261,17 @@ include '../connection.php';
         $("#collect-popup-bg, #collect-popup-item, #register-popup-bg, #register-popup-item").removeClass("hidden");
         $("#collect-popup-bg, #collect-popup-item, #register-popup-bg, #register-popup-item").hide();
 
+        // If (+) button is pressed, fade in modals for register
         $("#register-a-student").click((event) => {
             $("#register-popup-bg").fadeIn(150);
             $("#register-popup-item").delay(150).fadeIn(150);
-            $("#register-close-popup").click((event) => {
+            $("#register-close-popup").click((event) => { // If [x] button is pressed, fade out modals
                 $("#register-popup-bg, #register-popup-item").fadeOut(150);
             });
         });
 
+        // If collect button is pressed, fade in modals for collection
         function collect(link) {
-            let row = link.parentNode.parentNode;
             $("#collect-popup-bg").fadeIn(150);
             $("#collect-popup-item").delay(150).fadeIn(150);
             $("#collect-close-popup").click((event) => {
@@ -271,20 +279,24 @@ include '../connection.php';
                 $("#collect-amount").val(null);
             });
 
+            let row = link.parentNode.parentNode; // Get table datas
+            // Transfer table data to input fields
             $("#collect-student-id").val(row.cells[0].innerHTML);
-            $("#collect-total-fee").val(row.cells[4].innerHTML);
+            $("#collect-total-fee").val(row.cells[4].innerHTML); 
             $("#collect-balance").val(row.cells[5].innerHTML);
 
-            $("#collect-amount").on('input', () => {
+            $("#collect-amount").on('input', () => { // Input change in collected amount
                 let collectAmount = parseFloat($("#collect-amount").val());
                 let currentBalance = parseFloat(row.cells[5].innerHTML);
 
                 if (isNaN(collectAmount) || collectAmount > currentBalance || collectAmount <= 0) {
-                    $("#collect-balance").val(currentBalance);
+                    // If collected amount is not valid, disable Collect Fee button and set balance input to default
                     $("#collect-this-fee").prop('disabled', true);
+                    $("#collect-balance").val(currentBalance);
                 } else {
-                    $("#collect-balance").val(currentBalance - parseFloat($("#collect-amount").val()));
+                    // If valid, enable Collect Feebutton and set balance = (current balance - collected amount)
                     $("#collect-this-fee").prop('disabled', false);
+                    $("#collect-balance").val(currentBalance - parseFloat($("#collect-amount").val()));
                 }
             });
         }
@@ -293,14 +305,16 @@ include '../connection.php';
     }
     ?>
     <?php
+    # If collect fee is submitted
     if (isset($_POST['collect-this-fee'])) {
         $sid = $_POST['collect-student-id'];
         $collectamount = $_POST['collect-amount'];
-        $sqlupdate_collect = "UPDATE `registrations` SET `paid_fees` = (`paid_fees` + ?) WHERE `event_id` = ? AND `student_id` = ? ";
+        $sqlupdate_collect = "UPDATE `registrations` SET `paid_fees` = (`paid_fees` + ?) WHERE `event_id` = ? AND `student_id` = ? "; # Update fees of student
         $stmt_update_collect = $conn->prepare($sqlupdate_collect);
         $stmt_update_collect->bind_param("iis", $collectamount, $_GET['event-id'], $sid);
         if ($stmt_update_collect->execute()) {
             ?>
+            <!-- SweetAlert popup -->
             <script>
                 swal('Fees collected!', '', 'success')
                 .then(() => {
@@ -309,24 +323,28 @@ include '../connection.php';
             </script>
             <?php
         } else {
-            ?><script>swal('Failed to collect fee!', '', 'error');</script>"<?php
+            ?><script>swal('Failed to collect fee!', '', 'error');</script><?php
         }
     }
+    # If registration is submitted
     if (isset($_POST['register-this-student'])) {
         $sid = $_POST['register-student-id'];
         $advancefee = $_POST['register-advance-fee'];
 
+        # Check first if student is already registered in current event
         $sql_verify_register = "SELECT * FROM `registrations` WHERE `event_id` = ? AND `student_id` = ?";
         $stmt_verify_register = $conn->prepare($sql_verify_register);
         $stmt_verify_register->bind_param("is", $_GET['event-id'], $sid);
 
+        # Preparation of inserting data to database
         $sql_register = "INSERT INTO `registrations`(`event_id`, `student_id`, `registration_date`, `paid_fees`) VALUES (?, ?, NOW(), ?)";
         $stmt_register = $conn->prepare($sql_register);
         $stmt_register->bind_param("isi", $_GET['event-id'], $sid, $advancefee);
 
+        # If query returned with another result for current student, then it is already registered
         if ($stmt_verify_register->execute() && $stmt_verify_register->get_result()->num_rows > 0) {
-            ?><script>swal('You cant register a student twice in the event!', '', 'error');</script><?php
-        } elseif ($stmt_register->execute()) {
+            ?><script>swal('You can\'t register a student twice in this event!', '', 'error');</script><?php
+        } elseif ($stmt_register->execute()) { # Else if no result, insert data to database
             ?>
             <script>
                 swal('Student registered successfully!', '', 'success')

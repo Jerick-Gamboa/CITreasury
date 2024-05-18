@@ -76,12 +76,13 @@ include '../connection.php';
             </div>
             <div class="mt-1 mb-5 overflow-x-auto rounded-lg shadow-lg">
                 <div class="overflow-x-auto rounded-lg border border-black">
+                    <!-- Table of Events -->
                     <table class="w-full px-1 text-center">
                         <?php
-                        $sql = "SELECT * FROM `events`";
+                        $sql = "SELECT * FROM `events`"; # Query for showing all events
                         if (isset($_GET['search'])) {
                             $search = '%' . $_GET['search'] . '%';
-                            $sql .= " WHERE (`event_id` LIKE ? OR `event_name` LIKE ? OR `event_description` LIKE ? OR `event_date` LIKE ?)";
+                            $sql .= " WHERE (`event_id` LIKE ? OR `event_name` LIKE ? OR `event_description` LIKE ? OR `event_date` LIKE ?)"; # Append this if search in URL query is found
                             ?>
                             <script>
                                 $("#event-search").val("<?php echo htmlspecialchars($_GET['search']); ?>");
@@ -107,7 +108,7 @@ include '../connection.php';
                                 </tr>
                             </thead>
                             <script>
-                                const deleteIds = [];
+                                const deleteIds = []; // Declare array to store event-id
                             </script>
                             <?php
                             while($row = $result->fetch_assoc()) {
@@ -126,14 +127,14 @@ include '../connection.php';
                                     <td class="max-w-56 bg-purple-100">
                                         <a href="eventsregistration.php?event-id=<?php echo $eid ?>"><button class="px-3 py-2 my-1 mx-1 bg-blue-500 text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-blue-400">View</button></a>
                                         <button class="px-4 py-2 my-1 mx-1 bg-yellow-500 text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-yellow-400" onclick="editRow(this)">Edit</button>
-                                        <form method="POST" class="inline-block mt-1" id="delete-current-<?php echo str_replace(" ", "", $eid) ?>">
+                                        <form method="POST" class="inline-block mt-1" id="delete-current-<?php echo $eid; ?>"> <!-- Add unique form ID for each event-id  -->
                                             <input type="hidden" name="eid-to-delete" value="<?php echo $eid; ?>">
-                                            <button type="button" id="delete-event-<?php echo str_replace(" ", "", $eid) ?>" class="px-2 py-2 mb-1 mx-1 bg-red-600 text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-red-500">Delete</button>
+                                            <button type="button" id="delete-event-<?php echo $eid; ?>" class="px-2 py-2 mb-1 mx-1 bg-red-600 text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-red-500">Delete</button> <!-- Add unique button ID for each event-id  -->
                                         </form>
                                     </td>
                                 </tr>
                                 <script>
-                                    deleteIds.push("<?php echo str_replace(" ", "", $eid) ?>");
+                                    deleteIds.push("<?php echo $eid; ?>"); // Store event-ids in array for each query is executed
                                 </script>
                                 <?php
                             }
@@ -146,7 +147,9 @@ include '../connection.php';
             </div>
         </div>
     </div>
+    <!-- Darken Background for Modal, hidden by default -->
     <div id="popup-bg" class="fixed top-0 w-full min-h-screen bg-black opacity-50 hidden"></div>
+    <!-- Popup Modal for Adding Events, hidden by default -->
     <div id="popup-item" class="fixed top-0 w-full min-h-screen hidden">
         <div class="w-full min-h-screen flex items-center justify-center">
             <div class="m-5 w-full py-3 px-5 sm:w-1/2 lg:w-1/3 xl:1/4 rounded bg-white h-fit shadow-lg shadow-black">
@@ -172,7 +175,9 @@ include '../connection.php';
             </div>
         </div>
     </div>
+    <!-- Darken Background for Modal, hidden by default -->
     <div id="edit-popup-bg" class="fixed top-0 w-full min-h-screen bg-black opacity-50 hidden"></div>
+    <!-- Popup Modal for Editing Events, hidden by default -->
     <div id="edit-popup-item" class="fixed top-0 w-full min-h-screen hidden">
         <div class="w-full min-h-screen flex items-center justify-center">
             <div class="m-5 w-full py-3 px-5 sm:w-1/2 lg:w-1/3 xl:1/4 rounded bg-white h-fit shadow-lg shadow-black">
@@ -203,22 +208,25 @@ include '../connection.php';
     <script type="text/javascript">
         $("#popup-bg, #popup-item, #edit-popup-bg, #edit-popup-item").removeClass("hidden");
         $("#popup-bg, #popup-item, #edit-popup-bg, #edit-popup-item").hide();
+        // If (+) button is pressed, fade in modals
         $("#add-event").click((event) => {
             $("#popup-bg").fadeIn(150);
             $("#popup-item").delay(150).fadeIn(150);
-            $("#close-popup").click((event) => {
+            $("#close-popup").click((event) => { // If closed, fade out modals
                 $("#popup-bg, #popup-item").fadeOut(150);
             });
         });
 
+        // If edit button is pressed, fade in modals
         function editRow(link) {
             $("#edit-popup-bg").fadeIn(150);
             $("#edit-popup-item").delay(150).fadeIn(150);
-            $("#edit-close-popup").click((event) => {
+            $("#edit-close-popup").click((event) => { // If closed, fade out modals
                 $("#edit-popup-bg").fadeOut(150);
                 $("#edit-popup-item").fadeOut(150);
             });
-            let row = link.parentNode.parentNode;
+            let row = link.parentNode.parentNode; // Get table data
+            // Transfer table data to input fields
             $("#edit-event-id").val(row.cells[0].innerHTML);
             $("#edit-event-name").val(row.cells[1].innerHTML);
             $("#edit-event-desc").val(row.cells[2].innerHTML);
@@ -226,11 +234,13 @@ include '../connection.php';
             $("#edit-fee-per-event").val(row.cells[4].innerHTML);
         }
 
+        // Apply deletion of data using event-id to each unique form id and button id
         for (let i=0; i<deleteIds.length; i++) {
             deleteData("#delete-event-" + deleteIds[i], "#delete-current-" + deleteIds[i], "Delete this event?", "This action can't be undone.");
         }
     </script>
     <?php
+    // If Add Event is submitted
     if (isset($_POST['add-new-event'])) {
         $eventname = ucwords($_POST['event-name']);
         $eventdesc = $_POST['event-desc'];
@@ -252,6 +262,7 @@ include '../connection.php';
             ?><script>swal('Failed to add event!', '', 'error');</script>"<?php
         }
     }
+    // If Add Update Event is submitted
     if (isset($_POST['update-this-event'])) {
         $eid = str_replace(" ", "", $_POST['edit-event-id']);
         $eventname = ucwords($_POST['edit-event-name']);
@@ -274,6 +285,7 @@ include '../connection.php';
             ?><script>swal('Failed to update event!', '', 'error');</script>"<?php
         }
     }
+    // If Delete Event is submitted
     if (isset($_POST['eid-to-delete'])) {
         $sqldelete_reg = "DELETE FROM `registrations` WHERE `event_id` = ?";
         $stmt_delete_reg = $conn->prepare($sqldelete_reg);

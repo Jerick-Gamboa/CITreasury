@@ -15,7 +15,7 @@ function sendNotif(notif_title, notif_body, notif_icon, notif_clicked_function) 
 
 function deleteData(button_id, form_id, title_text, desc_text) {
   $(button_id).click((event) => {
-      event.preventDefault();
+      event.preventDefault(); // Prevent from submitting the form
       swal({
           title: title_text,
           text: desc_text,
@@ -28,7 +28,7 @@ function deleteData(button_id, form_id, title_text, desc_text) {
           dangerMode: true,
       }).then((willDelete) => {
           if (willDelete) {
-              $(form_id).submit();
+              $(form_id).submit(); // Submit form if pressed Yes
           }
       });
   });
