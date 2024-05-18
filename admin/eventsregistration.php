@@ -261,6 +261,7 @@ include '../connection.php';
             $("#collect-popup-item").delay(150).fadeIn(150);
             $("#collect-close-popup").click((event) => {
                 $("#collect-popup-bg, #collect-popup-item").fadeOut(150);
+                $("#collect-amount").val(null);
             });
 
             $("#collect-student-id").val(row.cells[0].innerHTML);
@@ -272,14 +273,11 @@ include '../connection.php';
                 let currentBalance = parseFloat(row.cells[5].innerHTML);
 
                 if (isNaN(collectAmount) || collectAmount > currentBalance || collectAmount <= 0) {
+                    $("#collect-balance").val(currentBalance);
                     $("#collect-this-fee").prop('disabled', true);
                 } else {
+                    $("#collect-balance").val(currentBalance - parseFloat($("#collect-amount").val()));
                     $("#collect-this-fee").prop('disabled', false);
-                }
-
-                $("#collect-balance").val(currentBalance - parseFloat($("#collect-amount").val()));
-                if ($("#collect-amount").val() === "") {
-                    $("#collect-balance").val(row.cells[5].innerHTML);
                 }
             });
         }
