@@ -7,16 +7,18 @@ include '../connection.php';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="../img/nobgcitsclogo.png">
+    <!-- Import JavaScript files -->
     <script src="../js/tailwind3.4.1.js"></script>
     <script src="../js/tailwind.config.js"></script>
     <script src="../js/sweetalert.min.js"></script>
     <script src="../js/jquery-3.7.1.min.js"></script>
     <script src="../js/predefined-script.js"></script>
-    <script src="../js/defer-script.js" defer></script>
+    <script src="../js/defer-script.js" defer></script> <!-- Defer attribute means this javascript file will be executed once the HTML file is fully loaded -->
     <title>CITreasury - Students</title>
 </head>
 <body>
     <?php
+    # Verify if login exists such that the cookie "cit-student-id" is found on browser
     if (isset($_COOKIE['cit-student-id'])) {
         $sql = "SELECT `type` FROM `accounts` WHERE `student_id` = ?";
         $stmt = $conn->prepare($sql);
@@ -26,16 +28,17 @@ include '../connection.php';
         if ($result->num_rows > 0) {
             $row = $result->fetch_assoc();
             $type = $row['type'];
-            if ($type === 'user') {
+            if ($type === 'user') { # If account type is user, redirect to user page
                 header("location: ../user/");
             }
-        } else {
+        } else { # If account is not found, return to login page
             header("location: ../");
         }
-    } else {
+    } else { # If cookie is not found, return to login page
         header("location: ../");
     }
     ?>
+    <!-- Top Navigation Bar -->
     <nav class="fixed w-full bg-custom-purple flex flex-row shadow shadow-gray-800">
         <img src="../img/nobgcitsclogo.png" class="w-12 h-12 my-2 ml-8">
         <h1 class="text-3xl p-3 font-bold text-white">CITreasury</h1>
@@ -45,6 +48,7 @@ include '../connection.php';
             </svg>
         </div>
     </nav>
+    <!-- Body -->
     <div class="flex flex-col md:flex-row bg-custom-purplo min-h-screen">
         <div class="mt-18 md:mt-20 mx-2">
             <div id="menu-items" class="hidden md:inline-block w-64 h-full">

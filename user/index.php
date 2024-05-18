@@ -18,6 +18,7 @@ include '../connection.php';
 </head>
 <body>
     <?php
+    # Verify if login exists such that the cookie "cit-student-id" is found on browser
     if (isset($_COOKIE['cit-student-id'])) {
         $sql = "SELECT `type` FROM `accounts` WHERE `student_id` = ?";
         $stmt = $conn->prepare($sql);
@@ -27,13 +28,13 @@ include '../connection.php';
         if ($result->num_rows > 0) {
             $row = $result->fetch_assoc();
             $type = $row['type'];
-            if ($type === 'admin') {
+            if ($type === 'admin') { # If account type is admin, redirect to admin page
                 header("location: ../admin/");
             }
-        } else {
+        } else { # If account is not found, return to login page
             header("location: ../");
         }
-    } else {
+    } else { # If cookie is not found, return to login page
         header("location: ../");
     }
     ?>

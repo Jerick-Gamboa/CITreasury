@@ -6,6 +6,7 @@ include 'connection.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Import JavaScript files -->
     <script src="js/tailwind3.4.1.js"></script>
     <script src="js/tailwind.config.js"></script>
     <script src="js/sweetalert.min.js"></script>
@@ -31,6 +32,7 @@ include 'connection.php';
         </form>
     </div>
     <?php
+    # If cookie "cit-student-id" is found on the browser
     if (isset($_COOKIE['cit-student-id'])) {
         $sql = "SELECT `type` FROM `accounts` WHERE `student_id` = ?";
         $stmt = $conn->prepare($sql);
@@ -40,13 +42,15 @@ include 'connection.php';
         if ($result->num_rows > 0) {
             $row = $result->fetch_assoc();
             $type = $row['type'];
-            if ($type === 'admin') {
+            if ($type === 'admin') { # if account type is admin, redirect to admin
                 header("location: admin/");
-            } elseif ($type === 'user') {
+            } elseif ($type === 'user') { # if account type is user, redirect to user
                 header("location: user/");
             }
+            # Else, do nothing
         }
     }
+    # If "login" is submitted
     if (isset($_POST['login'])) {
         $email = $_POST['email'];
         ?>
@@ -62,8 +66,9 @@ include 'connection.php';
         $result = $stmt->get_result();
         if ($result->num_rows > 0) {
             if ($row = $result->fetch_assoc()) {
-                if ($row['password'] === $password) {
+                if ($row['password'] === $password) { # If password is equal to submitted password
                     $_SESSION['cit-student-id'] = $row['student_id'];
+                    # Store cookie in the browser for 1 month login access
                     setcookie('cit-student-id', $_SESSION['cit-student-id'], time() + (86400 * 30), '/');
                     if ($row['type'] === 'admin') {
                         ?>
@@ -88,14 +93,13 @@ include 'connection.php';
                         <script> swal('Invalid account', '', 'error');</script>
                         <?php
                     }
-                    
                 } else {
                     ?>
                     <script> swal('Incorrect password', '', 'error');</script>
                     <?php
                 }
             }
-        } else {
+        } else { # If query did not return a result
             ?>
             <script>swal('User not found', '', 'error');</script>
             <?php
