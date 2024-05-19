@@ -63,19 +63,15 @@ include '../connection.php';
             # If event id is found in URL query
             if (isset($_GET['event-id'])) {
             ?>
-            <div class="fixed bottom-10 right-6">
-                <button id="register-a-student" class="focus:outline-none" title="Register a Student">
-                    <svg id="mdi-plus-circle" class="w-16 h-16 fill-green-500 bg-white hover:fill-green-600 rounded-full shadow-md shadow-gray-500" viewBox="2 2 20 20"><path d="M17,13H13V17H11V13H7V11H11V7H13V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg>
-                </button>
-            </div>
             <div class="mt-24 flex flex-col lg:flex-row justify-between">
                 <?php
-                $sql_title = "SELECT `event_name` FROM `events` WHERE `event_id` = ?";
+                $sql_title = "SELECT `event_name`, `event_date` FROM `events` WHERE `event_id` = ?";
                 $stmt_title = $conn->prepare($sql_title);
                 $stmt_title->bind_param("s", $_GET['event-id']);
                 $stmt_title->execute();
                 $result_title = $stmt_title->get_result();
                 if ($row_title = $result_title->fetch_assoc()) {
+                    $dateofcurrenteventinget = $row_title['event_date'];
                     # Set event name in title using event-id in URL query
                     ?><h1 id="event-title" class="text-3xl text-custom-purplo font-bold mb-3"><?php echo $row_title['event_name']; ?></h1><?php
                 }
@@ -88,6 +84,19 @@ include '../connection.php';
                         <input type="text" id="registered-search" name="search" placeholder="Search registered..." class="w-full focus:outline-none">
                     </form>
                 </div>
+            </div>
+            <div class="fixed bottom-10 right-6">
+                <?php
+                # If the event has passed, disable the button, otherwise enable it
+                $isEventPast = strtotime($dateofcurrenteventinget) < strtotime(date("Y-m-d"));
+                $buttonClasses = "focus:outline-none rounded-full shadow-md shadow-gray-500";
+                $svgClasses = "w-16 h-16 bg-white rounded-full " . ($isEventPast ? "fill-gray-400" : "fill-green-500 hover:fill-green-600");
+                ?>
+                <button id="register-a-student" class="<?php echo $buttonClasses; ?>" title="Register a Student" <?php if ($isEventPast) echo "disabled"; ?>>
+                    <svg id="mdi-plus-circle" class="<?php echo $svgClasses; ?>" viewBox="2 2 20 20">
+                        <path d="M17,13H13V17H11V13H7V11H11V7H13V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" />
+                    </svg>
+                </button>
             </div>
             <div class="mt-1 mb-5 overflow-x-auto rounded-lg shadow-lg">
                 <div class="overflow-x-auto rounded-lg border border-black">
