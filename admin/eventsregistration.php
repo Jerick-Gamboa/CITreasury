@@ -87,7 +87,7 @@ include '../connection.php';
             </div>
             <div class="fixed bottom-10 right-6">
                 <?php
-                # If the event has passed, disable the button, otherwise enable it
+                # If the event has passed, disable the registration button, otherwise enable it
                 $isEventPast = strtotime($dateofcurrenteventinget) < strtotime(date("Y-m-d"));
                 $buttonClasses = "focus:outline-none rounded-full shadow-md shadow-gray-500";
                 $svgClasses = "w-16 h-16 bg-white rounded-full " . ($isEventPast ? "fill-gray-400" : "fill-green-500 hover:fill-green-600");
