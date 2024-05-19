@@ -251,7 +251,7 @@ include '../connection.php';
                 <h3 class="text-2xl font-semibold text-custom-purple mb-3">Collect Fee</h3>
                 <form method="POST">
                     <label class="ml-1 text-sm">Student ID:</label>
-                    <input type="text" id="collect-student-id" name="collect-student-id" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
+                    <input type="text" id="collect-student-id" name="collect-student-id" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" maxlength="7" readonly>
                     <label class="ml-1 text-sm">Total Fee (₱):</label>
                     <input type="number" id="collect-total-fee" name="collect-total-fee" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" readonly>
                     <label class="ml-1 text-sm">Balance (₱):</label>
