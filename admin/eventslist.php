@@ -201,10 +201,8 @@ include '../connection.php';
                     <textarea id="edit-event-desc" name="edit-event-desc" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required></textarea> 
                     <label class="ml-1 text-sm">Event Date:</label>
                     <input type="date" id="edit-event-date" name="edit-event-date" data-ripple-light="true" data-tooltip-target="tooltip" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 hover:cursor-pointer bg-purple-100" required>
-                    <div data-tooltip="tooltip" class="absolute z-50 whitespace-normal break-words rounded-lg bg-black py-1.5 px-3 font-sans text-sm font-normal text-white focus:outline-none">
-                        Be careful in changing event dates,<br>
-                        as this changes the total fee to paid<br>
-                        with respect to current date.
+                    <div data-tooltip="tooltip" class="absolute z-50 whitespace-normal break-words rounded-lg bg-red-500 py-1.5 px-3 font-sans text-xs font-normal text-white shadow shadow-black focus:outline-none">
+                        Be careful when changing event dates, as this changes the <br>total fee to be paid with respect to the current date.
                     </div>
                     <label class="ml-1 text-sm">Fee per event (₱):</label>
                     <input type="number" id="edit-fee-per-event" name="edit-fee-per-event" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
