@@ -53,7 +53,20 @@ include '../connection.php';
         </div>
         <div class="w-full bg-red-50 px-6 min-h-screen">
             <div class="mt-24">
-                <h1 class="text-3xl text-custom-purplo font-bold mb-5">Welcome, Jack Cole Linn!</h1>
+                <?php
+                $sql_title = "SELECT * FROM `students` WHERE `student_id` = ?";
+                $stmt_title = $conn->prepare($sql_title);
+                $stmt_title->bind_param("s", $_COOKIE['cit-student-id']);
+                $stmt_title->execute();
+                $result_title = $stmt_title->get_result();
+                if ($row_title = $result_title->fetch_assoc()) {
+                    $lastname = $row_title['last_name'];
+                    $firstname = $row_title['first_name'];
+                    $mi = !empty($row_title['middle_initial']) ? $row_title['middle_initial'] . '.' : "";
+                    # Set student name in title using student-id in cookie
+                    ?><h1 class="text-3xl text-custom-purplo font-bold mb-5">Welcome, <?php echo $firstname . " ". $mi . " " . $lastname; ?>!</h1><?php
+                }
+                ?>
                 <div class="flex lg:flex-row flex-col">
                     <div class="w-full p-4 bg-blue-300 rounded-lg shadow-lg mr-5 mb-5">
                         <h3 class="text-gray-800 font-bold text-lg mb-4">Upcoming events</h3>
