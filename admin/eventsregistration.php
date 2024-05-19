@@ -276,7 +276,7 @@ include '../connection.php';
                 <h3 class="text-2xl font-semibold text-custom-purple mb-3">Register a Student</h3>
                 <form method="POST">
                     <label class="ml-1 text-sm">Student ID:</label>
-                    <input type="text" id="register-student-id" name="register-student-id" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
+                    <input type="text" id="register-student-id" name="register-student-id" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" maxlength="7" required>
                     <label class="ml-1 text-sm">Advance Fee (₱):</label>
                     <input type="number" id="register-advance-fee" name="register-advance-fee" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required value="0" min="0" max="<?php echo $totalfee; ?>">
                     <div class="flex items-center justify-center m-4">
