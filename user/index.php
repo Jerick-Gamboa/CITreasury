@@ -68,7 +68,7 @@ include '../connection.php';
                 }
                 ?>
                 <div class="w-full p-4 bg-yellow-300 rounded-lg shadow-lg mb-4">
-                    <h2 class="text-2xl text-gray-800 font-semibold">Total Paid Fees: ₱ 0.00</h2>
+                    <h2 class="text-2xl text-gray-800 font-semibold">Total Paid Fees: ₱ 200</h2>
                 </div>
                 <div class="flex lg:flex-row flex-col">
                     <div class="w-full p-4 bg-blue-300 rounded-lg shadow-lg mr-5 mb-5">
