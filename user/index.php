@@ -89,7 +89,7 @@ include '../connection.php';
                                 <?php
                             }
                         } else {
-                            ?><p>No upcoming events as of now.</p><?php
+                            ?><p class="text-sm">No upcoming events as of now.</p><?php
                         }
                         ?>
                     </div>
@@ -114,7 +114,7 @@ include '../connection.php';
                                 <?php
                             }
                         } else {
-                            ?><p>You haven't registered any events.</p><?php
+                            ?><p class="text-sm">You haven't registered any events.</p><?php
                         }
                         ?>
                     </div>
