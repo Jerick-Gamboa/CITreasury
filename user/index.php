@@ -11,7 +11,6 @@ include '../connection.php';
     <script src="../js/tailwind.config.js"></script>
     <script src="../js/sweetalert.min.js"></script>
     <script src="../js/jquery-3.7.1.min.js"></script>
-    <script src="../js/apexcharts.js"></script>
     <script src="../js/predefined-script.js"></script>
     <script src="../js/defer-script.js" defer></script>
     <title>CITreasury - Dashboard</title>
@@ -54,111 +53,61 @@ include '../connection.php';
         </div>
         <div class="w-full bg-red-50 px-6 min-h-screen">
             <div class="mt-24">
-                <h1 class="text-3xl text-custom-purplo font-bold mb-5">Dashboard</h1>
+                <h1 class="text-3xl text-custom-purplo font-bold mb-5">Welcome, Jack Cole Linn!</h1>
                 <div class="flex lg:flex-row flex-col">
-                    <div class="w-full bg-green-600 rounded shadow-lg mr-4 mb-4">
-                        <h3 class="mx-3 my-5 text-white">1st Year</h3>
-                        <div class="w-full px-3 py-2 bg-green-700 rounded-b">
-                            <a href="#" class="text-xs font-bold text-white">View Details</a>
-                        </div>
+                    <div class="w-full p-4 bg-blue-300 rounded-lg shadow-lg mr-5 mb-5">
+                        <h3 class="text-gray-800 font-bold text-lg mb-4">Upcoming events</h3>
+                        <?php
+                        $sql_upcoming_events = "SELECT * FROM `events` WHERE `event_date` > CURDATE()";
+                        $stmt_upcoming_events = $conn->prepare($sql_upcoming_events);
+                        $stmt_upcoming_events->execute();
+                        $result_upcoming_events = $stmt_upcoming_events->get_result();
+                        if ($result_upcoming_events->num_rows > 0) {
+                            while ($row_event = $result_upcoming_events->fetch_assoc()) {
+                                ?>
+                                <div class="border-l-4 border-white m-2 p-3 bg-blue-600 shadow-lg text-white">
+                                    <h3 class="text-2xl font-bold mb-2"><?php echo $row_event['event_name']; ?></h3>
+                                    <div class="text-sm font-semibold">
+                                        <p class="mb-1"><?php echo $row_event['event_description']; ?></p>
+                                        <p>Date: <?php echo $row_event['event_date']; ?></p>
+                                        <p>Event Fee: ₱ <?php echo $row_event['fee_per_event']; ?></p>
+                                    </div>
+                                </div>
+                                <?php
+                            }
+                        } else {
+                            ?><p>No upcoming events as of now.</p><?php
+                        }
+                        ?>
                     </div>
-                    <div class="w-full bg-yellow-600 rounded shadow-lg mr-4 mb-4">
-                        <h3 class="mx-3 my-5 text-white">2nd Year</h3>
-                        <div class="w-full px-3 py-2 bg-yellow-700 rounded-b">
-                            <a href="#" class="text-xs font-bold text-white">View Details</a>
-                        </div>
-                    </div>
-                    <div class="w-full bg-red-600 rounded shadow-lg mr-4 mb-4">
-                        <h3 class="mx-3 my-5 text-white">3rd Year</h3>
-                        <div class="w-full px-3 py-2 bg-red-700 rounded-b">
-                            <a href="#" class="text-xs font-bold text-white">View Details</a>
-                        </div>
-                    </div>
-                    <div class="w-full bg-blue-600 rounded shadow-lg mb-4">
-                        <h3 class="mx-3 my-5 text-white">4th Year</h3>
-                        <div class="w-full px-3 py-2 bg-blue-700 rounded-b">
-                            <a href="#" class="text-xs font-bold text-white">View Details</a>
-                        </div>
+                    <div class="w-full p-4 bg-green-200 rounded-lg shadow-lg mb-4">
+                        <h3 class="text-gray-800 font-bold text-lg mb-4">Registered events</h3>
+                        <?php
+                        $sql_registered_events = "SELECT `events`.`event_name`, `events`.`event_description`, `events`.`fee_per_event`, `registrations`.`registration_date`, `registrations`.`paid_fees` FROM `events` JOIN `registrations` ON `events`.`event_id` = `registrations`.`event_id` WHERE `registrations`.`student_id` = '22-1677';";
+                        $stmt_registered_events = $conn->prepare($sql_registered_events);
+                        $stmt_registered_events->execute();
+                        $result_registered_events = $stmt_registered_events->get_result();
+                        if ($result_registered_events->num_rows > 0) {
+                            while ($row_event = $result_registered_events->fetch_assoc()) {
+                                ?>
+                                <div class="border-l-4 border-white m-2 p-3 bg-green-500 shadow-lg text-white">
+                                    <h3 class="text-2xl font-bold mb-2"><?php echo $row_event['event_name']; ?></h3>
+                                    <div class="text-sm font-semibold">
+                                        <p class="mb-1"><?php echo $row_event['event_description']; ?></p>
+                                        <p>Registered: <?php echo $row_event['registration_date']; ?></p>
+                                        <p>Paid Fee: ₱ <?php echo $row_event['paid_fees']; ?></p>
+                                    </div>
+                                </div>
+                                <?php
+                            }
+                        } else {
+                            ?><p>You haven't registered any events.</p><?php
+                        }
+                        ?>
                     </div>
                 </div>
-                <div class="py-6" id="donut-chart"></div>
             </div>
         </div>
     </div>
-    <script type="text/javascript">  
-        const getChartOptions = () => {
-          return {
-            series: [320, 46],
-            colors: ["#DD00DD", "#16BDCA"],
-            chart: {
-              height: 320,
-              width: "100%",
-              type: "donut",
-            },
-            stroke: {
-              colors: ["transparent"],
-              lineCap: "",
-            },
-            plotOptions: {
-              pie: {
-                donut: {
-                  labels: {
-                    show: true,
-                    name: {
-                      show: true,
-                      offsetY: 20,
-                    },
-                    total: {
-                      showAlways: true,
-                      show: true,
-                      label: "Total Students",
-                      formatter: function (w) {
-                        const sum = w.globals.seriesTotals.reduce((a, b) => {
-                          return a + b
-                        }, 0)
-                        return sum // If decimal, use this: sum.toFixed(1)
-                      },
-                    },
-                    value: {
-                      show: true,
-                      offsetY: -20,
-                      formatter: function (value) {
-                        return value
-                      },
-                    },
-                  },
-                  size: "80%",
-                },
-              },
-            },
-            labels: ["Without Sanctions", "With Sanctions"],
-            dataLabels: {
-              enabled: false,
-            },
-            legend: {
-              position: "bottom",
-              fontFamily: "Inter, sans-serif",
-            },
-            yaxis: {
-              labels: {
-                formatter: function (value) {
-                  return value
-                },
-              },
-            },
-            xaxis: {
-              labels: {
-                formatter: function (value) {
-                  return value
-                },
-              },
-            },
-          }
-        }
-        if (document.getElementById("donut-chart") && typeof ApexCharts !== 'undefined') {
-          const chart = new ApexCharts(document.getElementById("donut-chart"), getChartOptions());
-          chart.render();
-        }
-    </script>
 </body>
 </html>
