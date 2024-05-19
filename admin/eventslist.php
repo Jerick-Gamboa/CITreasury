@@ -250,7 +250,7 @@ include '../connection.php';
             deleteData("#delete-event-" + deleteIds[i], "#delete-current-" + deleteIds[i], "Delete this event?", "This will also delete all registrations made.");
         }
     </script>
-    <script type="module" src="https://unpkg.com/@material-tailwind/html@latest/scripts/tooltip.js"></script>
+    <script type="module" src="../js/tooltip.js"></script>
     <?php
     // If Add Event is submitted
     if (isset($_POST['add-new-event'])) {
