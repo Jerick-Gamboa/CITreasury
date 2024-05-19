@@ -193,8 +193,8 @@ include '../connection.php';
                 </div>
                 <h3 class="text-2xl font-semibold text-custom-purple mb-3">Edit Event</h3>
                 <form method="POST">
-                    <label class="ml-1 text-sm">Event ID:</label>
-                    <input type="text" id="edit-event-id" name="edit-event-id" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" readonly>
+                    <!--label class="ml-1 text-sm">Event ID:</label-->
+                    <input type="hidden" id="edit-event-id" name="edit-event-id">
                     <label class="ml-1 text-sm">Event Name:</label>
                     <input type="text" id="edit-event-name" name="edit-event-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
                     <label class="ml-1 text-sm">Event Description:</label>
