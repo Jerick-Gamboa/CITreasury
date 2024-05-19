@@ -81,7 +81,7 @@ include '../connection.php';
                                 <div class="border-l-4 border-white m-2 p-3 bg-blue-600 shadow-lg text-white">
                                     <h3 class="text-2xl font-bold mb-2"><?php echo $row_event['event_name']; ?></h3>
                                     <div class="text-sm font-semibold">
-                                        <p class="mb-1"><?php echo $row_event['event_description']; ?></p>
+                                        <p class="mb-2"><?php echo $row_event['event_description']; ?></p>
                                         <p>Date: <?php echo $row_event['event_date']; ?></p>
                                         <p>Event Fee: ₱ <?php echo $row_event['fee_per_event']; ?></p>
                                     </div>
@@ -106,7 +106,7 @@ include '../connection.php';
                                 <div class="border-l-4 border-white m-2 p-3 bg-green-500 shadow-lg text-white">
                                     <h3 class="text-2xl font-bold mb-2"><?php echo $row_event['event_name']; ?></h3>
                                     <div class="text-sm font-semibold">
-                                        <p class="mb-1"><?php echo $row_event['event_description']; ?></p>
+                                        <p class="mb-2"><?php echo $row_event['event_description']; ?></p>
                                         <p>Registered: <?php echo $row_event['registration_date']; ?></p>
                                         <p>Paid Fee: ₱ <?php echo $row_event['paid_fees']; ?></p>
                                     </div>

@@ -76,7 +76,7 @@ include '../connection.php';
                 <div class="overflow-x-auto rounded-lg border border-black">
                     <table class="w-full px-1 text-center">
                         <?php
-                        $sql = "SELECT * FROM `students` JOIN `accounts` ON `students`.`student_id` = `accounts`.`student_id` WHERE `accounts`.`type` = 'user'";
+                        $sql = "SELECT * FROM `students` JOIN `accounts` ON `students`.`student_id` = `accounts`.`student_id` WHERE `accounts`.`student_id` != ?";
                         if (isset($_GET['search'])) {
                             $search = '%' . $_GET['search'] . '%';
                             $sql .= " AND (`students`.`student_id` LIKE ? OR `students`.`last_name` LIKE ? OR `students`.`first_name` LIKE ? OR `students`.`year_and_section` LIKE ?)";
@@ -88,7 +88,9 @@ include '../connection.php';
                         }
                         $stmt = $conn->prepare($sql);
                         if (isset($search)) {
-                            $stmt->bind_param("ssss", $search, $search, $search, $search);
+                            $stmt->bind_param("sssss", $_COOKIE['cit-student-id'], $search, $search, $search, $search);
+                        } else {
+                            $stmt->bind_param("s", $_COOKIE['cit-student-id']);
                         }
                         $stmt->execute();
                         $result = $stmt->get_result();
