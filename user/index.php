@@ -67,6 +67,9 @@ include '../connection.php';
                     ?><h1 class="text-3xl text-custom-purplo font-bold mb-5">Welcome, <?php echo $firstname . " ". $mi . " " . $lastname; ?>!</h1><?php
                 }
                 ?>
+                <div class="w-full p-4 bg-yellow-300 rounded-lg shadow-lg mb-4">
+                    <h2 class="text-2xl text-gray-800 font-semibold">Total Paid Fees: ₱ 0.00</h2>
+                </div>
                 <div class="flex lg:flex-row flex-col">
                     <div class="w-full p-4 bg-blue-300 rounded-lg shadow-lg mr-5 mb-5">
                         <h3 class="text-gray-800 font-bold text-lg mb-4">Upcoming events</h3>
