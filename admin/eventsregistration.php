@@ -96,7 +96,7 @@ include '../connection.php';
                         <?php
                         $eventId = $_GET['event-id'];
                         # Query for displaying registered students in a particular event
-                        # If the event date has been passed and their balance is not zero, the total fees will be the sum of event fee and sanction fee, or else, the total fee would be the event fee
+                        # If the event date has been passed and their balance is not zero and still registered before the event date, the total fees will be the sum of event fee and sanction fee, or else, the total fee would be the event fee
                         # Hence, the balance would also be affected
                         $sql = "SELECT  `students`.*, `registrations`.`registration_date`, 
                                     CASE 
