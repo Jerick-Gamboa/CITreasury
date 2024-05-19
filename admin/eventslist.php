@@ -200,7 +200,7 @@ include '../connection.php';
                     <label class="ml-1 text-sm">Event Description:</label>
                     <textarea id="edit-event-desc" name="edit-event-desc" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required></textarea> 
                     <label class="ml-1 text-sm">Event Date:</label>
-                    <input id="tooltip-date" type="date" id="edit-event-date" name="edit-event-date" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 hover:cursor-pointer bg-purple-100" required>
+                    <input type="date" id="edit-event-date" name="edit-event-date" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 hover:cursor-pointer bg-purple-100" required>
                     <div id="tooltip-content-date" class="absolute whitespace-normal break-words rounded-lg bg-red-500 py-1.5 px-3 font-sans text-xs font-normal text-white shadow shadow-black focus:outline-none">
                         Be careful when changing event dates, as this changes the <br>total fee to be paid with respect to the current date.
                     </div>
@@ -245,7 +245,7 @@ include '../connection.php';
             $("#edit-sanction-fee").val(row.cells[5].innerHTML);
         }
 
-        $('#tooltip-date').hover(
+        $('#edit-event-date').hover(
             () => {
                 $('#tooltip-content-date').fadeIn(150);
             }, 
