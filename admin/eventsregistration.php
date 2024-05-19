@@ -92,7 +92,7 @@ include '../connection.php';
                 $buttonClasses = "focus:outline-none rounded-full shadow-md shadow-gray-500";
                 $svgClasses = "w-16 h-16 bg-white rounded-full " . ($isEventPast ? "fill-gray-400" : "fill-green-500 hover:fill-green-600");
                 ?>
-                <button id="register-a-student" class="<?php echo $buttonClasses; ?>" title="Register a Student" <?php if ($isEventPast) echo "disabled"; ?>>
+                <button id="register-a-student" class="<?php echo $buttonClasses; ?>" <?php if (!$isEventPast) echo "title='Register a Student'"; ?> <?php if ($isEventPast) echo "disabled"; ?>>
                     <svg id="mdi-plus-circle" class="<?php echo $svgClasses; ?>" viewBox="2 2 20 20">
                         <path d="M17,13H13V17H11V13H7V11H11V7H13V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" />
                     </svg>
