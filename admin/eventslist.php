@@ -200,7 +200,12 @@ include '../connection.php';
                     <label class="ml-1 text-sm">Event Description:</label>
                     <textarea id="edit-event-desc" name="edit-event-desc" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required></textarea> 
                     <label class="ml-1 text-sm">Event Date:</label>
-                    <input type="date" id="edit-event-date" name="edit-event-date" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
+                    <input type="date" id="edit-event-date" name="edit-event-date" data-ripple-light="true" data-tooltip-target="tooltip" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 hover:cursor-pointer bg-purple-100" required>
+                    <div data-tooltip="tooltip" class="absolute z-50 whitespace-normal break-words rounded-lg bg-black py-1.5 px-3 font-sans text-sm font-normal text-white focus:outline-none">
+                        Be careful in changing event dates,<br>
+                        as this changes the total fee to paid<br>
+                        with respect to current date.
+                    </div>
                     <label class="ml-1 text-sm">Fee per event (₱):</label>
                     <input type="number" id="edit-fee-per-event" name="edit-fee-per-event" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
                     <label class="ml-1 text-sm">Sanction Fee (₱):</label>
@@ -244,9 +249,10 @@ include '../connection.php';
 
         // Apply deletion of data using event-id to each unique form id and button id
         for (let i=0; i<deleteIds.length; i++) {
-            deleteData("#delete-event-" + deleteIds[i], "#delete-current-" + deleteIds[i], "Delete this event?", "This action can't be undone.");
+            deleteData("#delete-event-" + deleteIds[i], "#delete-current-" + deleteIds[i], "Delete this event?", "This will also delete all registrations made.");
         }
     </script>
+    <script type="module" src="https://unpkg.com/@material-tailwind/html@latest/scripts/tooltip.js"></script>
     <?php
     // If Add Event is submitted
     if (isset($_POST['add-new-event'])) {
