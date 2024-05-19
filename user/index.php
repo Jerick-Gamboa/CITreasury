@@ -93,7 +93,7 @@ include '../connection.php';
                         }
                         ?>
                     </div>
-                    <div class="w-full p-4 bg-green-200 rounded-lg shadow-lg mb-4">
+                    <div class="w-full p-4 bg-green-300 rounded-lg shadow-lg mb-4">
                         <h3 class="text-gray-800 font-bold text-lg mb-4">Registered events</h3>
                         <?php
                         $sql_registered_events = "SELECT `events`.`event_name`, `events`.`event_description`, `events`.`fee_per_event`, `registrations`.`registration_date`, `registrations`.`paid_fees` FROM `events` JOIN `registrations` ON `events`.`event_id` = `registrations`.`event_id` WHERE `registrations`.`student_id` = '22-1677';";
@@ -103,7 +103,7 @@ include '../connection.php';
                         if ($result_registered_events->num_rows > 0) {
                             while ($row_event = $result_registered_events->fetch_assoc()) {
                                 ?>
-                                <div class="border-l-4 border-white m-2 p-3 bg-green-500 shadow-lg text-white">
+                                <div class="border-l-4 border-white m-2 p-3 bg-green-600 shadow-lg text-white">
                                     <h3 class="text-2xl font-bold mb-2"><?php echo $row_event['event_name']; ?></h3>
                                     <div class="text-sm font-semibold">
                                         <p class="mb-2"><?php echo $row_event['event_description']; ?></p>

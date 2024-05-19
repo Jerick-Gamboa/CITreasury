@@ -200,8 +200,8 @@ include '../connection.php';
                     <label class="ml-1 text-sm">Event Description:</label>
                     <textarea id="edit-event-desc" name="edit-event-desc" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required></textarea> 
                     <label class="ml-1 text-sm">Event Date:</label>
-                    <input type="date" id="edit-event-date" name="edit-event-date" data-ripple-light="true" data-tooltip-target="tooltip" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 hover:cursor-pointer bg-purple-100" required>
-                    <div data-tooltip="tooltip" class="absolute z-50 whitespace-normal break-words rounded-lg bg-red-500 py-1.5 px-3 font-sans text-xs font-normal text-white shadow shadow-black focus:outline-none">
+                    <input id="tooltip-date" type="date" id="edit-event-date" name="edit-event-date" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 hover:cursor-pointer bg-purple-100" required>
+                    <div id="tooltip-content-date" class="absolute whitespace-normal break-words rounded-lg bg-red-500 py-1.5 px-3 font-sans text-xs font-normal text-white shadow shadow-black focus:outline-none">
                         Be careful when changing event dates, as this changes the <br>total fee to be paid with respect to the current date.
                     </div>
                     <label class="ml-1 text-sm">Fee per event (₱):</label>
@@ -217,7 +217,7 @@ include '../connection.php';
     </div>
     <script type="text/javascript">
         $("#popup-bg, #popup-item, #edit-popup-bg, #edit-popup-item").removeClass("hidden");
-        $("#popup-bg, #popup-item, #edit-popup-bg, #edit-popup-item").hide();
+        $("#popup-bg, #popup-item, #edit-popup-bg, #edit-popup-item, #tooltip-content-date").hide();
         // If (+) button is pressed, fade in modals
         $("#add-event").click((event) => {
             $("#popup-bg").fadeIn(150);
@@ -245,12 +245,20 @@ include '../connection.php';
             $("#edit-sanction-fee").val(row.cells[5].innerHTML);
         }
 
+        $('#tooltip-date').hover(
+            () => {
+                $('#tooltip-content-date').fadeIn(150);
+            }, 
+            () => {
+                $('#tooltip-content-date').fadeOut(150);
+            }
+        );
+
         // Apply deletion of data using event-id to each unique form id and button id
         for (let i=0; i<deleteIds.length; i++) {
             deleteData("#delete-event-" + deleteIds[i], "#delete-current-" + deleteIds[i], "Delete this event?", "This will also delete all registrations made.");
         }
     </script>
-    <script type="module" src="../js/tooltip.js"></script>
     <?php
     // If Add Event is submitted
     if (isset($_POST['add-new-event'])) {
