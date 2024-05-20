@@ -53,7 +53,89 @@ include '../connection.php';
         </div>
         <div class="w-full bg-red-50 px-6 min-h-screen">
             <div class="mt-24">
-                
+                <h1 class="text-3xl text-custom-purplo font-bold mb-5">Your Sanctions</h1>
+            </div>
+            <div class="w-full p-4 bg-gradient-to-r from-custom-purplo to-purple-400 rounded-lg shadow-lg mb-4">
+                <h2 id="fees-to-paid" class="text-2xl text-white font-semibold">Fees To Paid: ₱ --</h2>
+            </div>
+            <div class="flex lg:flex-row flex-col">
+                    <div class="w-full p-4 bg-blue-300 rounded-lg shadow-lg mr-5 mb-5">
+                        <h3 class="text-gray-800 font-bold text-lg mb-4">Unregistered Past Events</h3>
+                        <?php
+                        $feestopaid = 0;
+                        $sql_unregistered_events = " SELECT `events`.*, `events`.`fee_per_event` + `events`.`sanction_fee` AS `total_fee`
+                            FROM `events` 
+                            LEFT JOIN `registrations` ON `events`.`event_id` = `registrations`.`event_id` AND `registrations`.`student_id` = ? 
+                            WHERE `registrations`.`student_id` IS NULL AND `events`.`event_date` < CURDATE()";
+                        $stmt_unregistered_events = $conn->prepare($sql_unregistered_events);
+                        $stmt_unregistered_events->bind_param("s", $_COOKIE['cit-student-id']);
+                        $stmt_unregistered_events->execute();
+                        $result_unregistered_events = $stmt_unregistered_events->get_result();
+                        if ($result_unregistered_events->num_rows > 0) {
+                            while ($row_event = $result_unregistered_events->fetch_assoc()) {
+                                ?>
+                                <div class="border-l-4 border-white m-2 p-3 bg-blue-600 shadow-lg text-white">
+                                    <h3 class="text-2xl font-bold mb-2"><?php echo $row_event['event_name']; ?></h3>
+                                    <div class="text-sm font-semibold">
+                                        <p class="mb-2"><?php echo $row_event['event_description']; ?></p>
+                                        <p>Date: <?php echo $row_event['event_date']; ?></p>
+                                        <p>Event Fee With Sanction: ₱ <?php echo $row_event['total_fee']; ?></p>
+                                    </div>
+                                </div>
+                                <?php
+                            }
+                        } else {
+                            ?><p class="text-sm">No unregistered past events found.</p><?php
+                        }
+                        ?>
+                    </div>
+                    <div class="w-full p-4 bg-green-300 rounded-lg shadow-lg mb-4">
+                        <h3 class="text-gray-800 font-bold text-lg mb-4">Unsettled Registrations</h3>
+                        <?php
+                        $sql_unsettledbalance_events = "
+                            SELECT 
+                                `students`.*, `registrations`.`registration_date`, 
+                                `registrations`.`paid_fees`, 
+                                `events`.*, 
+                                CASE 
+                                    WHEN `events`.`event_date` < CURDATE() AND `events`.`fee_per_event` > `registrations`.`paid_fees` THEN `events`.`fee_per_event` + `events`.`sanction_fee` 
+                                    WHEN (`events`.`event_date` >= CURDATE() OR `events`.`fee_per_event` = `registrations`.`paid_fees`) AND `registrations`.`status` = 'FULLY_PAID_BEFORE_EVENT' THEN `events`.`fee_per_event` 
+                                    ELSE `events`.`fee_per_event` + `events`.`sanction_fee` 
+                                END AS `total_fee`, 
+                                CASE 
+                                    WHEN `events`.`event_date` < CURDATE() AND `events`.`fee_per_event` > `registrations`.`paid_fees` THEN (`events`.`fee_per_event` + `events`.`sanction_fee`) - `registrations`.`paid_fees` 
+                                    WHEN (`events`.`event_date` >= CURDATE() OR `events`.`fee_per_event` = `registrations`.`paid_fees`) AND `registrations`.`status` = 'FULLY_PAID_BEFORE_EVENT' THEN `events`.`fee_per_event` - `registrations`.`paid_fees` 
+                                    ELSE (`events`.`fee_per_event` + `events`.`sanction_fee`) - `registrations`.`paid_fees` 
+                                END AS `balance` 
+                            FROM `students` 
+                            JOIN `registrations` ON `students`.`student_id` = `registrations`.`student_id` 
+                            JOIN `events` ON `events`.`event_id` = `registrations`.`event_id` 
+                            WHERE `students`.`student_id` = ? 
+                            HAVING `balance` <> 0";
+                        $stmt_unsettledbalance_events = $conn->prepare($sql_unsettledbalance_events);
+                        $stmt_unsettledbalance_events->bind_param("s", $_COOKIE['cit-student-id']);
+                        $stmt_unsettledbalance_events->execute();
+                        $result_unsettledbalance_events = $stmt_unsettledbalance_events->get_result();
+                        if ($result_unsettledbalance_events->num_rows > 0) {
+                            while ($row_event = $result_unsettledbalance_events->fetch_assoc()) {
+                                ?>
+                                <div class="border-l-4 border-white m-2 p-3 bg-green-600 shadow-lg text-white">
+                                    <h3 class="text-2xl font-bold mb-2"><?php echo $row_event['event_name']; ?></h3>
+                                    <div class="text-sm font-semibold">
+                                        <p class="mb-2"><?php echo $row_event['event_description']; ?></p>
+                                        <p>Registered: <?php echo $row_event['registration_date']; ?></p>
+                                        <p>Paid Fee: ₱ <?php echo $row_event['paid_fees']; ?></p>
+                                        <p>Current Balance: ₱ <?php echo $row_event['balance']; ?></p>
+                                    </div>
+                                </div>
+                                <?php
+                            }
+                        } else {
+                            ?><p class="text-sm">You have no unsettled balance during registration.</p><?php
+                        }
+                        ?>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
