@@ -75,6 +75,15 @@ include '../connection.php';
                     # Set event name in title using event-id in URL query
                     ?><h1 id="event-title" class="text-3xl text-custom-purplo font-bold mb-3"><?php echo $row_title['event_name']; ?></h1><?php
                 }
+                $sql_update_status = "UPDATE `registrations` 
+                    JOIN `events` ON `registrations`.`event_id` = `events`.`event_id`
+                    SET `registrations`.`status` = 'FULLY_PAID_BEFORE_EVENT'
+                    WHERE `registrations`.`event_id` = ? 
+                    AND `events`.`event_date` >= CURDATE() 
+                    AND `events`.`fee_per_event` = `registrations`.`paid_fees`";
+                $stmt_update_status = $conn->prepare($sql_update_status);
+                $stmt_update_status->bind_param("i", $_GET['event-id']);
+                $stmt_update_status->execute();
                 ?>
                 <!-- Search Bar -->
                 <div class="flex flex-row w-56 p-1 mb-3 border-2 border-custom-purple  focus:border-custom-purplo rounded-lg bg-white">
@@ -106,21 +115,21 @@ include '../connection.php';
                         $eventId = $_GET['event-id'];
                         # Query for displaying registered students in a particular event
                         # If the event was happened and the student has still balance, the total fees to paid would be the event fee + sanction fee
-                        # Else if the event wasnt happened yet or the event fee was fully paid, the total fees would be the event fee alone
+                        # Else if the event wasnt happened yet or the event fee was fully paid after registration, the total fees would be the event fee alone
                         # Or else, sanction fee was also applied
                         # The balance would also be affected
                         $sql = "SELECT  `students`.*, `registrations`.`registration_date`, 
                                     CASE 
                                         WHEN `events`.`event_date` < CURDATE() AND `events`.`fee_per_event` > `registrations`.`paid_fees` 
                                         THEN `events`.`fee_per_event` + `events`.`sanction_fee` 
-                                        WHEN `events`.`event_date` >= CURDATE() OR `events`.`fee_per_event` = `registrations`.`paid_fees` 
+                                        WHEN (`events`.`event_date` >= CURDATE() OR `events`.`fee_per_event` = `registrations`.`paid_fees`) AND `registrations`.`status` = 'FULLY_PAID_BEFORE_EVENT' 
                                         THEN `events`.`fee_per_event` 
                                         ELSE `events`.`fee_per_event` + `events`.`sanction_fee` 
                                     END AS `total_fee`, 
                                     CASE 
                                         WHEN `events`.`event_date` < CURDATE() AND `events`.`fee_per_event` > `registrations`.`paid_fees` 
                                         THEN (`events`.`fee_per_event` + `events`.`sanction_fee`) - `registrations`.`paid_fees` 
-                                        WHEN `events`.`event_date` >= CURDATE() OR `events`.`fee_per_event` = `registrations`.`paid_fees` 
+                                        WHEN (`events`.`event_date` >= CURDATE() OR `events`.`fee_per_event` = `registrations`.`paid_fees`) AND `registrations`.`status` = 'FULLY_PAID_BEFORE_EVENT' 
                                         THEN `events`.`fee_per_event` - `registrations`.`paid_fees`
                                         ELSE (`events`.`fee_per_event` + `events`.`sanction_fee`) - `registrations`.`paid_fees` 
                                     END AS `balance`
@@ -137,7 +146,7 @@ include '../connection.php';
                             </script>
                             <?php
                         }
-                        $sql .= " ORDER BY `registrations`.`paid_fees`";
+                        $sql .= " ORDER BY `balance` DESC";
                         $stmt = $conn->prepare($sql);
                         if (isset($search)) {
                             $stmt->bind_param("isssss", $eventId, $search, $search, $search, $search, $search);

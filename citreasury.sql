@@ -57,8 +57,7 @@ CREATE TABLE `events` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 INSERT INTO `events` (`event_id`, `event_name`, `event_description`, `event_date`, `fee_per_event`, `sanction_fee`) VALUES
-(101, 'IT Night', 'Baraylehan', '2024-05-17', 200,  20),
-(102, 'General Assembly', 'Saaga',  '2024-05-20', 0,  30);
+(101, 'IT Night', 'IT Night features a variety of activities designed to engage and inspire students within the College of Information Technology.',  '2024-05-19', 200,  20);
 
 DROP TABLE IF EXISTS `registrations`;
 CREATE TABLE `registrations` (
@@ -67,6 +66,7 @@ CREATE TABLE `registrations` (
   `student_id` varchar(7) NOT NULL,
   `registration_date` date NOT NULL,
   `paid_fees` int(11) NOT NULL,
+  `status` varchar(30) DEFAULT NULL,
   PRIMARY KEY (`registration_id`),
   KEY `registrations_event_id_events_event_id` (`event_id`),
   KEY `registrations_student_id_students_student_id` (`student_id`),
@@ -74,9 +74,8 @@ CREATE TABLE `registrations` (
   CONSTRAINT `registrations_student_id_students_student_id` FOREIGN KEY (`student_id`) REFERENCES `students` (`student_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `registrations` (`registration_id`, `event_id`, `student_id`, `registration_date`, `paid_fees`) VALUES
-(4, 101,  '22-0880',  '2024-05-15', 200),
-(10,  101,  '22-1677',  '2024-05-16', 30),
-(11,  102,  '22-1677',  '2024-05-19', 0);
+INSERT INTO `registrations` (`registration_id`, `event_id`, `student_id`, `registration_date`, `paid_fees`, `status`) VALUES
+(4, 101,  '22-0880',  '2024-05-15', 200,  'FULLY_PAID_BEFORE_EVENT'),
+(14,  101,  '22-1677',  '2024-05-18', 200,  NULL);
 
--- 2024-05-19 01:46:25
+-- 2024-05-20 10:24:49
