@@ -220,7 +220,7 @@ include '../connection.php';
                             $randomColor = $colors[$i];
                             ?>
                             <!-- Card of Events -->
-                            <div class="w-full bg-<?php echo $randomColor; ?>-600 rounded shadow-lg">
+                            <div class="w-full flex flex-col justify-between bg-<?php echo $randomColor; ?>-600 rounded shadow-lg">
                                 <div class="w-full px-3 pt-3 flex flex-row justify-between items-center">
                                     <h3 class="text-2xl text-white font-semibold">
                                         <?php echo $row_event['event_name']; ?>
