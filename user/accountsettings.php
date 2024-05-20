@@ -38,7 +38,7 @@ include '../connection.php';
     }
     ?>
     <nav class="fixed w-full bg-custom-purple flex flex-row shadow shadow-gray-800">
-        <img src="../img/nobgcitsclogo.png" class="w-12 h-12 my-2 ml-8">
+        <img src="../img/nobgcitsclogo.png" class="w-12 h-12 my-2 ml-6">
         <h1 class="text-3xl p-3 font-bold text-white">CITreasury</h1>
         <div class="w-full text-white">
             <svg id="mdi-menu" class="w-8 h-8 mr-3 my-4 p-1 float-right fill-current rounded transition-all duration-300-ease-in-out md:hidden hover:bg-white hover:text-custom-purple hover:cursor-pointer" viewBox="0 0 24 24"><path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z" /></svg>
@@ -46,7 +46,7 @@ include '../connection.php';
     </nav>
     <div class="flex flex-col md:flex-row bg-custom-purplo min-h-screen">
         <div class="mt-18 md:mt-20 mx-2">
-            <div id="menu-user-items" class="hidden md:inline-block w-64 h-full">
+            <div id="menu-user-items" class="hidden md:inline-block w-60 h-full">
             </div>
         </div>
         <div id="menu-user-items-mobile" class="fixed block md:hidden h-fit top-16 w-full p-4 bg-custom-purplo opacity-95">
