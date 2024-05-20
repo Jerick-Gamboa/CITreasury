@@ -209,7 +209,7 @@ include '../connection.php';
             <div class="container mx-auto mb-6">
                 <div class="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                     <?php
-                    $colors = ['red', 'green', 'blue', 'yellow', 'indigo', 'purple', 'pink'];
+                    $colors = ['red', 'green', 'blue', 'yellow', 'purple', 'pink'];
                     $sql_event = "SELECT `events`.*, COALESCE(`registration_counts`.`registration_count`, 0) AS `registration_count` FROM `events` LEFT JOIN (SELECT `event_id`, COUNT(*) AS `registration_count` FROM `registrations` GROUP BY `event_id`) `registration_counts` ON `events`.`event_id` = `registration_counts`.`event_id`";
                     $stmt_event = $conn->prepare($sql_event);
                     $stmt_event->execute();
