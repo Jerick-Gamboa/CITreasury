@@ -78,7 +78,7 @@ include '../connection.php';
                     }
                 }
                 ?>
-                <div class="w-full p-4 bg-gradient-to-r from-custom-purplo to-purple-400 rounded-lg shadow-lg mb-4">
+                <div class="w-full p-4 bg-custom-purplo rounded-lg shadow-lg mb-4">
                     <h2 class="text-2xl text-white font-semibold">Total Paid Fees: ₱ <?php echo $totalpaid; ?></h2>
                 </div>
                 <div class="flex lg:flex-row flex-col">
