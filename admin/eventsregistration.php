@@ -206,7 +206,7 @@ include '../connection.php';
             <div class="mt-24 flex flex-col lg:flex-row justify-between">
                 <h1 id="event-title" class="text-3xl text-custom-purplo font-bold mb-5">Manage Registrations</h1>
             </div>
-            <div class="container mx-auto">
+            <div class="container mx-auto mb-6">
                 <div class="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                     <?php
                     $colors = ['red', 'green', 'blue', 'yellow', 'indigo', 'purple', 'pink'];
