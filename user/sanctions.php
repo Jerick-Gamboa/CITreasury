@@ -59,8 +59,8 @@ include '../connection.php';
                 <h2 id="pending-fees" class="text-2xl text-white font-semibold">Pending Fees: ₱ --</h2>
             </div>
             <div class="flex lg:flex-row flex-col">
-                <div class="w-full p-4 bg-gradient-to-r from-custom-purplo to-purple-400 rounded-lg shadow-lg mr-5 mb-5">
-                    <h3 class="text-white font-bold text-lg mb-4">Unregistered Past Events</h3>
+                <div class="w-full p-4 bg-red-300 rounded-lg shadow-lg mr-5 mb-5">
+                    <h3 class="text-gray-800 font-bold text-lg mb-4">Unregistered Past Events</h3>
                     <?php
                     $pendingfees = 0;
                         $sql_unregistered_events = " SELECT `events`.*, `events`.`fee_per_event` + `events`.`sanction_fee` AS `total_fee`
@@ -74,7 +74,7 @@ include '../connection.php';
                     if ($result_unregistered_events->num_rows > 0) {
                         while ($row_event = $result_unregistered_events->fetch_assoc()) {
                             ?>
-                            <div class="border-l-4 border-white m-2 p-3 bg-gradient-to-r from-purple-400 to-purple-200 shadow-lg text-white">
+                            <div class="border-l-4 border-white m-2 p-3 bg-red-600 shadow-lg text-white">
                                 <h3 class="text-2xl font-bold mb-2"><?php echo $row_event['event_name']; ?></h3>
                                 <div class="text-sm font-semibold">
                                     <p>Date: <?php echo $row_event['event_date']; ?></p>
@@ -89,7 +89,7 @@ include '../connection.php';
                     }
                     ?>
                 </div>
-                <div class="w-full p-4 bg-green-300 rounded-lg shadow-lg mb-4">
+                <div class="w-full p-4 bg-orange-300 rounded-lg shadow-lg mb-4">
                     <h3 class="text-gray-800 font-bold text-lg mb-4">Unsettled Registrations</h3>
                     <?php
                     $sql_unsettledbalance_events = "
@@ -118,7 +118,7 @@ include '../connection.php';
                     if ($result_unsettledbalance_events->num_rows > 0) {
                         while ($row_event = $result_unsettledbalance_events->fetch_assoc()) {
                             ?>
-                            <div class="border-l-4 border-white m-2 p-3 bg-green-600 shadow-lg text-white">
+                            <div class="border-l-4 border-white m-2 p-3 bg-orange-600 shadow-lg text-white">
                                 <h3 class="text-2xl font-bold mb-2"><?php echo $row_event['event_name']; ?></h3>
                                 <div class="text-sm font-semibold">
                                     <p>Registered: <?php echo $row_event['registration_date']; ?></p>
