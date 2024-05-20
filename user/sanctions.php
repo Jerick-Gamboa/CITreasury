@@ -63,7 +63,7 @@ include '../connection.php';
                     <h3 class="text-gray-800 font-bold text-lg mb-4">Unregistered Past Events</h3>
                     <?php
                     $pendingfees = 0;
-                        $sql_unregistered_events = " SELECT `events`.*, `events`.`fee_per_event` + `events`.`sanction_fee` AS `total_fee`
+                        $sql_unregistered_events = " SELECT `events`.*, `events`.`event_fee` + `events`.`sanction_fee` AS `total_fee`
                         FROM `events` 
                         LEFT JOIN `registrations` ON `events`.`event_id` = `registrations`.`event_id` AND `registrations`.`student_id` = ? 
                         WHERE `registrations`.`student_id` IS NULL AND `events`.`event_date` < CURDATE()";
@@ -97,14 +97,14 @@ include '../connection.php';
                             `registrations`.`paid_fees`, 
                             `events`.*, 
                             CASE 
-                                WHEN `events`.`event_date` < CURDATE() AND `events`.`fee_per_event` > `registrations`.`paid_fees` THEN `events`.`fee_per_event` + `events`.`sanction_fee` 
-                                WHEN (`events`.`event_date` >= CURDATE() OR `events`.`fee_per_event` = `registrations`.`paid_fees`) AND `registrations`.`status` = 'FULLY_PAID_BEFORE_EVENT' THEN `events`.`fee_per_event` 
-                                ELSE `events`.`fee_per_event` + `events`.`sanction_fee` 
+                                WHEN `events`.`event_date` < CURDATE() AND `events`.`event_fee` > `registrations`.`paid_fees` THEN `events`.`event_fee` + `events`.`sanction_fee` 
+                                WHEN (`events`.`event_date` >= CURDATE() OR `events`.`event_fee` = `registrations`.`paid_fees`) AND `registrations`.`status` = 'FULLY_PAID_BEFORE_EVENT' THEN `events`.`event_fee` 
+                                ELSE `events`.`event_fee` + `events`.`sanction_fee` 
                             END AS `total_fee`, 
                             CASE 
-                                WHEN `events`.`event_date` < CURDATE() AND `events`.`fee_per_event` > `registrations`.`paid_fees` THEN (`events`.`fee_per_event` + `events`.`sanction_fee`) - `registrations`.`paid_fees` 
-                                WHEN (`events`.`event_date` >= CURDATE() OR `events`.`fee_per_event` = `registrations`.`paid_fees`) AND `registrations`.`status` = 'FULLY_PAID_BEFORE_EVENT' THEN `events`.`fee_per_event` - `registrations`.`paid_fees` 
-                                ELSE (`events`.`fee_per_event` + `events`.`sanction_fee`) - `registrations`.`paid_fees` 
+                                WHEN `events`.`event_date` < CURDATE() AND `events`.`event_fee` > `registrations`.`paid_fees` THEN (`events`.`event_fee` + `events`.`sanction_fee`) - `registrations`.`paid_fees` 
+                                WHEN (`events`.`event_date` >= CURDATE() OR `events`.`event_fee` = `registrations`.`paid_fees`) AND `registrations`.`status` = 'FULLY_PAID_BEFORE_EVENT' THEN `events`.`event_fee` - `registrations`.`paid_fees` 
+                                ELSE (`events`.`event_fee` + `events`.`sanction_fee`) - `registrations`.`paid_fees` 
                             END AS `balance` 
                         FROM `students` 
                         JOIN `registrations` ON `students`.`student_id` = `registrations`.`student_id` 

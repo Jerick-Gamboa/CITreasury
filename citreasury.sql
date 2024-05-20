@@ -34,8 +34,7 @@ CREATE TABLE `accounts` (
   `student_id` varchar(7) NOT NULL,
   `type` varchar(5) NOT NULL,
   PRIMARY KEY (`account_id`),
-  KEY `accounts_student_id_students_student_id` (`student_id`),
-  CONSTRAINT `accounts_student_id_students_student_id` FOREIGN KEY (`student_id`) REFERENCES `students` (`student_id`)
+  FOREIGN KEY (`student_id`) REFERENCES `students` (`student_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 INSERT INTO `accounts` (`account_id`, `email`, `password`, `student_id`, `type`) VALUES
@@ -51,13 +50,15 @@ CREATE TABLE `events` (
   `event_name` varchar(100) NOT NULL,
   `event_description` varchar(255) NOT NULL,
   `event_date` date NOT NULL,
-  `fee_per_event` int(6) NOT NULL,
+  `event_fee` int(6) NOT NULL,
   `sanction_fee` int(3) NOT NULL,
   PRIMARY KEY (`event_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `events` (`event_id`, `event_name`, `event_description`, `event_date`, `fee_per_event`, `sanction_fee`) VALUES
-(101, 'IT Night', 'IT Night features a variety of activities designed to engage and inspire students within the College of Information Technology.',  '2024-05-19', 200,  20);
+INSERT INTO `events` (`event_id`, `event_name`, `event_description`, `event_date`, `event_fee`, `sanction_fee`) VALUES
+(101, 'IT Night', 'Aranuhan', '2024-05-19', 200,  20),
+(102, 'General Assembly', 'Basta',  '2024-05-21', 0,  40),
+(103, 'Arts Month', 'Aranuhan', '2024-05-19', 100,  40);
 
 DROP TABLE IF EXISTS `registrations`;
 CREATE TABLE `registrations` (
@@ -68,14 +69,25 @@ CREATE TABLE `registrations` (
   `paid_fees` int(11) NOT NULL,
   `status` varchar(30) DEFAULT NULL,
   PRIMARY KEY (`registration_id`),
-  KEY `registrations_event_id_events_event_id` (`event_id`),
-  KEY `registrations_student_id_students_student_id` (`student_id`),
-  CONSTRAINT `registrations_event_id_events_event_id` FOREIGN KEY (`event_id`) REFERENCES `events` (`event_id`),
-  CONSTRAINT `registrations_student_id_students_student_id` FOREIGN KEY (`student_id`) REFERENCES `students` (`student_id`)
+  FOREIGN KEY (`event_id`) REFERENCES `events` (`event_id`),
+  FOREIGN KEY (`student_id`) REFERENCES `students` (`student_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 INSERT INTO `registrations` (`registration_id`, `event_id`, `student_id`, `registration_date`, `paid_fees`, `status`) VALUES
 (4, 101,  '22-0880',  '2024-05-15', 200,  'FULLY_PAID_BEFORE_EVENT'),
-(14,  101,  '22-1677',  '2024-05-18', 200,  NULL);
+(14,  101,  '22-1677',  '2024-05-18', 220,  NULL),
+(16,  102,  '22-1677',  '2024-05-21', 0,  'FULLY_PAID_BEFORE_EVENT'),
+(17,  102,  '22-0880',  '2024-05-21', 0,  'FULLY_PAID_BEFORE_EVENT');
 
--- 2024-05-20 10:24:49
+DROP TABLE IF EXISTS `sanctions`;
+CREATE TABLE `sanctions` (
+  `sanction_id` int(5) NOT NULL AUTO_INCREMENT,
+  `student_id` varchar(7) NOT NULL,
+  `event_id` int(5) NOT NULL,
+  `sanctions_paid` int(3) NOT NULL,
+  PRIMARY KEY (`sanction_id`),
+  FOREIGN KEY (`event_id`) REFERENCES `events` (`event_id`),
+  FOREIGN KEY (`student_id`) REFERENCES `students` (`student_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- 2024-05-20 18:23:29

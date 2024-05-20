@@ -80,7 +80,7 @@ include '../connection.php';
                     SET `registrations`.`status` = 'FULLY_PAID_BEFORE_EVENT'
                     WHERE `registrations`.`event_id` = ? 
                     AND `events`.`event_date` >= CURDATE() 
-                    AND `events`.`fee_per_event` = `registrations`.`paid_fees`";
+                    AND `events`.`event_fee` = `registrations`.`paid_fees`";
                 $stmt_update_status = $conn->prepare($sql_update_status);
                 $stmt_update_status->bind_param("i", $_GET['event-id']);
                 $stmt_update_status->execute();
@@ -120,18 +120,18 @@ include '../connection.php';
                         # The balance would also be affected
                         $sql = "SELECT  `students`.*, `registrations`.`registration_date`, 
                                     CASE 
-                                        WHEN `events`.`event_date` < CURDATE() AND `events`.`fee_per_event` > `registrations`.`paid_fees` 
-                                        THEN `events`.`fee_per_event` + `events`.`sanction_fee` 
+                                        WHEN `events`.`event_date` < CURDATE() AND `events`.`event_fee` > `registrations`.`paid_fees` 
+                                        THEN `events`.`event_fee` + `events`.`sanction_fee` 
                                         WHEN `events`.`event_date` >= CURDATE() OR `registrations`.`status` = 'FULLY_PAID_BEFORE_EVENT' 
-                                        THEN `events`.`fee_per_event` 
-                                        ELSE `events`.`fee_per_event` + `events`.`sanction_fee` 
+                                        THEN `events`.`event_fee` 
+                                        ELSE `events`.`event_fee` + `events`.`sanction_fee` 
                                     END AS `total_fee`, 
                                     CASE 
-                                        WHEN `events`.`event_date` < CURDATE() AND `events`.`fee_per_event` > `registrations`.`paid_fees` 
-                                        THEN (`events`.`fee_per_event` + `events`.`sanction_fee`) - `registrations`.`paid_fees` 
+                                        WHEN `events`.`event_date` < CURDATE() AND `events`.`event_fee` > `registrations`.`paid_fees` 
+                                        THEN (`events`.`event_fee` + `events`.`sanction_fee`) - `registrations`.`paid_fees` 
                                         WHEN `events`.`event_date` >= CURDATE() OR `registrations`.`status` = 'FULLY_PAID_BEFORE_EVENT' 
-                                        THEN `events`.`fee_per_event` - `registrations`.`paid_fees`
-                                        ELSE (`events`.`fee_per_event` + `events`.`sanction_fee`) - `registrations`.`paid_fees` 
+                                        THEN `events`.`event_fee` - `registrations`.`paid_fees`
+                                        ELSE (`events`.`event_fee` + `events`.`sanction_fee`) - `registrations`.`paid_fees` 
                                     END AS `balance`
                                 FROM `students` 
                                 JOIN `registrations` ON `students`.`student_id` = `registrations`.`student_id` 
@@ -228,7 +228,7 @@ include '../connection.php';
                                         <?php echo $row_event['event_name']; ?>
                                     </h3>
                                     <h2 class="text-4xl font-bold text-white">
-                                        ₱ <?php echo $row_event['fee_per_event']; ?>
+                                        ₱ <?php echo $row_event['event_fee']; ?>
                                     </h2>
                                 </div>
                                 <div class="w-full px-3 py-2 text-white">

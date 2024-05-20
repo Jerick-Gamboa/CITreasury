@@ -117,7 +117,7 @@ include '../connection.php';
                                 $eventname = $row['event_name'];
                                 $eventdesc = $row['event_description'];
                                 $eventdate = $row['event_date'];
-                                $feeperevent = $row['fee_per_event'];
+                                $feeperevent = $row['event_fee'];
                                 $sanctionfee = $row['sanction_fee'];
                                 ?>
                                 <tr class="border-t border-black">
@@ -175,7 +175,7 @@ include '../connection.php';
                     <textarea name="event-desc" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required></textarea>
                     <label class="ml-1 text-sm">Event Date:</label>
                     <input type="date" name="event-date" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
-                    <label class="ml-1 text-sm">Fee per event (₱):</label>
+                    <label class="ml-1 text-sm">Event Fee (₱):</label>
                     <input type="number" id="fee-per-event" name="fee-per-event" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
                     <label class="ml-1 text-sm">Sanction Fee (₱):</label>
                     <input type="number" id="sanction-fee" name="sanction-fee" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
@@ -210,7 +210,7 @@ include '../connection.php';
                     <div id="tooltip-content-date" class="absolute whitespace-normal break-words rounded-lg bg-red-500 py-1.5 px-3 font-sans text-xs font-normal text-white shadow shadow-black focus:outline-none">
                         Be careful when changing event dates, as this changes the <br>total fee to be paid with respect to the current date.
                     </div>
-                    <label class="ml-1 text-sm">Fee per event (₱):</label>
+                    <label class="ml-1 text-sm">Event Fee (₱):</label>
                     <input type="number" id="edit-fee-per-event" name="edit-fee-per-event" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
                     <label class="ml-1 text-sm">Sanction Fee (₱):</label>
                     <input type="number" id="edit-sanction-fee" name="edit-sanction-fee" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
@@ -273,7 +273,7 @@ include '../connection.php';
         $eventdate = $_POST['event-date'];
         $feeperevent = $_POST['fee-per-event'];
         $sanctionfee = $_POST['sanction-fee'];
-        $sql_event = "INSERT INTO `events`(`event_name`, `event_description`, `event_date`, `fee_per_event`, `sanction_fee`) VALUES (?, ?, ?, ?, ?)";
+        $sql_event = "INSERT INTO `events`(`event_name`, `event_description`, `event_date`, `event_fee`, `sanction_fee`) VALUES (?, ?, ?, ?, ?)";
         $stmt_event = $conn->prepare($sql_event);
         $stmt_event->bind_param("sssii", $eventname, $eventdesc, $eventdate, $feeperevent, $sanctionfee);
         if ($stmt_event->execute()) {
@@ -297,7 +297,7 @@ include '../connection.php';
         $eventdate = $_POST['edit-event-date'];
         $feeperevent = $_POST['edit-fee-per-event'];
         $sanctionfee = $_POST['edit-sanction-fee'];
-        $sqlupdate_event = "UPDATE `events` SET `event_name`=?, `event_description`=?, `event_date`=?, `fee_per_event`=?, `sanction_fee`=? WHERE `event_id` = ?";
+        $sqlupdate_event = "UPDATE `events` SET `event_name`=?, `event_description`=?, `event_date`=?, `event_fee`=?, `sanction_fee`=? WHERE `event_id` = ?";
         $stmt_update_event = $conn->prepare($sqlupdate_event);
         $stmt_update_event->bind_param("sssiii", $eventname, $eventdesc, $eventdate, $feeperevent, $sanctionfee, $eid);
         if ($stmt_update_event->execute()) {
