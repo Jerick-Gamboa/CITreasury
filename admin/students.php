@@ -119,11 +119,15 @@ include '../connection.php';
                                     <td class="px-2 border-r border-black bg-purple-100"><?php echo $sid; ?></td>
                                     <td class="px-2 border-r border-black bg-purple-100"><?php echo $lastname . ', ' . $firstname . ' ' . $mi; ?></td>
                                     <td class="px-2 border-r border-black bg-purple-100"><?php echo $yearsec; ?></td>
-                                    <td class="max-w-56 bg-purple-100">
-                                        <button class="px-4 py-2 my-1 mx-1 bg-yellow-500 text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-yellow-400" onclick="editRow(this)">Edit</button>
+                                    <td class="px-1 bg-purple-100">
+                                        <button class="px-3 py-2 my-1 mx-1 bg-yellow-500 text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-yellow-400" onclick="editRow(this)">
+                                            <svg id="mdi-pencil" class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z" /></svg>
+                                        </button>
                                         <form method="POST" class="inline-block" id="delete-current-<?php echo str_replace(" ", "", $sid) ?>">
                                             <input type="hidden" name="sid-to-delete" value="<?php echo $sid; ?>">
-                                            <button id="delete-student-<?php echo str_replace(" ", "", $sid) ?>" class="px-2 py-2 mb-1 mx-1 bg-red-600 text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-red-500">Delete</button>
+                                            <button id="delete-student-<?php echo str_replace(" ", "", $sid) ?>" class="px-3 py-2 mb-1 mx-1 bg-red-600 text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-red-500">
+                                                <svg id="mdi-delete" class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" /></svg>
+                                            </button>
                                         </form>
                                     </td>
                                 </tr>
