@@ -109,18 +109,18 @@ include '../connection.php';
                         # The balance would also be affected
                         $sql = "SELECT  `students`.*, `registrations`.`registration_date`, 
                                     CASE 
-                                        WHEN `events`.`event_date` < CURDATE() AND `events`.`fee_per_event` > `registrations`.`paid_fees`
-                                        THEN `events`.`fee_per_event` + `events`.`sanction_fee`
-                                        WHEN `events`.`fee_per_event` = `registrations`.`paid_fees`
-                                        THEN `events`.`fee_per_event`
-                                        ELSE `events`.`fee_per_event` + `events`.`sanction_fee`
+                                        WHEN `events`.`event_date` < CURDATE() AND `events`.`fee_per_event` > `registrations`.`paid_fees` 
+                                        THEN `events`.`fee_per_event` + `events`.`sanction_fee` 
+                                        WHEN `events`.`fee_per_event` = `registrations`.`paid_fees` OR `events`.`event_date` >= CURDATE() 
+                                        THEN `events`.`fee_per_event` 
+                                        ELSE `events`.`fee_per_event` + `events`.`sanction_fee` 
                                     END AS `total_fee`, 
                                     CASE 
-                                        WHEN `events`.`event_date` < CURDATE() AND `events`.`fee_per_event` > `registrations`.`paid_fees`
-                                        THEN (`events`.`fee_per_event` + `events`.`sanction_fee`) - `registrations`.`paid_fees`
-                                        WHEN `events`.`fee_per_event` = `registrations`.`paid_fees`
+                                        WHEN `events`.`event_date` < CURDATE() AND `events`.`fee_per_event` > `registrations`.`paid_fees` 
+                                        THEN (`events`.`fee_per_event` + `events`.`sanction_fee`) - `registrations`.`paid_fees` 
+                                        WHEN `events`.`fee_per_event` = `registrations`.`paid_fees` OR `events`.`event_date` >= CURDATE() 
                                         THEN `events`.`fee_per_event` - `registrations`.`paid_fees`
-                                        ELSE (`events`.`fee_per_event` + `events`.`sanction_fee`) - `registrations`.`paid_fees`
+                                        ELSE (`events`.`fee_per_event` + `events`.`sanction_fee`) - `registrations`.`paid_fees` 
                                     END AS `balance`
                                 FROM `students` 
                                 JOIN `registrations` ON `students`.`student_id` = `registrations`.`student_id` 
