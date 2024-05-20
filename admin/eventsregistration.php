@@ -105,20 +105,22 @@ include '../connection.php';
                         <?php
                         $eventId = $_GET['event-id'];
                         # Query for displaying registered students in a particular event
-                        # I
+                        # If the event was happened and the student has still balance, the total fees to paid would be the event fee + sanction fee
+                        # Else if the event wasnt happened yet or the event fee was fully paid, the total fees would be the event fee alone
+                        # Or else, sanction fee was also applied
                         # The balance would also be affected
                         $sql = "SELECT  `students`.*, `registrations`.`registration_date`, 
                                     CASE 
                                         WHEN `events`.`event_date` < CURDATE() AND `events`.`fee_per_event` > `registrations`.`paid_fees` 
                                         THEN `events`.`fee_per_event` + `events`.`sanction_fee` 
-                                        WHEN `events`.`fee_per_event` = `registrations`.`paid_fees` OR `events`.`event_date` >= CURDATE() 
+                                        WHEN `events`.`event_date` >= CURDATE() OR `events`.`fee_per_event` = `registrations`.`paid_fees` 
                                         THEN `events`.`fee_per_event` 
                                         ELSE `events`.`fee_per_event` + `events`.`sanction_fee` 
                                     END AS `total_fee`, 
                                     CASE 
                                         WHEN `events`.`event_date` < CURDATE() AND `events`.`fee_per_event` > `registrations`.`paid_fees` 
                                         THEN (`events`.`fee_per_event` + `events`.`sanction_fee`) - `registrations`.`paid_fees` 
-                                        WHEN `events`.`fee_per_event` = `registrations`.`paid_fees` OR `events`.`event_date` >= CURDATE() 
+                                        WHEN `events`.`event_date` >= CURDATE() OR `events`.`fee_per_event` = `registrations`.`paid_fees` 
                                         THEN `events`.`fee_per_event` - `registrations`.`paid_fees`
                                         ELSE (`events`.`fee_per_event` + `events`.`sanction_fee`) - `registrations`.`paid_fees` 
                                     END AS `balance`
