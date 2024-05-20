@@ -111,16 +111,12 @@ include '../connection.php';
                         # The balance would also be affected
                         $sql = "SELECT  `students`.*, `registrations`.`registration_date`, 
                                     CASE 
-                                        WHEN `events`.`event_date` > CURDATE()
-                                        THEN `events`.`fee_per_event`
-                                        WHEN `events`.`event_date` < CURDATE() AND `events`.`fee_per_event` > `registrations`.`paid_fees` 
+                                        WHEN `events`.`event_date` < CURDATE() AND (`events`.`fee_per_event` > `registrations`.`paid_fees` OR (`events`.`fee_per_event` + `events`.`sanction_fee`) = `registrations`.`paid_fees`) 
                                         THEN `events`.`fee_per_event` + `events`.`sanction_fee`
                                         ELSE `events`.`fee_per_event`
                                     END AS `total_fee`, 
                                     CASE 
-                                        WHEN `events`.`event_date` > CURDATE()
-                                        THEN `events`.`fee_per_event` - `registrations`.`paid_fees`
-                                        WHEN `events`.`event_date` < CURDATE() AND `events`.`fee_per_event` > `registrations`.`paid_fees` 
+                                        WHEN `events`.`event_date` < CURDATE() AND (`events`.`fee_per_event` > `registrations`.`paid_fees` OR (`events`.`fee_per_event` + `events`.`sanction_fee`) = `registrations`.`paid_fees`) 
                                         THEN (`events`.`fee_per_event` + `events`.`sanction_fee`) - `registrations`.`paid_fees`
                                         ELSE `events`.`fee_per_event` - `registrations`.`paid_fees`
                                     END AS `balance`
