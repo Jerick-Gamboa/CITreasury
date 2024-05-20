@@ -174,7 +174,7 @@ include '../connection.php';
                     <label class="ml-1 text-sm">Event Description:</label>
                     <textarea name="event-desc" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required></textarea>
                     <label class="ml-1 text-sm">Event Date:</label>
-                    <input type="date" name="event-date" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
+                    <input type="date" id="event-date" name="event-date" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
                     <label class="ml-1 text-sm">Event Fee (₱):</label>
                     <input type="number" id="fee-per-event" name="fee-per-event" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
                     <label class="ml-1 text-sm">Sanction Fee (₱):</label>
@@ -259,6 +259,11 @@ include '../connection.php';
                 $('#tooltip-content-date').fadeOut(150);
             }
         );
+
+        const today = new Date();
+        today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+        const todayString = today.toISOString().split('T')[0];
+        $('#event-date').attr('min', todayString);
 
         // Apply deletion of data using event-id to each unique form id and button id
         for (let i=0; i<deleteIds.length; i++) {
