@@ -133,6 +133,7 @@ include '../connection.php';
                                 $firstname = $row['first_name'];
                                 $mi = !empty($row['middle_initial']) ? $row['middle_initial'] . '.' : "";
                                 $yearsec = $row['year_and_section'];
+                                $eventid = $row['event_id'];
                                 $eventname = $row['event_name'];
                                 $eventdate = $row['event_date'];
                                 $totalfee = $row['total_fee'];
@@ -147,7 +148,7 @@ include '../connection.php';
                                     <td class="px-2 border-r border-black bg-purple-100"><?php echo $totalfee; ?></td>
                                     <td class="px-2 border-r border-black bg-purple-100"><?php echo $balance; ?></td>
                                     <td class="max-w-56 bg-purple-100">
-                                        <button class="px-3 py-2 my-1 mx-1 bg-green-500 text-white text-sm font-semibold rounded-lg focus:outline-none disabled:bg-gray-400 shadow hover:bg-green-400" onclick='collect(this)' <?php if ($balance <= 0) echo 'disabled'; ?>>
+                                        <button class="px-3 py-2 my-1 mx-1 bg-green-500 text-white text-sm font-semibold rounded-lg focus:outline-none disabled:bg-gray-400 shadow hover:bg-green-400" onclick='collect(this, "<?php echo $eventid; ?>")' <?php if ($balance <= 0) echo 'disabled'; ?>>
                                             <svg id="mdi-wallet-plus" class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M3 0V3H0V5H3V8H5V5H8V3H5V0H3M9 3V6H6V9H3V19C3 20.1 3.89 21 5 21H19C20.11 21 21 20.11 21 19V18H12C10.9 18 10 17.11 10 16V8C10 6.9 10.89 6 12 6H21V5C21 3.9 20.11 3 19 3H9M12 8V16H22V8H12M16 10.5C16.83 10.5 17.5 11.17 17.5 12C17.5 12.83 16.83 13.5 16 13.5C15.17 13.5 14.5 12.83 14.5 12C14.5 11.17 15.17 10.5 16 10.5Z" /></svg>
                                         </button> <!-- Disable button if balance is zero -->
                                     </td>
@@ -180,6 +181,7 @@ include '../connection.php';
                     <input type="text" id="collect-student-id" name="collect-student-id" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" maxlength="7" readonly>
                     <label class="ml-1 text-sm">Student Name:</label>
                     <input type="text" id="collect-student-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" readonly>
+                    <input type="hidden" id="collect-event-id" name="collect-event-id">
                     <label class="ml-1 text-sm">Event Name:</label>
                     <input type="text" id="collect-event-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" readonly>
                     <label class="ml-1 text-sm">Total Fee (₱):</label>
@@ -197,7 +199,7 @@ include '../connection.php';
     </div>
     <script type="text/javascript">
     // If collect button is pressed, fade in modals for collection
-        function collect(link) {
+        function collect(link, eventId) {
             $("#collect-popup-bg").fadeIn(150);
             $("#collect-popup-item").delay(150).fadeIn(150);
             $("#collect-close-popup").click((event) => {
@@ -210,12 +212,13 @@ include '../connection.php';
             $("#collect-student-id").val(row.cells[0].innerHTML);
             $("#collect-student-name").val(row.cells[1].innerHTML);
             $("#collect-event-name").val(row.cells[3].innerHTML);
+            $("#collect-event-id").val(eventId);
             $("#collect-total-fee").val(row.cells[5].innerHTML); 
             $("#collect-balance").val(row.cells[6].innerHTML);
 
             $("#collect-amount").on('input', () => { // Input change in collected amount
                 let collectAmount = parseFloat($("#collect-amount").val());
-                let currentBalance = parseFloat(row.cells[5].innerHTML);
+                let currentBalance = parseFloat(row.cells[6].innerHTML);
 
                 if (isNaN(collectAmount) || collectAmount > currentBalance || collectAmount <= 0) {
                     // If collected amount is not valid, disable Collect Sanctions button and set balance input to default
@@ -229,5 +232,29 @@ include '../connection.php';
             });
         }
     </script>
+    <?php
+    # If collect fee is submitted
+    if (isset($_POST['collect-this-fee'])) {
+        $sid = $_POST['collect-student-id'];
+        $eventid = $_POST['collect-event-id'];
+        $collectamount = $_POST['collect-amount'];
+        $sqladd_collect = "INSERT INTO `sanctions` (`student_id`, `event_id`, `sanctions_paid`) VALUES (?, ?, ?)";
+        $stmt_add_collect = $conn->prepare($sqladd_collect);
+        $stmt_add_collect->bind_param("sii", $sid, $eventid, $collectamount);
+        if ($stmt_add_collect->execute()) {
+            ?>
+            <!-- SweetAlert popup -->
+            <script>
+                swal('Sanction fees collected!', '', 'success')
+                .then(() => {
+                    window.location.href = 'sanctions.php';
+                });
+            </script>
+            <?php
+        } else {
+            ?><script>swal('Failed to collect fee!', '', 'error');</script><?php
+        }
+    }
+    ?>
 </body>
 </html>

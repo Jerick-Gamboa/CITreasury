@@ -219,9 +219,9 @@ include '../connection.php';
                 $("#edit-popup-bg, #edit-popup-item").fadeOut(150);
             });
             
-            var row = $(link).closest("tr");
-            var studentId = row.find("td:eq(0)").text();
-            var studentData = namesArray.find((student) => {
+            const row = $(link).closest("tr");
+            const studentId = row.find("td:eq(0)").text();
+            const studentData = namesArray.find((student) => {
                 return student[0] === studentId;
             });
             if (studentData) {
