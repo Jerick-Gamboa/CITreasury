@@ -91,7 +91,7 @@ include '../connection.php';
                     <div class="w-full bg-yellow-600 rounded shadow-lg mr-4 mb-4">
                         <div class="w-full flex flex-row justify-between items-center">
                             <h3 class="mx-3 my-5 text-white">Total Fees</h3>
-                            <h2 class="mx-3 my-5 text-4xl font-bold text-white">₱ <?php echo getQueryString($conn, "SELECT SUM(`paid_fees`) FROM `registrations`", "SUM(`paid_fees`)"); ?></h2>
+                            <h2 class="mx-3 my-5 text-4xl font-bold text-white">₱ <?php echo getQueryString($conn, "SELECT SUM(total_paid) AS total_amount_paid FROM (SELECT SUM(`paid_fees`) AS total_paid FROM `registrations` UNION ALL SELECT SUM(`sanctions_paid`) AS total_paid FROM `sanctions`) AS combined_payments; ", "total_amount_paid"); ?></h2>
                         </div>
                         <div class="w-full px-3 py-2 bg-yellow-700 rounded-b">
                             <p class="text-xs font-bold text-white">Total Amount Collected </p>

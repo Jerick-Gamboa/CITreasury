@@ -58,7 +58,7 @@ CREATE TABLE `events` (
 INSERT INTO `events` (`event_id`, `event_name`, `event_description`, `event_date`, `event_fee`, `sanction_fee`) VALUES
 (101, 'IT Night', 'Aranuhan', '2024-05-19', 200,  20),
 (102, 'General Assembly', 'Basta',  '2024-05-21', 0,  40),
-(103, 'Arts Month', 'Aranuhan', '2024-05-19', 100,  40);
+(103, 'Arts Month', 'Nugagawen', '2024-05-19', 100,  40);
 
 DROP TABLE IF EXISTS `registrations`;
 CREATE TABLE `registrations` (
