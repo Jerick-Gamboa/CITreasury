@@ -13,7 +13,7 @@ include '../connection.php';
     <script src="../js/jquery-3.7.1.min.js"></script>
     <script src="../js/predefined-script.js"></script>
     <script src="../js/defer-script.js" defer></script>
-    <title>CITreasury - Dashboard</title>
+    <title>CITreasury - Account Settings</title>
 </head>
 <body>
     <?php

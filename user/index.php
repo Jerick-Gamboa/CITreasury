@@ -82,7 +82,7 @@ include '../connection.php';
                     <h2 class="text-2xl text-white font-semibold">Total Paid Fees: ₱ <?php echo $totalpaid; ?></h2>
                 </div>
                 <div class="flex lg:flex-row flex-col">
-                    <div class="w-full p-4 bg-blue-300 rounded-lg shadow-lg mr-5 mb-5">
+                    <div class="w-full p-4 bg-blue-400 rounded-lg shadow-lg mr-5 mb-5">
                         <h3 class="text-gray-800 font-bold text-lg mb-4">Upcoming events</h3>
                         <?php
                         $sql_upcoming_events = "SELECT * FROM `events` WHERE `event_date` > CURDATE()";
@@ -92,7 +92,7 @@ include '../connection.php';
                         if ($result_upcoming_events->num_rows > 0) {
                             while ($row_event = $result_upcoming_events->fetch_assoc()) {
                                 ?>
-                                <div class="border-l-4 border-white m-2 p-3 bg-blue-600 shadow-lg text-white">
+                                <div class="border-l-4 border-white m-2 p-3 bg-blue-700 shadow-lg text-white">
                                     <h3 class="text-2xl font-bold mb-2"><?php echo $row_event['event_name']; ?></h3>
                                     <div class="text-sm font-semibold">
                                         <p class="mb-2"><?php echo $row_event['event_description']; ?></p>
@@ -107,7 +107,7 @@ include '../connection.php';
                         }
                         ?>
                     </div>
-                    <div class="w-full p-4 bg-green-300 rounded-lg shadow-lg mb-4">
+                    <div class="w-full p-4 bg-green-400 rounded-lg shadow-lg mb-4">
                         <h3 class="text-gray-800 font-bold text-lg mb-4">Registered events</h3>
                         <?php
                         $sql_registered_events = "SELECT `events`.`event_name`, `events`.`event_description`, `events`.`event_fee`, `registrations`.`registration_date`, `registrations`.`paid_fees` FROM `events` JOIN `registrations` ON `events`.`event_id` = `registrations`.`event_id` WHERE `registrations`.`student_id` = ?";
@@ -118,7 +118,7 @@ include '../connection.php';
                         if ($result_registered_events->num_rows > 0) {
                             while ($row_event = $result_registered_events->fetch_assoc()) {
                                 ?>
-                                <div class="border-l-4 border-white m-2 p-3 bg-green-600 shadow-lg text-white">
+                                <div class="border-l-4 border-white m-2 p-3 bg-green-700 shadow-lg text-white">
                                     <h3 class="text-2xl font-bold mb-2"><?php echo $row_event['event_name']; ?></h3>
                                     <div class="text-sm font-semibold">
                                         <p class="mb-2"><?php echo $row_event['event_description']; ?></p>

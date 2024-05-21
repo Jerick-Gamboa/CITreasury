@@ -14,7 +14,7 @@ include '../connection.php';
     <script src="../js/jquery-3.7.1.min.js"></script>
     <script src="../js/predefined-script.js"></script>
     <script src="../js/defer-script.js" defer></script> <!-- Defer attribute means this javascript file will be executed once the HTML file is fully loaded -->
-    <title>CITreasury - Students</title>
+    <title>CITreasury - Sanctions</title>
 </head>
 <body>
     <?php
