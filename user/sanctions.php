@@ -55,7 +55,7 @@ include '../connection.php';
             <div class="mt-24">
                 <h1 class="text-3xl text-custom-purplo font-bold mb-5">Your Sanctions</h1>
             </div>
-            <div class="w-full p-4 bg-gradient-to-r from-custom-purplo to-purple-400 rounded-lg shadow-lg mb-4">
+            <div class="w-full p-4 bg-custom-purplo rounded-lg shadow-lg mb-4">
                 <h2 id="pending-fees" class="text-2xl text-white font-semibold">Pending Fees: ₱ --</h2>
             </div>
             <div class="flex lg:flex-row flex-col">
@@ -96,7 +96,7 @@ include '../connection.php';
                                 <h3 class="text-2xl font-bold mb-2"><?php echo $row_event['event_name']; ?></h3>
                                 <div class="text-sm font-semibold">
                                     <p>Date: <?php echo $row_event['event_date']; ?></p>
-                                    <p>To pay: ₱ <?php echo $row_event['total_fee']; ?></p>
+                                    <p>To Pay: ₱ <?php echo $row_event['total_fee']; ?></p>
                                 </div>
                             </div>
                             <?php
@@ -141,7 +141,7 @@ include '../connection.php';
                                 <div class="text-sm font-semibold">
                                     <p>Registered: <?php echo $row_event['registration_date']; ?></p>
                                     <p>Paid Fee: ₱ <?php echo $row_event['paid_fees']; ?></p>
-                                    <p>To pay: ₱ <?php echo $row_event['balance']; ?></p>
+                                    <p>To Pay: ₱ <?php echo $row_event['balance']; ?></p>
                                 </div>
                             </div>
                             <?php
