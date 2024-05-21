@@ -66,14 +66,14 @@ include '../connection.php';
                     # Set student name in title using student-id in cookie
                     ?><h1 class="text-3xl text-custom-purplo font-bold mb-5">Welcome, <?php echo $firstname . " ". $mi . " " . $lastname; ?>!</h1><?php
                 }
-                $sql_total = "SELECT SUM(`paid_fees`) FROM `registrations` WHERE `student_id` = ?";
+                $sql_total = " SELECT SUM(`registrations`.`paid_fees`) + COALESCE(SUM(`sanctions`.`sanctions_paid`), 0) AS `total_paid` FROM `registrations` LEFT JOIN `sanctions` ON `registrations`.`student_id` = `sanctions`.`student_id` WHERE `registrations`.`student_id` = ?";
                 $stmt_total = $conn->prepare($sql_total);
                 $stmt_total->bind_param("s", $_COOKIE['cit-student-id']);
                 $stmt_total->execute();
                 $result_total = $stmt_total->get_result();
                 if ($row = $result_total->fetch_assoc()) {
-                    $totalpaid = $row['SUM(`paid_fees`)'];
-                    if ($row['SUM(`paid_fees`)'] === NULL) {
+                    $totalpaid = $row['total_paid'];
+                    if ($row['total_paid'] === NULL) {
                         $totalpaid = "0";
                     }
                 }

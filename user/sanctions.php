@@ -63,12 +63,30 @@ include '../connection.php';
                     <h3 class="text-gray-800 font-bold text-lg mb-4">Unregistered Past Events</h3>
                     <?php
                     $pendingfees = 0;
-                        $sql_unregistered_events = " SELECT `events`.*, `events`.`event_fee` + `events`.`sanction_fee` AS `total_fee`
-                        FROM `events` 
-                        LEFT JOIN `registrations` ON `events`.`event_id` = `registrations`.`event_id` AND `registrations`.`student_id` = ? 
-                        WHERE `registrations`.`student_id` IS NULL AND `events`.`event_date` < CURDATE()";
+                    $sql_unregistered_events = "
+                        SELECT `events`.*, `events`.`event_fee` + `events`.`sanction_fee` AS `total_fee`,
+                            (`events`.`event_fee` + `events`.`sanction_fee` - COALESCE(`sanctions`.`total_sanctions_paid`, 0)) AS `balance`
+                        FROM `events`
+                        LEFT JOIN `registrations` 
+                        ON `events`.`event_id` = `registrations`.`event_id` 
+                            AND `registrations`.`student_id` = ?
+                        LEFT JOIN 
+                            (
+                                SELECT 
+                                    `event_id`, 
+                                    `student_id`, 
+                                    SUM(`sanctions_paid`) AS `total_sanctions_paid`
+                                FROM 
+                                    `sanctions`
+                                GROUP BY 
+                                    `event_id`, `student_id`
+                            ) AS `sanctions` 
+                        ON `events`.`event_id` = `sanctions`.`event_id` AND `sanctions`.`student_id` = ?
+                        WHERE `registrations`.`student_id` IS NULL 
+                            AND `events`.`event_date` < CURDATE()
+                            AND (`events`.`event_fee` + `events`.`sanction_fee`) > COALESCE(`sanctions`.`total_sanctions_paid`, 0)";
                     $stmt_unregistered_events = $conn->prepare($sql_unregistered_events);
-                    $stmt_unregistered_events->bind_param("s", $_COOKIE['cit-student-id']);
+                    $stmt_unregistered_events->bind_param("ss", $_COOKIE['cit-student-id'], $_COOKIE['cit-student-id']);
                     $stmt_unregistered_events->execute();
                     $result_unregistered_events = $stmt_unregistered_events->get_result();
                     if ($result_unregistered_events->num_rows > 0) {
@@ -78,14 +96,14 @@ include '../connection.php';
                                 <h3 class="text-2xl font-bold mb-2"><?php echo $row_event['event_name']; ?></h3>
                                 <div class="text-sm font-semibold">
                                     <p>Date: <?php echo $row_event['event_date']; ?></p>
-                                    <p>Event Fee With Sanction: ₱ <?php echo $row_event['total_fee']; ?></p>
+                                    <p>To pay: ₱ <?php echo $row_event['total_fee']; ?></p>
                                 </div>
                             </div>
                             <?php
                             $pendingfees += $row_event['total_fee'];
                         }
                     } else {
-                        ?><p class="text-sm">No unregistered past events found.</p><?php
+                        ?><p class="text-sm">No events found.</p><?php
                     }
                     ?>
                 </div>
@@ -123,7 +141,7 @@ include '../connection.php';
                                 <div class="text-sm font-semibold">
                                     <p>Registered: <?php echo $row_event['registration_date']; ?></p>
                                     <p>Paid Fee: ₱ <?php echo $row_event['paid_fees']; ?></p>
-                                    <p>Current Balance: ₱ <?php echo $row_event['balance']; ?></p>
+                                    <p>To pay: ₱ <?php echo $row_event['balance']; ?></p>
                                 </div>
                             </div>
                             <?php
