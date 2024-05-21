@@ -105,7 +105,7 @@ include '../connection.php';
                             </script>
                             <?php
                         }
-                        $sql_unregisteredpast .= " ORDER BY `students`.`student_id`, `events`.`event_date`";
+                        $sql_unregisteredpast .= " ORDER BY `balance` DESC";
                         $stmt_unregisteredpast = $conn->prepare($sql_unregisteredpast);
                         if (isset($search)) {
                             $stmt_unregisteredpast->bind_param("sssss", $search, $search, $search, $search, $search);
