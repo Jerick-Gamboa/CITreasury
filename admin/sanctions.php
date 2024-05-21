@@ -67,6 +67,11 @@ include '../connection.php';
                   </form>
                 </div>
             </div>
+            <?php
+            $results_per_page = 10; // Number of results per page
+            $page = isset($_GET['page']) ? (int)$_GET['page'] : 1; // Current page number
+            $offset = ($page - 1) * $results_per_page; // Offset for SQL query
+            ?>
             <div class="mt-1 mb-5 overflow-x-auto rounded-lg shadow-lg">
                 <div class="overflow-x-auto rounded-lg border border-black">
                     <!-- Table of Unregistered Students -->
@@ -103,11 +108,16 @@ include '../connection.php';
                             </script>
                             <?php
                         }
-                        $sql_unregisteredpast .= " ORDER BY `balance` DESC";
+
+                        $sql_unregisteredpast .= " ORDER BY `balance` DESC LIMIT ? OFFSET ?";
+
                         $stmt_unregisteredpast = $conn->prepare($sql_unregisteredpast);
                         if (isset($search)) {
-                            $stmt_unregisteredpast->bind_param("sssss", $search, $search, $search, $search, $search);
+                            $stmt_unregisteredpast->bind_param("ssssssi", $search, $search, $search, $search, $search, $results_per_page, $offset);
+                        } else {
+                            $stmt_unregisteredpast->bind_param("ii", $results_per_page, $offset);
                         }
+
                         $stmt_unregisteredpast->execute();
                         $result_unregisteredpast = $stmt_unregisteredpast->get_result();
                         if ($result_unregisteredpast->num_rows > 0) {
@@ -159,6 +169,42 @@ include '../connection.php';
                         ?>
                     </table>
                 </div>
+            </div>
+            <div id="has-result" class="w-full">
+                <p>Showing only 10 maximum results</p>
+            </div>
+            <div class="pagination my-2">
+                <?php
+                // Get the total number of rows for pagination
+                $sql_count = "
+                    SELECT COUNT(*) AS total
+                    FROM `students`
+                    CROSS JOIN `events`
+                    LEFT JOIN `registrations` ON `students`.`student_id` = `registrations`.`student_id` AND `events`.`event_id` = `registrations`.`event_id`
+                    WHERE `registrations`.`student_id` IS NULL AND `events`.`event_date` < CURDATE()";
+
+                if (isset($search)) {
+                    $sql_count .= " AND (`students`.`student_id` LIKE ? OR `students`.`last_name` LIKE ? OR `students`.`first_name` LIKE ? OR `students`.`year_and_section` LIKE ? OR `events`.`event_name` LIKE ?)";
+                }
+
+                $stmt_count = $conn->prepare($sql_count);
+                if (isset($search)) {
+                    $stmt_count->bind_param("sssss", $search, $search, $search, $search, $search);
+                }
+                $stmt_count->execute();
+                $result_count = $stmt_count->get_result();
+                $row_count = $result_count->fetch_assoc();
+                $total_pages = ceil($row_count['total'] / $results_per_page);
+                for ($i = 1; $i <= $total_pages; $i++) {
+                    ?><a href='sanctions.php?page=<?php echo $i; ?>'><button class="px-3 py-2 my-1 mr-1 <?php echo $_GET['page'] == $i ? 'bg-purple-600' : 'bg-custom-purplo'; ?> text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-custom-purple"><?php echo $i; ?></button></a>
+                    <?php
+                }
+                if ($total_pages <= 0) {
+                    ?>
+                    <script>$("#has-result").html(null)</script>
+                    <?php
+                }
+                ?>
             </div>
         </div>
     </div>
