@@ -70,8 +70,7 @@ include '../connection.php';
                         LEFT JOIN `registrations` 
                         ON `events`.`event_id` = `registrations`.`event_id` 
                             AND `registrations`.`student_id` = ?
-                        LEFT JOIN 
-                            (
+                        LEFT JOIN (
                                 SELECT 
                                     `event_id`, 
                                     `student_id`, 
@@ -96,7 +95,7 @@ include '../connection.php';
                                 <h3 class="text-2xl font-bold mb-2"><?php echo $row_event['event_name']; ?></h3>
                                 <div class="text-sm font-semibold">
                                     <p>Date: <?php echo $row_event['event_date']; ?></p>
-                                    <p>To Pay: ₱ <?php echo $row_event['total_fee']; ?></p>
+                                    <p>To Pay: ₱ <?php echo $row_event['balance']; ?></p>
                                 </div>
                             </div>
                             <?php
