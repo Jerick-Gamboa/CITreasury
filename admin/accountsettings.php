@@ -94,6 +94,7 @@ include '../connection.php';
             ?>
             <script>
                 window.location.href = 'accountsettings.php';
+                swal('Changes saved!', '', 'success');
             </script>
             <?php
         } else {
