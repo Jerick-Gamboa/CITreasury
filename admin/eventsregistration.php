@@ -278,6 +278,8 @@ include '../connection.php';
                 <form method="POST">
                     <label class="ml-1 text-sm">Student ID:</label>
                     <input type="text" id="collect-student-id" name="collect-student-id" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" maxlength="7" readonly>
+                    <label class="ml-1 text-sm">Student Name:</label>
+                    <input type="text" id="collect-student-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" readonly>
                     <label class="ml-1 text-sm">Total Fee (₱):</label>
                     <input type="number" id="collect-total-fee" name="collect-total-fee" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" readonly>
                     <label class="ml-1 text-sm">Balance (₱):</label>
@@ -340,6 +342,7 @@ include '../connection.php';
             let row = link.parentNode.parentNode; // Get table datas
             // Transfer table data to input fields
             $("#collect-student-id").val(row.cells[0].innerHTML);
+            $("#collect-student-name").val(row.cells[1].innerHTML);
             $("#collect-total-fee").val(row.cells[4].innerHTML); 
             $("#collect-balance").val(row.cells[5].innerHTML);
 

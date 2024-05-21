@@ -163,5 +163,71 @@ include '../connection.php';
             </div>
         </div>
     </div>
+    <!-- Darken Background for Modal, hidden by default -->
+    <div id="collect-popup-bg" class="fixed top-0 w-full min-h-screen bg-black opacity-50 hidden"></div>
+    <!-- Popup Modal For Collecting Fees, hidden by default -->
+    <div id="collect-popup-item" class="fixed top-0 w-full min-h-screen hidden">
+        <div class="w-full min-h-screen flex items-center justify-center">
+            <div class="m-5 w-full py-3 px-5 sm:w-1/2 lg:w-1/3 xl:1/4 rounded bg-white h-fit shadow-lg shadow-black">
+                <div class="w-full flex justify-end">
+                    <button class="focus:outline-none" id="collect-close-popup">
+                        <svg id="mdi-close-box-outline" class="mt-2 w-6 h-6 hover:fill-red-500" viewBox="0 0 24 24"><path d="M19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M19,19H5V5H19V19M17,8.4L13.4,12L17,15.6L15.6,17L12,13.4L8.4,17L7,15.6L10.6,12L7,8.4L8.4,7L12,10.6L15.6,7L17,8.4Z" /></svg>
+                    </button>
+                </div>
+                <h3 class="text-2xl font-semibold text-custom-purple mb-3">Collect Sanction Fees</h3>
+                <form method="POST">
+                    <label class="ml-1 text-sm">Student ID:</label>
+                    <input type="text" id="collect-student-id" name="collect-student-id" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" maxlength="7" readonly>
+                    <label class="ml-1 text-sm">Student Name:</label>
+                    <input type="text" id="collect-student-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" readonly>
+                    <label class="ml-1 text-sm">Event Name:</label>
+                    <input type="text" id="collect-event-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" readonly>
+                    <label class="ml-1 text-sm">Total Fee (₱):</label>
+                    <input type="number" id="collect-total-fee" name="collect-total-fee" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" readonly>
+                    <label class="ml-1 text-sm">Balance (₱):</label>
+                    <input type="number" id="collect-balance" name="collect-balance" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" readonly>
+                    <label class="ml-1 text-sm">Collected Amount (₱):</label>
+                    <input type="number" id="collect-amount" name="collect-amount" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
+                    <div class="flex items-center justify-center m-4">
+                        <button type="submit" class="px-3 py-2 bg-custom-purple rounded-lg focus:outline-none focus:border-purple-500 text-base text-white font-bold disabled:bg-gray-400 hover:bg-custom-purplo" id="collect-this-fee" name="collect-this-fee" disabled>Collect Sanctions</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+    // If collect button is pressed, fade in modals for collection
+        function collect(link) {
+            $("#collect-popup-bg").fadeIn(150);
+            $("#collect-popup-item").delay(150).fadeIn(150);
+            $("#collect-close-popup").click((event) => {
+                $("#collect-popup-bg, #collect-popup-item").fadeOut(150);
+                $("#collect-amount").val(null);
+            });
+
+            let row = link.parentNode.parentNode; // Get table datas
+            // Transfer table data to input fields
+            $("#collect-student-id").val(row.cells[0].innerHTML);
+            $("#collect-student-name").val(row.cells[1].innerHTML);
+            $("#collect-event-name").val(row.cells[3].innerHTML);
+            $("#collect-total-fee").val(row.cells[5].innerHTML); 
+            $("#collect-balance").val(row.cells[6].innerHTML);
+
+            $("#collect-amount").on('input', () => { // Input change in collected amount
+                let collectAmount = parseFloat($("#collect-amount").val());
+                let currentBalance = parseFloat(row.cells[5].innerHTML);
+
+                if (isNaN(collectAmount) || collectAmount > currentBalance || collectAmount <= 0) {
+                    // If collected amount is not valid, disable Collect Sanctions button and set balance input to default
+                    $("#collect-this-fee").prop('disabled', true);
+                    $("#collect-balance").val(currentBalance);
+                } else {
+                    // If valid, enable Collect Sanctions button and set balance = (current balance - collected amount)
+                    $("#collect-this-fee").prop('disabled', false);
+                    $("#collect-balance").val(currentBalance - parseFloat($("#collect-amount").val()));
+                }
+            });
+        }
+    </script>
 </body>
 </html>
