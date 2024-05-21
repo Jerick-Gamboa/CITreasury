@@ -93,7 +93,7 @@ include '../connection.php';
                                         `student_id`, `event_id`
                                 ) AS `sanctions` 
                             ON `students`.`student_id` = `sanctions`.`student_id` AND `events`.`event_id` = `sanctions`.`event_id`
-                            WHERE `registrations`.`student_id` IS NULL AND (`events`.`event_fee` + `events`.`sanction_fee` > COALESCE(`sanctions`.`total_sanctions_paid`, 0)) AND `events`.`event_date` < CURDATE()";
+                            WHERE `registrations`.`student_id` IS NULL AND `events`.`event_date` < CURDATE()";
                         if (isset($_GET['search'])) {
                             $search = '%' . $_GET['search'] . '%';
                             $sql_unregisteredpast .= " AND (`students`.`student_id` LIKE ? OR `students`.`last_name` LIKE ? OR `students`.`first_name` LIKE ? OR `students`.`year_and_section` LIKE ? OR `events`.`event_name` LIKE ?)";
