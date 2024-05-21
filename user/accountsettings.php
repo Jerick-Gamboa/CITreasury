@@ -19,13 +19,14 @@ include '../connection.php';
     <?php
     # Verify if login exists such that the cookie "cit-student-id" is found on browser
     if (isset($_COOKIE['cit-student-id'])) {
-        $sql = "SELECT `type` FROM `accounts` WHERE `student_id` = ?";
+        $sql = "SELECT `type`, `password` FROM `accounts` WHERE `student_id` = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $_COOKIE['cit-student-id']);
         $stmt->execute();
         $result = $stmt->get_result();
         if ($result->num_rows > 0) {
             $row = $result->fetch_assoc();
+            $currentpass = $row['password']; # Get account password
             $type = $row['type'];
             if ($type === 'admin') { # If account type is admin, redirect to admin page
                 header("location: ../admin/");
@@ -55,7 +56,57 @@ include '../connection.php';
             <div class="mt-24">
                 <h1 class="text-3xl text-custom-purplo font-bold mb-5">Manage Your Account</h1>
             </div>
+            <div class="mt-16 w-full flex justify-center">
+                <div class="w-112 bg-white rounded-lg shadow">
+                    <h3 class="text-2xl font-semibold px-6 py-4 text-custom-purple">Change Password:</h3>
+                    <hr class="border border-lg border-custom-purple">
+                    <form class="p-6" id="password-form" method="POST">
+                        <label class="ml-1 text-sm">Old Password:</label>
+                        <input type="password" id="old-password" name="old-password" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
+                        <label class="ml-1 text-sm">New Password:</label>
+                        <input type="password" id="new-password" name="new-password" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
+                        <label class="ml-1 text-sm">Confirm New Password:</label>
+                        <input type="password" id="confirm-password" name="confirm-password" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
+                        <div class="flex items-center justify-center m-4">
+                            <button type="submit" class="px-3 py-2 bg-custom-purple rounded-lg focus:outline-none focus:border-purple-500 text-base text-white font-bold disabled:bg-gray-400 hover:bg-custom-purplo" id="update-password" name="update-password" disabled>Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
+    <script type="text/javascript">
+        $("#new-password, #confirm-password").on('input', () => {
+            if ($("#new-password").val() !== $("#confirm-password").val()) {
+                $("#update-password").prop('disabled', true);
+            } else {
+                $("#update-password").prop('disabled', false);
+            }
+        });
+    </script>
+    <?php
+        if (isset($_POST['update-password'])) {
+            if ($_POST['old-password'] !== $currentpass) {
+                ?>
+                <script>
+                    swal("Wrong old password!" ,'', 'error');
+                </script>
+                <?php
+            } else {
+                $sqlupdate_account = "UPDATE `accounts` SET `password`=? WHERE `student_id` = ?";
+                $stmt_update_account = $conn->prepare($sqlupdate_account);
+                $stmt_update_account->bind_param("ss", $email, $sid);
+                if ($stmt_update_account->execute()) {
+                    ?>
+                    <script>
+                        swal("Password changed successfully!" ,'', 'success').then(() => {
+                            window.location.href = "index.php";
+                        });
+                    </script>
+                    <?php
+                }
+            }
+        }
+    ?>
 </body>
 </html>
