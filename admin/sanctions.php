@@ -178,8 +178,7 @@ include '../connection.php';
                 <?php
                 // Get the total number of rows for pagination
                 $sql_count = "
-                    SELECT COUNT(*) AS total
-                    FROM `students`
+                    SELECT COUNT(*) FROM `students`
                     CROSS JOIN `events`
                     LEFT JOIN `registrations` ON `students`.`student_id` = `registrations`.`student_id` AND `events`.`event_id` = `registrations`.`event_id`
                     WHERE `registrations`.`student_id` IS NULL AND `events`.`event_date` < CURDATE()";
@@ -191,9 +190,9 @@ include '../connection.php';
                     $stmt_count->bind_param("sssss", $search, $search, $search, $search, $search);
                 }
                 $stmt_count->execute();
-                $result_count = $stmt_count->get_result();
-                $row_count = $result_count->fetch_assoc();
-                $total_pages = ceil($row_count['total'] / $results_per_page);
+                $row = $stmt_count->get_result()->fetch_assoc();
+                $total_records = $row['COUNT(*)'];
+                $total_pages = ceil($total_records / $results_per_page);
                 for ($i = 1; $i <= $total_pages; $i++) {
                     ?><a href='sanctions.php?<?php echo (isset($search)) ? "search=".$_GET['search']."&" : ""; ?>page=<?php echo $i; ?>'><button class="px-3 py-2 my-1 mr-1 <?php echo $page == $i ? 'bg-purple-600' : 'bg-custom-purplo'; ?> text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-custom-purple"><?php echo $i; ?></button></a>
                     <?php

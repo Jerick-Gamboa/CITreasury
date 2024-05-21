@@ -177,8 +177,8 @@ include '../connection.php';
                     $stmt_total->bind_param("s", $_COOKIE['cit-student-id']);
                 }
                 $stmt_total->execute();
-                $stmt_total->bind_result($total_records);
-                $stmt_total->fetch();
+                $row = $stmt_total->get_result()->fetch_assoc();
+                $total_records = $row['COUNT(*)'];
                 // Calculate total pages
                 $total_pages = ceil($total_records / $results_per_page);
                 // Display pagination buttons
