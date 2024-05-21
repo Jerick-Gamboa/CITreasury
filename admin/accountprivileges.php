@@ -126,7 +126,7 @@ include '../connection.php';
                                     <td class="px-2 border-r border-black bg-purple-100"><?php echo $password; ?></td>
                                     <td class="px-2 border-r border-black bg-purple-100"><?php echo $type; ?></td>
                                     <td class="px-1 bg-purple-100">
-                                        <button class="px-3 py-2 my-1 mx-1 bg-yellow-500 text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-yellow-400" onclick="editRow(this)">
+                                        <button class="px-3 py-2 my-1 mx-1 bg-orange-500 text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-orange-400" onclick="editRow(this)">
                                             <svg id="mdi-pencil" class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z" /></svg>
                                         </button>
                                     </td>
@@ -186,20 +186,21 @@ include '../connection.php';
                         <svg id="mdi-close-box-outline" class="mt-2 w-6 h-6 hover:fill-red-500" viewBox="0 0 24 24"><path d="M19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M19,19H5V5H19V19M17,8.4L13.4,12L17,15.6L15.6,17L12,13.4L8.4,17L7,15.6L10.6,12L7,8.4L8.4,7L12,10.6L15.6,7L17,8.4Z" /></svg>
                     </button>
                 </div>
-                <h3 class="text-2xl font-semibold text-custom-purple mb-3">Edit Student</h3>
+                <h3 class="text-2xl font-semibold text-custom-purple mb-3">Edit Account Privilege</h3>
                 <form method="POST">
                     <label class="ml-1 text-sm">Student ID:</label>
                     <input type="text" id="edit-student-id" name="edit-student-id" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" maxlength="7" readonly>
-                    <label class="ml-1 text-sm">Last Name:</label>
-                    <input type="text" id="edit-last-name" name="edit-last-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" pattern="[a-zA-Z\s']+" required>
-                    <label class="ml-1 text-sm">First Name:</label>
-                    <input type="text" id="edit-first-name" name="edit-first-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" pattern="[a-zA-Z\s']+" required>
-                    <label class="ml-1 text-sm">Middle Initial:</label>
-                    <input type="text" id="edit-middle-initial" name="edit-middle-initial" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" maxlength="3" pattern="[a-zA-Z\s']+">
-                    <label class="ml-1 text-sm">Year & Section:</label>
-                    <input type="text" id="edit-yearsec" name="edit-yearsec" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" maxlength="2" pattern="[A-Za-z0-9]+" required>
+                    <label class="ml-1 text-sm">Email:</label>
+                    <input type="email" id="edit-email" name="edit-email" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" readonly>
+                    <label class="ml-1 text-sm">Password:</label>
+                    <input type="text" id="edit-password" name="edit-password" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
+                    <label class="ml-1 text-sm">Role:</label>
+                    <select id="edit-account-type" name="edit-account-type" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                    </select>
                     <div class="flex items-center justify-center m-4">
-                        <button type="submit" class="px-3 py-2 bg-custom-purple rounded-lg focus:outline-none focus:border-purple-500 text-base text-white font-bold hover:bg-custom-purplo" name="update-this-student">Update Student</button>
+                        <button type="submit" class="px-3 py-2 bg-custom-purple rounded-lg focus:outline-none focus:border-purple-500 text-base text-white font-bold hover:bg-red-600" name="update-this-account">Update Account</button>
                     </div>
                 </form>
             </div>
@@ -210,54 +211,37 @@ include '../connection.php';
         $("#edit-popup-bg, #edit-popup-item").hide();
 
         function editRow(link) {
+            let row = link.parentNode.parentNode
             $("#edit-popup-bg").fadeIn(150);
             $("#edit-popup-item").delay(150).fadeIn(150);
             $("#edit-close-popup").click(function() {
                 $("#edit-popup-bg, #edit-popup-item").fadeOut(150);
             });
-            
-            const row = $(link).closest("tr");
-            const studentId = row.find("td:eq(0)").text();
-            const studentData = namesArray.find((student) => {
-                return student[0] === studentId;
-            });
-            if (studentData) {
-                $("#edit-student-id").val(studentData[0]);
-                $("#edit-last-name").val(studentData[1]);
-                $("#edit-first-name").val(studentData[2]);
-                $("#edit-middle-initial").val(studentData[3].replace(".", ""));
-                $("#edit-yearsec").val(studentData[4]);
-            }
+            $("#edit-student-id").val(row.cells[0].innerHTML);
+            $("#edit-email").val(row.cells[1].innerHTML);
+            $("#edit-password").val(row.cells[2].innerHTML);
+            $("#edit-account-type").val(row.cells[3].innerHTML);
         }
     </script>
     <?php
-    if (isset($_POST['update-this-student'])) {
-        $sid = str_replace(" ", "", $_POST['edit-student-id']);
-        $lastname = ucwords($_POST['edit-last-name']);
-        $firstname = ucwords($_POST['edit-first-name']);
-        $mi = ucwords($_POST['edit-middle-initial']);
-        $yearsec = strtoupper($_POST['edit-yearsec']);
-        $email = strtolower(str_replace(" ", "", $firstname)) . "." . strtolower(str_replace(" ", "", $lastname)) . "@cbsua.edu.ph";
-
-        $sqlupdate_account = "UPDATE `accounts` SET `email`=? WHERE `student_id` = ?";
+    if (isset($_POST['update-this-account'])) {
+        $password = $_POST['edit-password'];
+        $acctype = $_POST['edit-account-type'];
+        $sid = $_POST['edit-student-id'];
+        $sqlupdate_account = "UPDATE `accounts` SET `password`=?, `type`=? WHERE `student_id` = ?";
         $stmt_update_account = $conn->prepare($sqlupdate_account);
-
-        $sqlupdate_student = "UPDATE `students` SET `last_name`= ?, `first_name`= ?, `middle_initial`= ?, `year_and_section`= ? WHERE `student_id` = ?";
-        $stmt_update_student = $conn->prepare($sqlupdate_student);
-
-        $stmt_update_account->bind_param("ss", $email, $sid);
-        $stmt_update_student->bind_param("sssss", $lastname, $firstname, $mi, $yearsec, $sid);
-        if ($stmt_update_student->execute()) {
+        $stmt_update_account->bind_param("sss", $password, $acctype, $sid);
+        if ($stmt_update_account->execute()) {
             ?>
             <script>
-                swal('Student updated successfully!', '<?php echo $stmt_update_account->execute() ? "Modifying the name can also modify the student\'s email." : "But student email failed to update." ?>', 'success')
+                swal('Account updated successfully!', '', 'success')
                 .then(() => {
-                    window.location.href = 'students.php';
+                    window.location.href = 'accountprivileges.php';
                 });
             </script>
             <?php
         } else {
-            ?><script>swal('Failed to update student!', '', 'error');</script>"<?php
+            ?><script>swal('Failed to update account!', '', 'error');</script>"<?php
         }
     }
     ?>

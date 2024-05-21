@@ -19,15 +19,18 @@ include '../connection.php';
     <?php
     # Verify if login exists such that the cookie "cit-student-id" is found on browser
     if (isset($_COOKIE['cit-student-id'])) {
-        $sql = "SELECT `type`, `password` FROM `accounts` WHERE `student_id` = ?";
+        $sql = "SELECT `accounts`.`type`, `accounts`.`password`, `students`.*  FROM `accounts` JOIN `students` on `students`.`student_id` = `accounts`.`student_id` WHERE `accounts`.`student_id` = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $_COOKIE['cit-student-id']);
         $stmt->execute();
         $result = $stmt->get_result();
         if ($result->num_rows > 0) {
             $row = $result->fetch_assoc();
-            $currentpass = $row['password']; # Current password of admin
             $type = $row['type'];
+            $lastname = $row['last_name'];
+            $firstname = $row['first_name'];
+            $mi = $row['middle_initial'];
+            $yearsec = $row['year_and_section'];
             if ($type === 'user') { # If account type is user, redirect to user page
                 header("location: ../user/");
             }
@@ -56,59 +59,47 @@ include '../connection.php';
             <div class="mt-24">
                 <h1 class="text-3xl text-custom-purplo font-bold mb-5">Manage Your Account</h1>
             </div>
-            <div class="mt-12 w-full flex justify-center">
+            <div class="mt-6 w-full flex justify-center">
                 <div class="w-112 bg-white rounded-lg shadow">
-                    <h3 class="text-2xl font-semibold px-6 py-4 text-custom-purple">Change Password:</h3>
+                    <h3 class="text-2xl font-semibold px-6 py-4 text-custom-purple">Change Information:</h3>
                     <hr class="border border-lg border-custom-purple">
                     <form class="p-6" id="password-form" method="POST">
-                        <label class="ml-1 text-sm">Old Password:</label>
-                        <input type="password" id="old-password" name="old-password" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
-                        <label class="ml-1 text-sm">New Password:</label>
-                        <input type="password" id="new-password" name="new-password" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
-                        <label class="ml-1 text-sm">Confirm New Password:</label>
-                        <input type="password" id="confirm-password" name="confirm-password" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
+                        <label class="ml-1 text-sm">Last Name:</label>
+                        <input type="text" id="edit-last-name" name="edit-last-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" pattern="[a-zA-Z\s']+" value="<?php echo $lastname; ?>" required>
+                        <label class="ml-1 text-sm">First Name:</label>
+                        <input type="text" id="edit-first-name" name="edit-first-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" pattern="[a-zA-Z\s']+" value="<?php echo $firstname; ?>" required>
+                        <label class="ml-1 text-sm">Middle Initial:</label>
+                        <input type="text" id="edit-middle-initial" name="edit-middle-initial" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" maxlength="3" pattern="[a-zA-Z\s']+" value="<?php echo $mi; ?>">
+                        <label class="ml-1 text-sm">Year & Section:</label>
+                        <input type="text" id="edit-yearsec" name="edit-yearsec" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" maxlength="2" pattern="[A-Za-z0-9]+" value="<?php echo $yearsec; ?>" required>
                         <div class="flex items-center justify-center m-4">
-                            <button type="submit" class="px-3 py-2 bg-custom-purple rounded-lg focus:outline-none focus:border-purple-500 text-base text-white font-bold disabled:bg-gray-400 hover:bg-custom-purplo" id="update-password" name="update-password" disabled>Save Changes</button>
+                            <button type="submit" class="px-3 py-2 bg-custom-purple rounded-lg focus:outline-none focus:border-purple-500 text-base text-white font-bold disabled:bg-gray-400 hover:bg-custom-purplo" name="update-information">Save Changes</button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-    <script type="text/javascript">
-        // While editing in new and confirm password
-        $("#new-password, #confirm-password").on('input', () => {
-            // If new password is not the same as confirm password, disable save changes button, otherwise enable it
-            if ($("#new-password").val() !== $("#confirm-password").val()) {
-                $("#update-password").prop('disabled', true);
-            } else {
-                $("#update-password").prop('disabled', false);
-            }
-        });
-    </script>
     <?php
-        if (isset($_POST['update-password'])) {
-            if ($_POST['old-password'] !== $currentpass) { # If old password is not the same as current password
-                ?>
-                <script>
-                    swal("Wrong old password!" ,'', 'error');
-                </script>
-                <?php
-            } else { # Else update admin password
-                $sqlupdate_account = "UPDATE `accounts` SET `password`=? WHERE `student_id` = ?";
-                $stmt_update_account = $conn->prepare($sqlupdate_account);
-                $stmt_update_account->bind_param("ss", $_POST['new-password'], $_COOKIE['cit-student-id']);
-                if ($stmt_update_account->execute()) {
-                    ?>
-                    <script>
-                        swal("Password changed successfully!" ,'', 'success').then(() => {
-                            window.location.href = "index.php";
-                        });
-                    </script>
-                    <?php
-                }
-            }
+    if (isset($_POST['update-information'])) {
+        $sid = $_COOKIE['cit-student-id'];
+        $lastname = ucwords($_POST['edit-last-name']);
+        $firstname = ucwords($_POST['edit-first-name']);
+        $mi = ucwords($_POST['edit-middle-initial']);
+        $yearsec = strtoupper($_POST['edit-yearsec']);
+        $sqlupdate_student = "UPDATE `students` SET `last_name`= ?, `first_name`= ?, `middle_initial`= ?, `year_and_section`= ? WHERE `student_id` = ?";
+        $stmt_update_student = $conn->prepare($sqlupdate_student);
+        $stmt_update_student->bind_param("sssss", $lastname, $firstname, $mi, $yearsec, $sid);
+        if ($stmt_update_student->execute()) {
+            ?>
+            <script>
+                window.location.href = 'accountsettings.php';
+            </script>
+            <?php
+        } else {
+            ?><script>swal('Failed to update information!', '', 'error');</script>"<?php
         }
+    }
     ?>
 </body>
 </html>
