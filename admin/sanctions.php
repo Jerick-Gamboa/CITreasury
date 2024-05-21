@@ -75,9 +75,7 @@ include '../connection.php';
                         $sql_unregisteredpast = "
                             SELECT 
                                 `students`.*,
-                                `events`.`event_id`,
-                                `events`.`event_name`,
-                                `events`.`event_date`,
+                                `events`.*,
                                 `events`.`event_fee` + `events`.`sanction_fee` AS `total_fee`,
                                 (`events`.`event_fee` + `events`.`sanction_fee` - COALESCE(`sanctions`.`total_sanctions_paid`, 0)) AS `balance`
                             FROM `students`
