@@ -123,7 +123,8 @@ include '../connection.php';
                                     <div class="text-sm font-semibold">
                                         <p class="mb-2"><?php echo $row_event['event_description']; ?></p>
                                         <p>Registered: <?php echo $row_event['registration_date']; ?></p>
-                                        <p>Paid Fee: ₱ <?php echo $row_event['paid_fees']; ?></p>
+                                        <p>Event Fee: ₱ <?php echo $row_event['event_fee']; ?></p>
+                                        <p>Paid Fees: ₱ <?php echo $row_event['paid_fees']; ?></p>
                                     </div>
                                 </div>
                                 <?php
