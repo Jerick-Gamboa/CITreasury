@@ -95,7 +95,7 @@ include '../connection.php';
             } else {
                 $sqlupdate_account = "UPDATE `accounts` SET `password`=? WHERE `student_id` = ?";
                 $stmt_update_account = $conn->prepare($sqlupdate_account);
-                $stmt_update_account->bind_param("ss", $email, $sid);
+                $stmt_update_account->bind_param("ss", $_POST['new-password'], $_COOKIE['cit-student-id']);
                 if ($stmt_update_account->execute()) {
                     ?>
                     <script>
