@@ -56,7 +56,7 @@ include '../connection.php';
             <div class="mt-24">
                 <h1 class="text-3xl text-custom-purplo font-bold mb-5">Manage Your Account</h1>
             </div>
-            <div class="mt-16 w-full flex justify-center">
+            <div class="mt-12 w-full flex justify-center">
                 <div class="w-112 bg-white rounded-lg shadow">
                     <h3 class="text-2xl font-semibold px-6 py-4 text-custom-purple">Change Password:</h3>
                     <hr class="border border-lg border-custom-purple">
