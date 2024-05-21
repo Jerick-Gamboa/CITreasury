@@ -79,22 +79,35 @@ include '../connection.php';
                     <!-- Table of Events -->
                     <table class="w-full px-1 text-center">
                         <?php
-                        $sql = "SELECT * FROM `events`"; # Query for showing all events
+                        // Pagination variables
+                        $results_per_page = 10;
+                        $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
+                        $offset = ($page - 1) * $results_per_page;
+                        // SQL query for displaying all events
+                        $sql = "SELECT * FROM `events`";
+                        // Check if search is set
                         if (isset($_GET['search'])) {
                             $search = '%' . $_GET['search'] . '%';
-                            $sql .= " WHERE (`event_id` LIKE ? OR `event_name` LIKE ? OR `event_description` LIKE ? OR `event_date` LIKE ?)"; # Append this if search in URL query is found
+                            $sql .= " WHERE (`event_id` LIKE ? OR `event_name` LIKE ? OR `event_description` LIKE ? OR `event_date` LIKE ?)";
                             ?>
                             <script>
                                 $("#event-search").val("<?php echo htmlspecialchars($_GET['search']); ?>");
                             </script>
                             <?php
                         }
+                        // Add limit and offset for pagination
+                        $sql .= " LIMIT ? OFFSET ?";
+                        // Prepare the statement
                         $stmt = $conn->prepare($sql);
                         if (isset($search)) {
-                            $stmt->bind_param("ssss", $search, $search, $search, $search);
+                            $stmt->bind_param("ssssii", $search, $search, $search, $search, $results_per_page, $offset);
+                        } else {
+                            $stmt->bind_param("ii", $results_per_page, $offset);
                         }
+                        // Execute the statement
                         $stmt->execute();
                         $result = $stmt->get_result();
+                        // Check if there are results
                         if ($result->num_rows > 0) {
                             ?>
                             <thead class="text-white uppercase bg-custom-purplo ">
@@ -112,6 +125,7 @@ include '../connection.php';
                                 const deleteIds = []; // Declare array to store event-id
                             </script>
                             <?php
+                            // Loop through the results
                             while($row = $result->fetch_assoc()) {
                                 $eid = $row['event_id'];
                                 $eventname = $row['event_name'];
@@ -153,6 +167,39 @@ include '../connection.php';
                         ?>
                     </table>
                 </div>
+            </div>
+            <!-- Pagination controls -->
+            <div id="has-result" class="w-full">
+                <p>Showing <?php echo $results_per_page; ?> entries per page</p>
+                <p>Results: <?php echo $result->num_rows; ?> row(s)</p>
+            </div>
+            <div class="pagination my-2">
+                <?php
+                // Get the total number of records
+                $sql_total = "SELECT COUNT(*) FROM `events`";
+                if (isset($search)) {
+                    $sql_total .= " WHERE (`event_id` LIKE ? OR `event_name` LIKE ? OR `event_description` LIKE ? OR `event_date` LIKE ?)";
+                    $stmt_total = $conn->prepare($sql_total);
+                    $stmt_total->bind_param("ssss", $search, $search, $search, $search);
+                } else {
+                    $stmt_total = $conn->prepare($sql_total);
+                }
+                $stmt_total->execute();
+                $stmt_total->bind_result($total_records);
+                $stmt_total->fetch();
+                // Calculate total pages
+                $total_pages = ceil($total_records / $results_per_page);
+                // Display pagination buttons
+                for ($i = 1; $i <= $total_pages; $i++) {
+                    ?><a href='eventslist.php?page=<?php echo $i; ?>'><button class="px-3 py-2 my-1 mr-1 <?php echo $page == $i ? 'bg-purple-600' : 'bg-custom-purplo'; ?> text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-custom-purple"><?php echo $i; ?></button></a>
+                    <?php
+                }
+                if ($total_pages <= 0) {
+                    ?>
+                    <script>$("#has-result").html(null)</script>
+                    <?php
+                }
+                ?>
             </div>
         </div>
     </div>
