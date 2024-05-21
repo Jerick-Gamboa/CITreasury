@@ -110,8 +110,9 @@ include '../connection.php';
                     <div class="w-full p-4 bg-green-300 rounded-lg shadow-lg mb-4">
                         <h3 class="text-gray-800 font-bold text-lg mb-4">Registered events</h3>
                         <?php
-                        $sql_registered_events = "SELECT `events`.`event_name`, `events`.`event_description`, `events`.`event_fee`, `registrations`.`registration_date`, `registrations`.`paid_fees` FROM `events` JOIN `registrations` ON `events`.`event_id` = `registrations`.`event_id` WHERE `registrations`.`student_id` = '22-1677';";
+                        $sql_registered_events = "SELECT `events`.`event_name`, `events`.`event_description`, `events`.`event_fee`, `registrations`.`registration_date`, `registrations`.`paid_fees` FROM `events` JOIN `registrations` ON `events`.`event_id` = `registrations`.`event_id` WHERE `registrations`.`student_id` = ?";
                         $stmt_registered_events = $conn->prepare($sql_registered_events);
+                        $stmt_registered_events->bind_param("s", $_COOKIE['cit-student-id']);
                         $stmt_registered_events->execute();
                         $result_registered_events = $stmt_registered_events->get_result();
                         if ($result_registered_events->num_rows > 0) {
