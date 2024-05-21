@@ -115,12 +115,12 @@ include '../connection.php';
                             `events`.*, 
                             CASE 
                                 WHEN `events`.`event_date` < CURDATE() AND `events`.`event_fee` > `registrations`.`paid_fees` THEN `events`.`event_fee` + `events`.`sanction_fee` 
-                                WHEN (`events`.`event_date` >= CURDATE() OR `events`.`event_fee` = `registrations`.`paid_fees`) AND `registrations`.`status` = 'FULLY_PAID_BEFORE_EVENT' THEN `events`.`event_fee` 
+                                WHEN `events`.`event_date` >= CURDATE() OR `registrations`.`status` = 'FULLY_PAID_BEFORE_EVENT' THEN `events`.`event_fee` 
                                 ELSE `events`.`event_fee` + `events`.`sanction_fee` 
                             END AS `total_fee`, 
                             CASE 
                                 WHEN `events`.`event_date` < CURDATE() AND `events`.`event_fee` > `registrations`.`paid_fees` THEN (`events`.`event_fee` + `events`.`sanction_fee`) - `registrations`.`paid_fees` 
-                                WHEN (`events`.`event_date` >= CURDATE() OR `events`.`event_fee` = `registrations`.`paid_fees`) AND `registrations`.`status` = 'FULLY_PAID_BEFORE_EVENT' THEN `events`.`event_fee` - `registrations`.`paid_fees` 
+                                WHEN `events`.`event_date` >= CURDATE() OR `registrations`.`status` = 'FULLY_PAID_BEFORE_EVENT' THEN `events`.`event_fee` - `registrations`.`paid_fees` 
                                 ELSE (`events`.`event_fee` + `events`.`sanction_fee`) - `registrations`.`paid_fees` 
                             END AS `balance` 
                         FROM `students` 
