@@ -47,10 +47,10 @@ include '../connection.php';
     </nav>
     <div class="flex flex-col md:flex-row bg-custom-purplo min-h-screen">
         <div class="mt-18 md:mt-20 mx-2">
-            <div id="menu-user-items" class="hidden md:inline-block w-60 h-full">
+            <div id="menu-items" class="hidden md:inline-block w-60 h-full">
             </div>
         </div>
-        <div id="menu-user-items-mobile" class="fixed block md:hidden h-fit top-16 w-full p-4 bg-custom-purplo opacity-95">
+        <div id="menu-items-mobile" class="fixed block md:hidden h-fit top-16 w-full p-4 bg-custom-purplo opacity-95">
         </div>
         <div class="w-full bg-red-50 px-6 min-h-screen">
             <div class="mt-24">
