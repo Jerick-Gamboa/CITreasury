@@ -171,7 +171,8 @@ include '../connection.php';
                 </div>
             </div>
             <div id="has-result" class="w-full">
-                <p>Showing only 10 maximum results</p>
+                <p>Showing <?php echo $results_per_page; ?> entries per page</p>
+                <p>Results: <?php echo $result_unregisteredpast->num_rows; ?> row(s)</p>
             </div>
             <div class="pagination my-2">
                 <?php
@@ -196,7 +197,7 @@ include '../connection.php';
                 $row_count = $result_count->fetch_assoc();
                 $total_pages = ceil($row_count['total'] / $results_per_page);
                 for ($i = 1; $i <= $total_pages; $i++) {
-                    ?><a href='sanctions.php?page=<?php echo $i; ?>'><button class="px-3 py-2 my-1 mr-1 <?php echo $_GET['page'] == $i ? 'bg-purple-600' : 'bg-custom-purplo'; ?> text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-custom-purple"><?php echo $i; ?></button></a>
+                    ?><a href='sanctions.php?page=<?php echo $i; ?>'><button class="px-3 py-2 my-1 mr-1 <?php echo $page == $i ? 'bg-purple-600' : 'bg-custom-purplo'; ?> text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-custom-purple"><?php echo $i; ?></button></a>
                     <?php
                 }
                 if ($total_pages <= 0) {

@@ -76,7 +76,15 @@ include '../connection.php';
                 <div class="overflow-x-auto rounded-lg border border-black">
                     <table class="w-full px-1 text-center">
                         <?php
+                        // Pagination variables
+                        $results_per_page = 10;
+                        $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
+                        $offset = ($page - 1) * $results_per_page;
+
+                        // Base SQL query
                         $sql = "SELECT * FROM `students` JOIN `accounts` ON `students`.`student_id` = `accounts`.`student_id` WHERE `accounts`.`student_id` != ?";
+
+                        // Check if search is set
                         if (isset($_GET['search'])) {
                             $search = '%' . $_GET['search'] . '%';
                             $sql .= " AND (`students`.`student_id` LIKE ? OR `students`.`last_name` LIKE ? OR `students`.`first_name` LIKE ? OR `students`.`year_and_section` LIKE ?)";
@@ -86,14 +94,23 @@ include '../connection.php';
                             </script>
                             <?php
                         }
+
+                        // Add limit and offset for pagination
+                        $sql .= " LIMIT ? OFFSET ?";
+
+                        // Prepare the statement
                         $stmt = $conn->prepare($sql);
                         if (isset($search)) {
-                            $stmt->bind_param("sssss", $_COOKIE['cit-student-id'], $search, $search, $search, $search);
+                            $stmt->bind_param("ssssssi", $_COOKIE['cit-student-id'], $search, $search, $search, $search, $results_per_page, $offset);
                         } else {
-                            $stmt->bind_param("s", $_COOKIE['cit-student-id']);
+                            $stmt->bind_param("sii", $_COOKIE['cit-student-id'], $results_per_page, $offset);
                         }
+
+                        // Execute the statement
                         $stmt->execute();
                         $result = $stmt->get_result();
+
+                        // Check if there are results
                         if ($result->num_rows > 0) {
                             ?>
                             <thead class="text-white uppercase bg-custom-purplo ">
@@ -108,6 +125,7 @@ include '../connection.php';
                                 const namesArray = [];
                             </script>
                             <?php
+                            // Loop through the results
                             while($row = $result->fetch_assoc()) {
                                 $sid = $row['student_id'];
                                 $lastname = $row['last_name'];
@@ -121,12 +139,16 @@ include '../connection.php';
                                     <td class="px-2 border-r border-black bg-purple-100"><?php echo $yearsec; ?></td>
                                     <td class="px-1 bg-purple-100">
                                         <button class="px-3 py-2 my-1 mx-1 bg-yellow-500 text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-yellow-400" onclick="editRow(this)">
-                                            <svg id="mdi-pencil" class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z" /></svg>
+                                            <svg id="mdi-pencil" class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                                                <path d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z" />
+                                            </svg>
                                         </button>
-                                        <form method="POST" class="inline-block" id="delete-current-<?php echo str_replace(" ", "", $sid) ?>">
+                                        <form method="POST" class="inline-block" id="delete-current-<?php echo str_replace(' ', '', $sid); ?>">
                                             <input type="hidden" name="sid-to-delete" value="<?php echo $sid; ?>">
-                                            <button id="delete-student-<?php echo str_replace(" ", "", $sid) ?>" class="px-3 py-2 mb-1 mx-1 bg-red-600 text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-red-500">
-                                                <svg id="mdi-delete" class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" /></svg>
+                                            <button id="delete-student-<?php echo str_replace(' ', '', $sid); ?>" class="px-3 py-2 mb-1 mx-1 bg-red-600 text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-red-500">
+                                                <svg id="mdi-delete" class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                                                    <path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" />
+                                                </svg>
                                             </button>
                                         </form>
                                     </td>
@@ -142,6 +164,40 @@ include '../connection.php';
                         ?>
                     </table>
                 </div>
+            </div>
+            <!-- Pagination controls -->
+            <div id="has-result" class="w-full">
+                <p>Showing <?php echo $results_per_page; ?> entries per page</p>
+                <p>Results: <?php echo $result->num_rows; ?> row(s)</p>
+            </div>
+            <div class="pagination my-2">
+                <?php
+                // Get the total number of records
+                $sql_total = "SELECT COUNT(*) FROM `students` JOIN `accounts` ON `students`.`student_id` = `accounts`.`student_id` WHERE `accounts`.`student_id` != ?";
+                if (isset($search)) {
+                    $sql_total .= " AND (`students`.`student_id` LIKE ? OR `students`.`last_name` LIKE ? OR `students`.`first_name` LIKE ? OR `students`.`year_and_section` LIKE ?)";
+                    $stmt_total = $conn->prepare($sql_total);
+                    $stmt_total->bind_param("sssss", $_COOKIE['cit-student-id'], $search, $search, $search, $search);
+                } else {
+                    $stmt_total = $conn->prepare($sql_total);
+                    $stmt_total->bind_param("s", $_COOKIE['cit-student-id']);
+                }
+                $stmt_total->execute();
+                $stmt_total->bind_result($total_records);
+                $stmt_total->fetch();
+                // Calculate total pages
+                $total_pages = ceil($total_records / $results_per_page);
+                // Display pagination buttons
+                for ($i = 1; $i <= $total_pages; $i++) {
+                    ?><a href='students.php?page=<?php echo $i; ?>'><button class="px-3 py-2 my-1 mr-1 <?php echo $page == $i ? 'bg-purple-600' : 'bg-custom-purplo'; ?> text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-custom-purple"><?php echo $i; ?></button></a>
+                    <?php
+                }
+                if ($total_pages <= 0) {
+                    ?>
+                    <script>$("#has-result").html(null)</script>
+                    <?php
+                }
+                ?>
             </div>
         </div>
     </div>
