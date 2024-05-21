@@ -154,8 +154,8 @@ function clickToShowHide(button_id, target_show_hide) {
 
 clickToShowHide("#mdi-menu", "#menu-items-mobile");
 clickToShowHide("#mdi-menu", "#menu-user-items-mobile");
-clickToShowHide("#menu-items #account-set", "#menu-items #account-set-items");
-clickToShowHide("#menu-items-mobile #account-set", "#menu-items-mobile #account-set-items");
+// clickToShowHide("#menu-items #account-set", "#menu-items #account-set-items");
+// clickToShowHide("#menu-items-mobile #account-set", "#menu-items-mobile #account-set-items");
 
 function logoutAction(button_id) {
     $(button_id).click((e) => {
