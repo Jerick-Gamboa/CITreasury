@@ -412,7 +412,7 @@ include '../connection.php';
             </script>
             <?php
         } else {
-            ?><script>swal('Failed to register student!', '', 'error');</script><?php
+            ?><script>swal('Registration failed!', '', 'error');</script><?php
         }
     }
     ?>
