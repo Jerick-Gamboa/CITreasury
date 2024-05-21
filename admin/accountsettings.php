@@ -26,10 +26,10 @@ include '../connection.php';
         $result = $stmt->get_result();
         if ($result->num_rows > 0) {
             $row = $result->fetch_assoc();
-            $currentpass = $row['password']; # Get account password
+            $currentpass = $row['password']; # Current password of admin
             $type = $row['type'];
-            if ($type === 'admin') { # If account type is admin, redirect to admin page
-                header("location: ../admin/");
+            if ($type === 'user') { # If account type is user, redirect to user page
+                header("location: ../user/");
             }
         } else { # If account is not found, return to login page
             header("location: ../");
@@ -94,7 +94,7 @@ include '../connection.php';
                     swal("Wrong old password!" ,'', 'error');
                 </script>
                 <?php
-            } else { # Else update student password
+            } else { # Else update admin password
                 $sqlupdate_account = "UPDATE `accounts` SET `password`=? WHERE `student_id` = ?";
                 $stmt_update_account = $conn->prepare($sqlupdate_account);
                 $stmt_update_account->bind_param("ss", $_POST['new-password'], $_COOKIE['cit-student-id']);
