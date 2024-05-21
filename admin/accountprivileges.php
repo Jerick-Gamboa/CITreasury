@@ -195,7 +195,7 @@ include '../connection.php';
                     <label class="ml-1 text-sm">Password:</label>
                     <input type="text" id="edit-password" name="edit-password" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
                     <label class="ml-1 text-sm">Role:</label>
-                    <select id="edit-account-type" name="edit-account-type" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
+                    <select id="edit-account-type" name="edit-account-type" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 disabled:bg-gray-200 bg-purple-100" required>
                         <option value="user">User</option>
                         <option value="admin">Admin</option>
                     </select>
@@ -221,6 +221,11 @@ include '../connection.php';
             $("#edit-email").val(row.cells[1].innerHTML);
             $("#edit-password").val(row.cells[2].innerHTML);
             $("#edit-account-type").val(row.cells[3].innerHTML);
+            if ($("#edit-student-id").val() === "<?php echo $_COOKIE['cit-student-id']; ?>") {
+                $("#edit-account-type").prop('disabled', true);
+            } else {
+                $("#edit-account-type").prop('disabled', false);
+            }
         }
     </script>
     <?php
