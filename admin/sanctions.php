@@ -57,8 +57,109 @@ include '../connection.php';
         <div id="menu-items-mobile" class="fixed block md:hidden h-fit top-16 w-full p-4 bg-custom-purplo opacity-95">
         </div>
         <div class="w-full bg-red-50 px-6 min-h-screen">
-            <div class="mt-24">
-                <h1 class="text-3xl text-custom-purplo font-bold mb-5">Manage Sanctions</h1>
+            <div class="mt-24 flex flex-col lg:flex-row justify-between">
+                <h1 class="text-3xl text-custom-purplo font-bold mb-3">Manage Sanctions</h1>
+                <!-- Search Bar -->
+                <div class="flex flex-row w-56 p-1 mb-3 border-2 border-custom-purple  focus:border-custom-purplo rounded-lg bg-white">
+                    <svg id="mdi-magnify" class="h-6 w-6 mr-1 fill-custom-purple" viewBox="0 0 24 24"><path d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z" /></svg>
+                    <form method="GET">
+                        <input type="text" id="unregistered-search" name="search" placeholder="Search..." class="w-full focus:outline-none">
+                  </form>
+                </div>
+            </div>
+            <div class="mt-1 mb-5 overflow-x-auto rounded-lg shadow-lg">
+                <div class="overflow-x-auto rounded-lg border border-black">
+                    <!-- Table of Unregistered Students -->
+                    <table class="w-full px-1 text-center">
+                        <?php
+                        $sql_unregisteredpast = "
+                            SELECT 
+                                `students`.*,
+                                `events`.`event_id`,
+                                `events`.`event_name`,
+                                `events`.`event_date`,
+                                `events`.`event_fee` + `events`.`sanction_fee` AS `total_fee`,
+                                (`events`.`event_fee` + `events`.`sanction_fee` - COALESCE(`sanctions`.`total_sanctions_paid`, 0)) AS `balance`
+                            FROM `students`
+                            CROSS JOIN `events`
+                            LEFT JOIN `registrations` ON `students`.`student_id` = `registrations`.`student_id` AND `events`.`event_id` = `registrations`.`event_id`
+                            LEFT JOIN 
+                                (
+                                    SELECT 
+                                        `student_id`, 
+                                        `event_id`, 
+                                        SUM(`sanctions_paid`) AS `total_sanctions_paid`
+                                    FROM 
+                                        `sanctions`
+                                    GROUP BY 
+                                        `student_id`, `event_id`
+                                ) AS `sanctions` 
+                            ON `students`.`student_id` = `sanctions`.`student_id` AND `events`.`event_id` = `sanctions`.`event_id`
+                            WHERE `registrations`.`student_id` IS NULL AND `events`.`event_date` < CURDATE()";
+                        if (isset($_GET['search'])) {
+                            $search = '%' . $_GET['search'] . '%';
+                            $sql_unregisteredpast .= " AND (`students`.`student_id` LIKE ? OR `students`.`last_name` LIKE ? OR `students`.`first_name` LIKE ? OR `students`.`year_and_section` LIKE ? OR `events`.`event_name` LIKE ?)";
+                            ?>
+                            <script>
+                                $("#unregistered-search").val("<?php echo htmlspecialchars($_GET['search']); ?>");
+                            </script>
+                            <?php
+                        }
+                        $sql_unregisteredpast .= " ORDER BY `students`.`student_id`, `events`.`event_date`";
+                        $stmt_unregisteredpast = $conn->prepare($sql_unregisteredpast);
+                        if (isset($search)) {
+                            $stmt_unregisteredpast->bind_param("sssss", $search, $search, $search, $search, $search);
+                        }
+                        $stmt_unregisteredpast->execute();
+                        $result_unregisteredpast = $stmt_unregisteredpast->get_result();
+                        if ($result_unregisteredpast->num_rows > 0) {
+                            ?>
+                            <thead class="text-white uppercase bg-custom-purplo ">
+                                <tr>
+                                    <th scope="col" class="p-2 border-r border-black">Student ID</th>
+                                    <th scope="col" class="p-2 border-r border-black">Student Name</th>
+                                    <th scope="col" class="p-2 border-r border-black">Year & Section</th>
+                                    <th scope="col" class="p-2 border-r border-black">Event Name</th>
+                                    <th scope="col" class="p-2 border-r border-black">Event Date</th>
+                                    <th scope="col" class="p-2 border-r border-black">Total Fees (₱)</th>
+                                    <th scope="col" class="p-2 border-r border-black">Balance (₱)</th>
+                                    <th scope="col" class="p-2">Actions</th>
+                                </tr>
+                            </thead>
+                            <?php
+                            while($row = $result_unregisteredpast->fetch_assoc()) {
+                                $sid = $row['student_id'];
+                                $lastname = $row['last_name'];
+                                $firstname = $row['first_name'];
+                                $mi = !empty($row['middle_initial']) ? $row['middle_initial'] . '.' : "";
+                                $yearsec = $row['year_and_section'];
+                                $eventname = $row['event_name'];
+                                $eventdate = $row['event_date'];
+                                $totalfee = $row['total_fee'];
+                                $balance = $row['balance'];
+                                ?>
+                                <tr class="border-t border-black">
+                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $sid; ?></td>
+                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $lastname . ', ' . $firstname . ' ' . $mi; ?></td>
+                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $yearsec; ?></td>
+                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $eventname; ?></td>
+                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $eventdate; ?></td>
+                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $totalfee; ?></td>
+                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $balance; ?></td>
+                                    <td class="max-w-56 bg-purple-100">
+                                        <button class="px-3 py-2 my-1 mx-1 bg-green-500 text-white text-sm font-semibold rounded-lg focus:outline-none disabled:bg-gray-400 shadow hover:bg-green-400" onclick='collect(this)' <?php if ($balance <= 0) echo 'disabled'; ?>>
+                                            <svg id="mdi-wallet-plus" class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M3 0V3H0V5H3V8H5V5H8V3H5V0H3M9 3V6H6V9H3V19C3 20.1 3.89 21 5 21H19C20.11 21 21 20.11 21 19V18H12C10.9 18 10 17.11 10 16V8C10 6.9 10.89 6 12 6H21V5C21 3.9 20.11 3 19 3H9M12 8V16H22V8H12M16 10.5C16.83 10.5 17.5 11.17 17.5 12C17.5 12.83 16.83 13.5 16 13.5C15.17 13.5 14.5 12.83 14.5 12C14.5 11.17 15.17 10.5 16 10.5Z" /></svg>
+                                        </button> <!-- Disable button if balance is zero -->
+                                    </td>
+                                </tr>
+                                <?php
+                            }
+                        } else { // If query returned no results, display this
+                            ?><h3 class="p-4">No unregistered students found.</h3><?php
+                        }
+                        ?>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
