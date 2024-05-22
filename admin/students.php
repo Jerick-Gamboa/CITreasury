@@ -193,6 +193,15 @@ include '../connection.php';
                 }
                 ?>
             </div>
+            <div class="mb-4">
+                <form method="POST" enctype="multipart/form-data">
+                    <fieldset class="p-3 w-fit border-2 rounded-lg border-custom-purple flex flex-row">
+                        <legend class="font-semibold text-custom-purple">Import CSV File</legend>
+                        <input type="file" name="students-csv-file" id="students-csv-file" class="w-full px-2 text-sm py-1 border-2 border-custom-purple rounded-lg focus:outline-none focus:border-purple-500 bg-purple-100" required accept=".csv">
+                        <input type="submit" value="Import" class="ml-2 px-2 text-white font-semibold bg-custom-purplo rounded-lg hover:cursor-pointer hover:bg-purple-600" name="importcsv">
+                    </fieldset>
+                </form>
+            </div>
         </div>
     </div>
     <div id="popup-bg" class="fixed top-0 w-full min-h-screen bg-black opacity-50 hidden"></div>
@@ -377,6 +386,80 @@ include '../connection.php';
         } else {
             ?>
             <script>swal('Student deletion failed', '', 'error');</script>
+            <?php
+        }
+    }
+    if (isset($_POST['importcsv'])) {
+        if (isset($_FILES['students-csv-file']) && $_FILES['students-csv-file']['error'] == UPLOAD_ERR_OK) {
+            $file_name = $_FILES['students-csv-file']['name'];
+            $file_ext = pathinfo($file_name, PATHINFO_EXTENSION);
+            if ($file_ext !== 'csv') {
+                ?>
+                <script>
+                    swal('Error: Please upload a CSV file.', '', 'error');
+                </script>
+                <?php
+            } else {
+                $file_tmp = $_FILES['students-csv-file']['tmp_name'];
+                $file_handle = fopen($file_tmp, "r");
+                if ($file_handle !== false) {
+                    $expected_header = ['student_id', 'last_name', 'first_name', 'middle_initial', 'year_and_section'];
+                    $csv_header = fgetcsv($file_handle);
+                    $csv_header[0] = preg_replace('/\x{FEFF}/u', '', $csv_header[0]);
+                    if ($csv_header !== $expected_header) {
+                        ?>
+                        <script>
+                            swal('Error: Incorrect CSV file format!', 'Please make sure the CSV file follows the correct structure.', 'error');
+                        </script>
+                        <?php
+                    } else {
+                        rewind($file_handle);
+                        fgetcsv($file_handle);
+                        while ($data = fgetcsv($file_handle)) {
+                            $sid = $data[0];
+                            $lastname = $data[1];
+                            $firstname = $data[2];
+                            $mi = $data[3];
+                            $yearsec = $data[4];
+                            $email = strtolower(str_replace(" ", "", $firstname)) . "." . strtolower(str_replace(" ", "", $lastname)) . "@cbsua.edu.ph";
+                            $password = "cit-" . $sid;
+
+                            $sql_student = "INSERT INTO `students`(`student_id`, `last_name`, `first_name`, `middle_initial`, `year_and_section`) VALUES (?, ?, ?, ?, ?)";
+                            $stmt_student = $conn->prepare($sql_student);
+
+                            $sql_account = "INSERT INTO `accounts`(`email`, `password`, `student_id`, `type`) VALUES (?, ?, ?, 'user')";
+                            $stmt_account = $conn->prepare($sql_account);
+
+                            $stmt_student->bind_param("sssss", $sid, $lastname, $firstname, $mi, $yearsec);
+                            $stmt_account->bind_param("sss", $email, $password, $sid);
+
+                            $stmt_student->execute();
+                            $stmt_account->execute();
+                        }
+                        fclose($file_handle);
+                        $conn->close();
+                        ?>
+                        <script>
+                            swal('CSV File imported successfully!', '', 'success')
+                            .then((okay) => {
+                                window.location.href = 'students.php';
+                            });
+                        </script>
+                        <?php
+                    }
+                } else {
+                    ?>
+                    <script>
+                        swal('Failed to open CSV File!', '', 'error');
+                    </script>
+                    <?php
+                }
+            }
+        } else {
+            ?>
+            <script>
+                swal('Error uploading file!', '', 'error');
+            </script>
             <?php
         }
     }
