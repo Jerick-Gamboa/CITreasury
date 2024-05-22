@@ -375,7 +375,7 @@ include '../connection.php';
         $stmt_delete_reg->bind_param("s", $_POST['sid-to-delete']);
         $stmt_delete_student->bind_param("s", $_POST['sid-to-delete']);
 
-        if ($stmt_delete_account->execute() && $stmt_delete_sanc->execute() && $stmt_delete_reg->execute() && $stmt_delete_account->execute()) {
+        if ($stmt_delete_account->execute() && $stmt_delete_sanc->execute() && $stmt_delete_reg->execute() && $stmt_delete_student->execute()) {
             ?>
             <script>
                 swal('Student successfully deleted', '', 'success')
