@@ -1,12 +1,14 @@
-<!DOCTYPE html>
 <?php
+session_start();
 include '../connection.php';
 ?>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="../img/nobgcitsclogo.png">
+    <link rel="stylesheet" href="../inter-variable.css">
     <!-- Import JavaScript files -->
     <script src="../js/tailwind3.4.1.js"></script>
     <script src="../js/tailwind.config.js"></script>
@@ -14,15 +16,15 @@ include '../connection.php';
     <script src="../js/jquery-3.7.1.min.js"></script>
     <script src="../js/predefined-script.js"></script>
     <script src="../js/defer-script.js" defer></script> <!-- Defer attribute means this javascript file will be executed once the HTML file is fully loaded -->
-    <title>CITreasury - Sanctions</title>
+    <title>CITreasury - Account Privileges</title>
 </head>
 <body>
     <?php
-    # Verify if login exists such that the cookie "cit-student-id" is found on browser
-    if (isset($_COOKIE['cit-student-id'])) {
+    # Verify if login exists such that the session "cit-student-id" is found on browser
+    if (isset($_SESSION['cit-student-id'])) {
         $sql = "SELECT `type` FROM `accounts` WHERE `student_id` = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("s", $_COOKIE['cit-student-id']);
+        $stmt->bind_param("s", $_SESSION['cit-student-id']);
         $stmt->execute();
         $result = $stmt->get_result();
         if ($result->num_rows > 0) {
@@ -34,7 +36,7 @@ include '../connection.php';
         } else { # If account is not found, return to login page
             header("location: ../");
         }
-    } else { # If cookie is not found, return to login page
+    } else { # If session is not found, return to login page
         header("location: ../");
     }
     ?>
@@ -107,7 +109,6 @@ include '../connection.php';
                                 <tr>
                                     <th scope="col" class="p-2 border-r border-black">Student ID</th>
                                     <th scope="col" class="p-2 border-r border-black">Email</th>
-                                    <th scope="col" class="p-2 border-r border-black">Password</th>
                                     <th scope="col" class="p-2 border-r border-black">Role</th>
                                     <th scope="col" class="p-2">Actions</th>
                                 </tr>
@@ -117,13 +118,11 @@ include '../connection.php';
                             while($row = $result->fetch_assoc()) {
                                 $sid = $row['student_id'];
                                 $email = $row['email'];
-                                $password = $row['password'];
                                 $type = $row['type'];
                                 ?>
                                 <tr class="border-t border-black">
                                     <td class="px-2 border-r border-black bg-purple-100"><?php echo $sid; ?></td>
                                     <td class="px-2 border-r border-black bg-purple-100"><?php echo $email; ?></td>
-                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $password; ?></td>
                                     <td class="px-2 border-r border-black bg-purple-100"><?php echo $type; ?></td>
                                     <td class="px-1 bg-purple-100">
                                         <button class="px-3 py-2 my-1 mx-1 bg-orange-500 text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-orange-400" onclick="editRow(this)">
@@ -192,8 +191,6 @@ include '../connection.php';
                     <input type="text" id="edit-student-id" name="edit-student-id" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" maxlength="7" readonly>
                     <label class="ml-1 text-sm">Email:</label>
                     <input type="email" id="edit-email" name="edit-email" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" readonly>
-                    <label class="ml-1 text-sm">Password:</label>
-                    <input type="text" id="edit-password" name="edit-password" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
                     <label class="ml-1 text-sm">Role:</label>
                     <select id="edit-account-type" name="edit-account-type" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 disabled:bg-gray-200 bg-purple-100" required>
                         <option value="user">User</option>
@@ -219,9 +216,8 @@ include '../connection.php';
             });
             $("#edit-student-id").val(row.cells[0].innerHTML);
             $("#edit-email").val(row.cells[1].innerHTML);
-            $("#edit-password").val(row.cells[2].innerHTML);
-            $("#edit-account-type").val(row.cells[3].innerHTML);
-            if ($("#edit-student-id").val() === "<?php echo $_COOKIE['cit-student-id']; ?>") {
+            $("#edit-account-type").val(row.cells[2].innerHTML);
+            if ($("#edit-student-id").val() === "<?php echo $_SESSION['cit-student-id']; ?>") {
                 $("#edit-account-type").prop('disabled', true);
             } else {
                 $("#edit-account-type").prop('disabled', false);
@@ -230,12 +226,11 @@ include '../connection.php';
     </script>
     <?php
     if (isset($_POST['update-this-account'])) {
-        $password = $_POST['edit-password'];
         $acctype = $_POST['edit-account-type'];
         $sid = $_POST['edit-student-id'];
-        $sqlupdate_account = "UPDATE `accounts` SET `password`=?, `type`=? WHERE `student_id` = ?";
+        $sqlupdate_account = "UPDATE `accounts` SET `type`=? WHERE `student_id` = ?";
         $stmt_update_account = $conn->prepare($sqlupdate_account);
-        $stmt_update_account->bind_param("sss", $password, $acctype, $sid);
+        $stmt_update_account->bind_param("ss", $acctype, $sid);
         if ($stmt_update_account->execute()) {
             ?>
             <script>

@@ -1,12 +1,14 @@
-<!DOCTYPE html>
 <?php
+session_start();
 include '../connection.php';
 ?>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="../img/nobgcitsclogo.png">
+    <link rel="stylesheet" href="../inter-variable.css">
     <script src="../js/tailwind3.4.1.js"></script>
     <script src="../js/tailwind.config.js"></script>
     <script src="../js/sweetalert.min.js"></script>
@@ -17,11 +19,11 @@ include '../connection.php';
 </head>
 <body>
     <?php
-    # Verify if login exists such that the cookie "cit-student-id" is found on browser
-    if (isset($_COOKIE['cit-student-id'])) {
+    # Verify if login exists such that the session "cit-student-id" is found on browser
+    if (isset($_SESSION['cit-student-id'])) {
         $sql = "SELECT `type` FROM `accounts` WHERE `student_id` = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("s", $_COOKIE['cit-student-id']);
+        $stmt->bind_param("s", $_SESSION['cit-student-id']);
         $stmt->execute();
         $result = $stmt->get_result();
         if ($result->num_rows > 0) {
@@ -33,7 +35,7 @@ include '../connection.php';
         } else { # If account is not found, return to login page
             header("location: ../");
         }
-    } else { # If cookie is not found, return to login page
+    } else { # If session is not found, return to login page
         header("location: ../");
     }
     ?>
@@ -85,7 +87,7 @@ include '../connection.php';
                             AND `events`.`event_date` < CURDATE()
                             AND (`events`.`event_fee` + `events`.`sanction_fee`) > COALESCE(`sanctions`.`total_sanctions_paid`, 0)";
                     $stmt_unregistered_events = $conn->prepare($sql_unregistered_events);
-                    $stmt_unregistered_events->bind_param("ss", $_COOKIE['cit-student-id'], $_COOKIE['cit-student-id']);
+                    $stmt_unregistered_events->bind_param("ss", $_SESSION['cit-student-id'], $_SESSION['cit-student-id']);
                     $stmt_unregistered_events->execute();
                     $result_unregistered_events = $stmt_unregistered_events->get_result();
                     if ($result_unregistered_events->num_rows > 0) {
@@ -129,7 +131,7 @@ include '../connection.php';
                         WHERE `students`.`student_id` = ? 
                         HAVING `balance` <> 0";
                     $stmt_unsettledbalance_events = $conn->prepare($sql_unsettledbalance_events);
-                    $stmt_unsettledbalance_events->bind_param("s", $_COOKIE['cit-student-id']);
+                    $stmt_unsettledbalance_events->bind_param("s", $_SESSION['cit-student-id']);
                     $stmt_unsettledbalance_events->execute();
                     $result_unsettledbalance_events = $stmt_unsettledbalance_events->get_result();
                     if ($result_unsettledbalance_events->num_rows > 0) {

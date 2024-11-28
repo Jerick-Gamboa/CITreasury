@@ -1,4 +1,5 @@
 <?php
+session_start();
 include 'connection.php';
 ?>
 <!DOCTYPE html>
@@ -13,6 +14,7 @@ include 'connection.php';
     <script src="js/jquery-3.7.1.min.js"></script>
     <script src="js/predefined-script.js"></script>
     <link rel="icon" href="img/nobgcitsclogo.png">
+    <link rel="stylesheet" href="inter-variable.css">
 </head>
 <body class="bg-gradient-to-t from-custom-purple to-purple-200 h-screen flex items-center justify-center">
     <div class="w-112 bg-white shadow rounded-lg">
@@ -32,11 +34,11 @@ include 'connection.php';
         </form>
     </div>
     <?php
-    # If cookie "cit-student-id" is found on the browser
-    if (isset($_COOKIE['cit-student-id'])) {
+    # If session "cit-student-id" is found
+    if (isset($_SESSION['cit-student-id'])) {
         $sql = "SELECT `type` FROM `accounts` WHERE `student_id` = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("s", $_COOKIE['cit-student-id']);
+        $stmt->bind_param("s", $_SESSION['cit-student-id']);
         $stmt->execute();
         $result = $stmt->get_result();
         if ($result->num_rows > 0) {
@@ -66,10 +68,8 @@ include 'connection.php';
         $result = $stmt->get_result();
         if ($result->num_rows > 0) {
             if ($row = $result->fetch_assoc()) {
-                if ($row['password'] === $password) { # If password is equal to submitted password
+                if (password_verify($password, $row['password'])) { # If hashed password matches
                     $_SESSION['cit-student-id'] = $row['student_id'];
-                    # Store cookie in the browser for 1 month login access
-                    setcookie('cit-student-id', $_SESSION['cit-student-id'], time() + (86400 * 30), '/');
                     if ($row['type'] === 'admin') {
                         ?>
                         <script>

@@ -1,12 +1,14 @@
-<!DOCTYPE html>
 <?php
+session_start();
 include '../connection.php';
 ?>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="../img/nobgcitsclogo.png">
+    <link rel="stylesheet" href="../inter-variable.css">
     <script src="../js/tailwind3.4.1.js"></script>
     <script src="../js/tailwind.config.js"></script>
     <script src="../js/sweetalert.min.js"></script>
@@ -17,11 +19,11 @@ include '../connection.php';
 </head>
 <body>
     <?php
-    # Verify if login exists such that the cookie "cit-student-id" is found on browser
-    if (isset($_COOKIE['cit-student-id'])) {
+    # Verify if login exists such that the session "cit-student-id" is found on browser
+    if (isset($_SESSION['cit-student-id'])) {
         $sql = "SELECT `type` FROM `accounts` WHERE `student_id` = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("s", $_COOKIE['cit-student-id']);
+        $stmt->bind_param("s", $_SESSION['cit-student-id']);
         $stmt->execute();
         $result = $stmt->get_result();
         if ($result->num_rows > 0) {
@@ -33,7 +35,7 @@ include '../connection.php';
         } else { # If account is not found, return to login page
             header("location: ../");
         }
-    } else { # If cookie is not found, return to login page
+    } else { # If session is not found, return to login page
         header("location: ../");
     }
     ?>
@@ -56,7 +58,7 @@ include '../connection.php';
                 <?php
                 $sql_title = "SELECT * FROM `students` WHERE `student_id` = ?";
                 $stmt_title = $conn->prepare($sql_title);
-                $stmt_title->bind_param("s", $_COOKIE['cit-student-id']);
+                $stmt_title->bind_param("s", $_SESSION['cit-student-id']);
                 $stmt_title->execute();
                 $result_title = $stmt_title->get_result();
                 if ($row_title = $result_title->fetch_assoc()) {
@@ -68,7 +70,7 @@ include '../connection.php';
                 }
                 $sql_total = "SELECT SUM(total_paid) AS total_amount_paid FROM (SELECT SUM(`paid_fees`) AS total_paid FROM `registrations` WHERE `student_id` = ? UNION ALL SELECT SUM(`sanctions_paid`) AS total_paid FROM `sanctions` WHERE `student_id` = ?) AS combined_payments";
                 $stmt_total = $conn->prepare($sql_total);
-                $stmt_total->bind_param("ss", $_COOKIE['cit-student-id'], $_COOKIE['cit-student-id']);
+                $stmt_total->bind_param("ss", $_SESSION['cit-student-id'], $_SESSION['cit-student-id']);
                 $stmt_total->execute();
                 $result_total = $stmt_total->get_result();
                 if ($row = $result_total->fetch_assoc()) {
@@ -112,7 +114,7 @@ include '../connection.php';
                         <?php
                         $sql_registered_events = "SELECT `events`.`event_name`, `events`.`event_description`, `events`.`event_fee`, `registrations`.`registration_date`, `registrations`.`paid_fees` FROM `events` JOIN `registrations` ON `events`.`event_id` = `registrations`.`event_id` WHERE `registrations`.`student_id` = ?";
                         $stmt_registered_events = $conn->prepare($sql_registered_events);
-                        $stmt_registered_events->bind_param("s", $_COOKIE['cit-student-id']);
+                        $stmt_registered_events->bind_param("s", $_SESSION['cit-student-id']);
                         $stmt_registered_events->execute();
                         $result_registered_events = $stmt_registered_events->get_result();
                         if ($result_registered_events->num_rows > 0) {

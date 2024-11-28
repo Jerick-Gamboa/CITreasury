@@ -1,12 +1,14 @@
-<!DOCTYPE html>
 <?php
+session_start();
 include '../connection.php';
 ?>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="../img/nobgcitsclogo.png">
+    <link rel="stylesheet" href="../inter-variable.css">
     <script src="../js/tailwind3.4.1.js"></script>
     <script src="../js/tailwind.config.js"></script>
     <script src="../js/sweetalert.min.js"></script>
@@ -17,11 +19,11 @@ include '../connection.php';
 </head>
 <body>
     <?php
-    # Verify if login exists such that the cookie "cit-student-id" is found on browser
-    if (isset($_COOKIE['cit-student-id'])) {
+    # Verify if login exists such that the session "cit-student-id" is found on browser
+    if (isset($_SESSION['cit-student-id'])) {
         $sql = "SELECT `type`, `password` FROM `accounts` WHERE `student_id` = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("s", $_COOKIE['cit-student-id']);
+        $stmt->bind_param("s", $_SESSION['cit-student-id']);
         $stmt->execute();
         $result = $stmt->get_result();
         if ($result->num_rows > 0) {
@@ -34,7 +36,7 @@ include '../connection.php';
         } else { # If account is not found, return to login page
             header("location: ../");
         }
-    } else { # If cookie is not found, return to login page
+    } else { # If session is not found, return to login page
         header("location: ../");
     }
     ?>
@@ -88,7 +90,7 @@ include '../connection.php';
     </script>
     <?php
         if (isset($_POST['update-password'])) {
-            if ($_POST['old-password'] !== $currentpass) { # If old password is not the same as current password
+            if (!password_verify($_POST['old-password'], $currentpass)) { # If old password is not the same as current password
                 ?>
                 <script>
                     swal("Wrong old password!" ,'', 'error');
@@ -97,7 +99,8 @@ include '../connection.php';
             } else { # Else update student password
                 $sqlupdate_account = "UPDATE `accounts` SET `password`=? WHERE `student_id` = ?";
                 $stmt_update_account = $conn->prepare($sqlupdate_account);
-                $stmt_update_account->bind_param("ss", $_POST['new-password'], $_COOKIE['cit-student-id']);
+                $hash_password = password_hash($_POST['new-password'], PASSWORD_DEFAULT);
+                $stmt_update_account->bind_param("ss", $hash_password, $_SESSION['cit-student-id']);
                 if ($stmt_update_account->execute()) {
                     ?>
                     <script>

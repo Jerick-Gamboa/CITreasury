@@ -1,12 +1,14 @@
-<!DOCTYPE html>
 <?php
+session_start();
 include '../connection.php';
 ?>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="../img/nobgcitsclogo.png">
+    <link rel="stylesheet" href="../inter-variable.css">
     <!-- Import JavaScript files -->
     <script src="../js/tailwind3.4.1.js"></script>
     <script src="../js/tailwind.config.js"></script>
@@ -14,15 +16,15 @@ include '../connection.php';
     <script src="../js/jquery-3.7.1.min.js"></script>
     <script src="../js/predefined-script.js"></script>
     <script src="../js/defer-script.js" defer></script> <!-- Defer attribute means this javascript file will be executed once the HTML file is fully loaded -->
-    <title>CITreasury - Sanctions</title>
+    <title>CITreasury - Students</title>
 </head>
 <body>
     <?php
-    # Verify if login exists such that the cookie "cit-student-id" is found on browser
-    if (isset($_COOKIE['cit-student-id'])) {
+    # Verify if login exists such that the session "cit-student-id" is found on browser
+    if (isset($_SESSION['cit-student-id'])) {
         $sql = "SELECT `type` FROM `accounts` WHERE `student_id` = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("s", $_COOKIE['cit-student-id']);
+        $stmt->bind_param("s", $_SESSION['cit-student-id']);
         $stmt->execute();
         $result = $stmt->get_result();
         if ($result->num_rows > 0) {
@@ -34,7 +36,7 @@ include '../connection.php';
         } else { # If account is not found, return to login page
             header("location: ../");
         }
-    } else { # If cookie is not found, return to login page
+    } else { # If session is not found, return to login page
         header("location: ../");
     }
     ?>
@@ -97,9 +99,9 @@ include '../connection.php';
                         // Prepare the statement
                         $stmt = $conn->prepare($sql);
                         if (isset($search)) {
-                            $stmt->bind_param("ssssssi", $_COOKIE['cit-student-id'], $search, $search, $search, $search, $results_per_page, $offset);
+                            $stmt->bind_param("ssssssi", $_SESSION['cit-student-id'], $search, $search, $search, $search, $results_per_page, $offset);
                         } else {
-                            $stmt->bind_param("sii", $_COOKIE['cit-student-id'], $results_per_page, $offset);
+                            $stmt->bind_param("sii", $_SESSION['cit-student-id'], $results_per_page, $offset);
                         }
                         // Execute the statement
                         $stmt->execute();
@@ -171,10 +173,10 @@ include '../connection.php';
                 if (isset($search)) {
                     $sql_total .= " AND (`students`.`student_id` LIKE ? OR `students`.`last_name` LIKE ? OR `students`.`first_name` LIKE ? OR `students`.`year_and_section` LIKE ?)";
                     $stmt_total = $conn->prepare($sql_total);
-                    $stmt_total->bind_param("sssss", $_COOKIE['cit-student-id'], $search, $search, $search, $search);
+                    $stmt_total->bind_param("sssss", $_SESSION['cit-student-id'], $search, $search, $search, $search);
                 } else {
                     $stmt_total = $conn->prepare($sql_total);
-                    $stmt_total->bind_param("s", $_COOKIE['cit-student-id']);
+                    $stmt_total->bind_param("s", $_SESSION['cit-student-id']);
                 }
                 $stmt_total->execute();
                 $row = $stmt_total->get_result()->fetch_assoc();
@@ -415,6 +417,8 @@ include '../connection.php';
                     } else {
                         rewind($file_handle);
                         fgetcsv($file_handle);
+                        $errors = '';
+                        $hasError = false;
                         while ($data = fgetcsv($file_handle)) {
                             $sid = $data[0];
                             $lastname = $data[1];
@@ -423,24 +427,29 @@ include '../connection.php';
                             $yearsec = $data[4];
                             $email = strtolower(str_replace(" ", "", $firstname)) . "." . strtolower(str_replace(" ", "", $lastname)) . "@cbsua.edu.ph";
                             $password = "cit-" . $sid;
+                            $hash_password = password_hash($password, PASSWORD_DEFAULT);
+                            try {
+                                $sql_student = "INSERT INTO `students`(`student_id`, `last_name`, `first_name`, `middle_initial`, `year_and_section`) VALUES (?, ?, ?, ?, ?)";
+                                $stmt_student = $conn->prepare($sql_student);
 
-                            $sql_student = "INSERT INTO `students`(`student_id`, `last_name`, `first_name`, `middle_initial`, `year_and_section`) VALUES (?, ?, ?, ?, ?)";
-                            $stmt_student = $conn->prepare($sql_student);
+                                $sql_account = "INSERT INTO `accounts`(`email`, `password`, `student_id`, `type`) VALUES (?, ?, ?, 'user')";
+                                $stmt_account = $conn->prepare($sql_account);
 
-                            $sql_account = "INSERT INTO `accounts`(`email`, `password`, `student_id`, `type`) VALUES (?, ?, ?, 'user')";
-                            $stmt_account = $conn->prepare($sql_account);
+                                $stmt_student->bind_param("sssss", $sid, $lastname, $firstname, $mi, $yearsec);
+                                $stmt_account->bind_param("sss", $email, $hash_password, $sid);
 
-                            $stmt_student->bind_param("sssss", $sid, $lastname, $firstname, $mi, $yearsec);
-                            $stmt_account->bind_param("sss", $email, $password, $sid);
-
-                            $stmt_student->execute();
-                            $stmt_account->execute();
+                                $stmt_student->execute();
+                                $stmt_account->execute();
+                            } catch (mysqli_sql_exception $e) {
+                                $hasError = true;
+                                $errors .= $e->getMessage() . '\n';
+                            }
                         }
                         fclose($file_handle);
                         $conn->close();
                         ?>
                         <script>
-                            swal('CSV File imported successfully!', '', 'success')
+                            swal(<?php if ($hasError) {?>'CSV File imported with errors!', "<?php echo $errors; ?>", 'error' <?php } else { ?>'CSV File imported successfully!', '', 'success' <?php } ?> )
                             .then((okay) => {
                                 window.location.href = 'students.php';
                             });
