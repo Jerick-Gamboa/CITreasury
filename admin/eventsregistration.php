@@ -72,6 +72,7 @@ include '../connection.php';
                 $stmt_title->bind_param("s", $_GET['event-id']);
                 $stmt_title->execute();
                 $result_title = $stmt_title->get_result();
+                $dateofcurrenteventinget = "";
                 if ($row_title = $result_title->fetch_assoc()) {
                     $dateofcurrenteventinget = $row_title['event_date'];
                     # Set event name in title using event-id in URL query
