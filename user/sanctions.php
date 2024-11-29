@@ -3,7 +3,7 @@ session_start();
 include '../connection.php';
 include '../helperfunctions.php';
 include '../components/menu.php';
-verifyAdminLoggedIn($conn);
+verifyUserLoggedIn($conn);
 
 $html = new HTML("CITreasury - Sanctions");
 $html->addLink('stylesheet', '../inter-variable.css');
