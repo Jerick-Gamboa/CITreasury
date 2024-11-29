@@ -425,7 +425,7 @@ $html->startBody();
                         $conn->close();
                         ?>
                         <script>
-                            swal(<?php if ($hasError) {?>'CSV File imported with errors!', "<?php echo $errors; ?>", 'error' <?php } else { ?>'CSV File imported successfully!', '', 'success' <?php } ?> )
+                            swal(<?php if ($hasError) {?>'CSV File imported with errors!', "<?php echo $errors; ?>", 'warning' <?php } else { ?>'CSV File imported successfully!', '', 'success' <?php } ?> )
                             .then((okay) => {
                                 window.location.href = 'students.php';
                             });
