@@ -16,7 +16,7 @@ $stmt_account = $conn->prepare($sql_account);
 $stmt_student->bind_param("sssss", $sid, $lastname, $firstname, $mi, $yearsec);
 $stmt_account->bind_param("sss", $email, $hash_password, $sid);
 if ($stmt_student->execute() && $stmt_account->execute()) {
-	echo "Admin account created:<br>Email: jhz.rmx@cbsua.edu.ph<br>Password: cit-22-1342";
+	echo "Admin account created:<br>Email: ".$email."<br>Password: ".$password;
 } else {
 	echo "An error occured.";
 }
