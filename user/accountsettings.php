@@ -1,6 +1,7 @@
 <?php
 session_start();
 include '../connection.php';
+include '../helperfunctions.php';
 # Verify if login exists such that the session "cit-student-id" is found
 if (isset($_SESSION['cit-student-id'])) {
     $sql = "SELECT `type`, `password` FROM `accounts` WHERE `student_id` = ?";
