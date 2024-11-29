@@ -1,22 +1,20 @@
 <?php
 session_start();
 include 'connection.php';
+include 'helperfunctions.php';
 include 'password_compat.php';
+
+$html = new HTML("CITreasury - Account Settings");
+$html->addLink('stylesheet', 'inter-variable.css');
+$html->addLink('icon', 'img/nobgcitsclogo.png');
+$html->addScript("js/tailwind3.4.1.js");
+$html->addScript("js/tailwind.config.js");
+$html->addScript("js/sweetalert.min.js");
+$html->addScript("js/jquery-3.7.1.min.js");
+$html->addScript("js/predefined-script.js");
+$html->addScript("js/defer-script.js", true);
+$html->startBody();
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Import JavaScript files -->
-    <script src="js/tailwind3.4.1.js"></script>
-    <script src="js/tailwind.config.js"></script>
-    <script src="js/sweetalert.min.js"></script>
-    <script src="js/jquery-3.7.1.min.js"></script>
-    <script src="js/predefined-script.js"></script>
-    <link rel="icon" href="img/nobgcitsclogo.png">
-    <link rel="stylesheet" href="inter-variable.css">
-</head>
 <body class="bg-gradient-to-t from-custom-purple to-purple-200 h-screen flex items-center justify-center">
     <div class="w-112 bg-white shadow rounded-lg">
         <img src="img/headerlogo.png" class="w-full rounded-t-lg"><br>
@@ -110,5 +108,6 @@ include 'password_compat.php';
     <!-- script type="text/javascript">
         sendNotif("Welcome to CITreasury!", "What's up?", "nobgcitsclogo.png", null);
     </script -->
-</body>
-</html>
+<?php
+$html->endBody();
+?>
