@@ -397,5 +397,6 @@ $html->startBody();
         }
     }
     ?>
-</body>
-</html>
+<?php
+$html->endBody();
+?>

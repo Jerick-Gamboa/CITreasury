@@ -135,5 +135,6 @@ $html->startBody();
             </div>
         </div>
     </div>
-</body>
-</html>
+<?php
+$html->endBody();
+?>

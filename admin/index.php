@@ -163,5 +163,6 @@ $html->startBody();
           chart.render();
         }
     </script>
-</body>
-</html>
+<?php
+$html->endBody();
+?>
