@@ -1,6 +1,8 @@
 <?php
 session_start();
 include '../connection.php';
+include '../helperfunctions.php';
+verifyAdminLoggedIn($conn);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -19,27 +21,6 @@ include '../connection.php';
     <title>CITreasury - Events</title>
 </head>
 <body>
-    <?php
-    # Verify if login exists such that the session "cit-student-id" is found on browser
-    if (isset($_SESSION['cit-student-id'])) {
-        $sql = "SELECT `type` FROM `accounts` WHERE `student_id` = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("s", $_SESSION['cit-student-id']);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if ($result->num_rows > 0) {
-            $row = $result->fetch_assoc();
-            $type = $row['type'];
-            if ($type === 'user') { # If account type is user, redirect to user page
-                header("location: ../user/");
-            }
-        } else { # If account is not found, return to login page
-            header("location: ../");
-        }
-    } else { # If session is not found, return to login page
-        header("location: ../");
-    }
-    ?>
     <!-- Top Navigation Bar -->
     <nav class="fixed w-full bg-custom-purple flex flex-row shadow shadow-gray-800">
         <img src="../img/nobgcitsclogo.png" class="w-12 h-12 my-2 ml-6">

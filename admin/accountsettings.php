@@ -1,6 +1,29 @@
 <?php
 session_start();
 include '../connection.php';
+# Verify if login exists such that the session "cit-student-id" is found
+if (isset($_SESSION['cit-student-id'])) {
+    $sql = "SELECT `accounts`.`type`, `accounts`.`password`, `students`.*  FROM `accounts` JOIN `students` on `students`.`student_id` = `accounts`.`student_id` WHERE `accounts`.`student_id` = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $_SESSION['cit-student-id']);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $type = $row['type'];
+        $lastname = $row['last_name'];
+        $firstname = $row['first_name'];
+        $mi = $row['middle_initial'];
+        $yearsec = $row['year_and_section'];
+        if ($type === 'user') { # If account type is user, redirect to user page
+            header("location: ../user/");
+        }
+    } else { # If account is not found, return to login page
+        header("location: ../");
+    }
+} else { # If session is not found, return to login page
+    header("location: ../");
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -18,31 +41,6 @@ include '../connection.php';
     <title>CITreasury - Account Settings</title>
 </head>
 <body>
-    <?php
-    # Verify if login exists such that the session "cit-student-id" is found on browser
-    if (isset($_SESSION['cit-student-id'])) {
-        $sql = "SELECT `accounts`.`type`, `accounts`.`password`, `students`.*  FROM `accounts` JOIN `students` on `students`.`student_id` = `accounts`.`student_id` WHERE `accounts`.`student_id` = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("s", $_SESSION['cit-student-id']);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if ($result->num_rows > 0) {
-            $row = $result->fetch_assoc();
-            $type = $row['type'];
-            $lastname = $row['last_name'];
-            $firstname = $row['first_name'];
-            $mi = $row['middle_initial'];
-            $yearsec = $row['year_and_section'];
-            if ($type === 'user') { # If account type is user, redirect to user page
-                header("location: ../user/");
-            }
-        } else { # If account is not found, return to login page
-            header("location: ../");
-        }
-    } else { # If session is not found, return to login page
-        header("location: ../");
-    }
-    ?>
     <nav class="fixed w-full bg-custom-purple flex flex-row shadow shadow-gray-800">
         <img src="../img/nobgcitsclogo.png" class="w-12 h-12 my-2 ml-6">
         <h1 class="text-3xl p-3 font-bold text-white">CITreasury</h1>
