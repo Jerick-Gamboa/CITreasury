@@ -2,6 +2,7 @@
 session_start();
 include '../connection.php';
 include '../helperfunctions.php';
+include '../components/menu.php';
 # Verify if login exists such that the session "cit-student-id" is found
 if (isset($_SESSION['cit-student-id'])) {
     $sql = "SELECT `accounts`.`type`, `accounts`.`password`, `students`.*  FROM `accounts` JOIN `students` on `students`.`student_id` = `accounts`.`student_id` WHERE `accounts`.`student_id` = ?";
@@ -46,9 +47,11 @@ $html->startBody();
     <div class="flex flex-col md:flex-row bg-custom-purplo min-h-screen">
         <div class="mt-18 md:mt-20 mx-2">
             <div id="menu-items" class="hidden md:inline-block w-60 h-full">
+                <?php menuContent(); ?>
             </div>
         </div>
         <div id="menu-items-mobile" class="fixed block md:hidden h-fit top-16 w-full p-4 bg-custom-purplo opacity-95">
+            <?php menuContent(); ?>
         </div>
         <div class="w-full bg-red-50 px-6 min-h-screen">
             <div class="mt-24">
