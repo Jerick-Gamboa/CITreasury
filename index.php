@@ -4,7 +4,7 @@ include 'connection.php';
 include 'helperfunctions.php';
 include 'password_compat.php';
 
-$html = new HTML("CITreasury - Account Settings");
+$html = new HTML("Login");
 $html->addLink('stylesheet', 'inter-variable.css');
 $html->addLink('icon', 'img/nobgcitsclogo.png');
 $html->addScript("js/tailwind3.4.1.js");
