@@ -24,23 +24,17 @@ if (isset($_SESSION['cit-student-id'])) {
 } else { # If session is not found, return to login page
     header("location: ../");
 }
+$html = new HTML("CITreasury - Account Settings");
+$html->addLink('stylesheet', '../inter-variable.css');
+$html->addLink('icon', '../img/nobgcitsclogo.png');
+$html->addScript("../js/tailwind3.4.1.js");
+$html->addScript("../js/tailwind.config.js");
+$html->addScript("../js/sweetalert.min.js");
+$html->addScript("../js/jquery-3.7.1.min.js");
+$html->addScript("../js/predefined-script.js");
+$html->addScript("../js/defer-script.js", true);
+$html->startBody();
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="../img/nobgcitsclogo.png">
-    <link rel="stylesheet" href="../inter-variable.css">
-    <script src="../js/tailwind3.4.1.js"></script>
-    <script src="../js/tailwind.config.js"></script>
-    <script src="../js/sweetalert.min.js"></script>
-    <script src="../js/jquery-3.7.1.min.js"></script>
-    <script src="../js/predefined-script.js"></script>
-    <script src="../js/defer-script.js" defer></script>
-    <title>CITreasury - Account Settings</title>
-</head>
-<body>
     <nav class="fixed w-full bg-custom-purple flex flex-row shadow shadow-gray-800">
         <img src="../img/nobgcitsclogo.png" class="w-12 h-12 my-2 ml-6">
         <h1 class="text-3xl p-3 font-bold text-white">CITreasury</h1>
