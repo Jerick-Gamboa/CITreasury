@@ -1,5 +1,6 @@
 <?php
 include '../connection.php';
+include '../password_compat.php';
 $sid = "22-1342";
 $lastname = "RMX";
 $firstname = "JHZ";
