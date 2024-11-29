@@ -168,7 +168,7 @@ clickToShowHide("#mdi-menu", "#menu-user-items-mobile");
 function logoutAction(button_id) {
     $(button_id).click((e) => {
         swal({
-            title: "Are you sure to logout?",
+            title: "Logout?",
             text: "You can log into your account at anytime.",
             icon: "info",
             buttons: true,
