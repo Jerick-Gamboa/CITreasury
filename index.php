@@ -1,6 +1,7 @@
 <?php
 session_start();
 include 'connection.php';
+include 'password_compat.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">

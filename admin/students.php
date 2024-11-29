@@ -2,6 +2,7 @@
 session_start();
 include '../connection.php';
 include '../helperfunctions.php';
+include '../password_compat.php';
 verifyAdminLoggedIn($conn);
 
 $html = new HTML("CITreasury - Students");
