@@ -417,8 +417,12 @@ $html->startBody();
                                 $stmt_student->bind_param("sssss", $sid, $lastname, $firstname, $mi, $yearsec);
                                 $stmt_account->bind_param("sss", $email, $hash_password, $sid);
 
-                                $stmt_student->execute();
-                                $stmt_account->execute();
+                                if ($stmt_student->execute()) {
+                                    $stmt_account->execute();
+                                } else {
+                                    $hasError = true;
+                                    $errors .= "ID '".$sid."' failed to insert.\n";
+                                }
                             } catch (mysqli_sql_exception $e) {
                                 $hasError = true;
                                 $errors .= $e->getMessage() . '\n';
