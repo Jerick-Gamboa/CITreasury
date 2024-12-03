@@ -84,15 +84,20 @@ $html->startBody();
         $lastname = ucwords($_POST['edit-last-name']);
         $firstname = ucwords($_POST['edit-first-name']);
         $mi = ucwords($_POST['edit-middle-initial']);
+        $email = strtolower(str_replace(" ", "", $firstname)) . "." . strtolower(str_replace(" ", "", $lastname)) . "@cbsua.edu.ph";
         $yearsec = strtoupper($_POST['edit-yearsec']);
         $sqlupdate_student = "UPDATE `students` SET `last_name`= ?, `first_name`= ?, `middle_initial`= ?, `year_and_section`= ? WHERE `student_id` = ?";
         $stmt_update_student = $conn->prepare($sqlupdate_student);
         $stmt_update_student->bind_param("sssss", $lastname, $firstname, $mi, $yearsec, $sid);
         if ($stmt_update_student->execute()) {
+            $sqlupdate_account = "UPDATE `accounts` SET `email`=? WHERE `student_id` = ?";
+            $stmt_update_account = $conn->prepare($sqlupdate_account);
+            $stmt_update_account->bind_param("ss", $email, $sid);
             ?>
             <script>
-                window.location.href = 'accountsettings.php';
-                swal('Changes saved!', '', 'success');
+                swal('Changes saved!', '<?php echo $stmt_update_account->execute() ? "Modifying the name can also modify the email." : "But student email failed to update." ?>', 'success').then(() => {
+                    window.location.href = 'accountsettings.php';
+                });
             </script>
             <?php
         } else {
