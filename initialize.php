@@ -50,7 +50,7 @@ CREATE TABLE `events` (
   PRIMARY KEY (`event_id`)
 ) ENGINE=InnoDB;
 
-INSERT INTO `events` (`event_id`, `event_name`, `event_description`, `event_date`, `event_fee`, `sanction_fee`) VALUES
+INSERT INTO `events` (`event_id`, `event_name`, `event_description`, `event_target`, `event_date`, `event_fee`, `sanction_fee`) VALUES
 (101, 'IT Night', 'Aranuhan', '1,2,3,4',  '2024-05-19', 200,  20),
 (102, 'General Assembly', 'Basta',  '1,2,3,4',  '2024-05-21', 0,  40),
 (103, 'Arts Month', 'Nugagawen',  '1,2,3,4',  '2024-05-19', 100,  40),
