@@ -370,7 +370,6 @@ $html->startBody();
     }
     # If registration is submitted
     if (isset($_POST['register-this-student'])) {
-        # TODO: Handling students if they are not in basta
         $sid = $_POST['register-student-id'];
         $advancefee = $_POST['register-advance-fee'];
 
