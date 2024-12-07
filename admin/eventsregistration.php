@@ -117,7 +117,7 @@ $html->startBody();
                                 FROM `students` 
                                 JOIN `registrations` ON `students`.`student_id` = `registrations`.`student_id` 
                                 JOIN `events` ON `events`.`event_id` = `registrations`.`event_id` 
-                                WHERE `registrations`.`event_id` = ?";
+                                WHERE `registrations`.`event_id` = ? AND FIND_IN_SET(SUBSTRING(`students`.`year_and_section`, 1, 1), `events`.`event_target`) > 0";
                         if (isset($_GET['search'])) {
                             $search = '%' . $_GET['search'] . '%';
                             $sql .= " AND (`students`.`student_id` LIKE ? OR `students`.`last_name` LIKE ? OR `students`.`first_name` LIKE ? OR `students`.`year_and_section` LIKE ? OR `registrations`.`registration_date` LIKE ?)";
@@ -370,6 +370,7 @@ $html->startBody();
     }
     # If registration is submitted
     if (isset($_POST['register-this-student'])) {
+        # TODO: Handling students if they are not in basta
         $sid = $_POST['register-student-id'];
         $advancefee = $_POST['register-advance-fee'];
 

@@ -95,6 +95,7 @@ $html->startBody();
                                     <th scope="col" class="p-2 border-r border-black">Event ID</th>
                                     <th scope="col" class="p-2 border-r border-black">Event Name</th>
                                     <th scope="col" class="p-2 border-r border-black">Event Description</th>
+                                    <th scope="col" class="p-2 border-r border-black">Target Year</th>
                                     <th scope="col" class="p-2 border-r border-black">Event Date</th>
                                     <th scope="col" class="p-2 border-r border-black">Event Fee (₱)</th>
                                     <th scope="col" class="p-2 border-r border-black">Sanction Fee (₱)</th>
@@ -110,6 +111,7 @@ $html->startBody();
                                 $eid = $row['event_id'];
                                 $eventname = $row['event_name'];
                                 $eventdesc = $row['event_description'];
+                                $eventtarget = $row['event_target'];
                                 $eventdate = $row['event_date'];
                                 $feeperevent = $row['event_fee'];
                                 $sanctionfee = $row['sanction_fee'];
@@ -118,6 +120,7 @@ $html->startBody();
                                     <td class="px-2 border-r border-black bg-purple-100"><?php echo $eid; ?></td>
                                     <td class="px-2 border-r border-black bg-purple-100"><?php echo $eventname; ?></td>
                                     <td class="px-2 border-r border-black bg-purple-100"><?php echo $eventdesc; ?></td>
+                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $eventtarget; ?></td>
                                     <td class="px-2 border-r border-black bg-purple-100"><?php echo $eventdate; ?></td>
                                     <td class="px-2 border-r border-black bg-purple-100"><?php echo $feeperevent; ?></td>
                                     <td class="px-2 border-r border-black bg-purple-100"><?php echo $sanctionfee; ?></td>
@@ -200,6 +203,21 @@ $html->startBody();
                     <input type="text" name="event-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
                     <label class="ml-1 text-sm">Event Description:</label>
                     <textarea name="event-desc" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required></textarea>
+                    <label class="ml-1 text-sm">Target Year Levels:</label>
+                    <div class="mb-4 flex flex-row justify-between bg-purple-100 border-2 border-custom-purple rounded-lg px-4 py-2">
+                        <label class="flex items-center">
+                            <input type="checkbox" name="event-target[]" value="1" class="mr-2"> 1st year
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="event-target[]" value="2" class="mr-2"> 2nd year
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="event-target[]" value="3" class="mr-2"> 3rd year
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="event-target[]" value="4" class="mr-2"> 4th year
+                        </label>
+                    </div>
                     <label class="ml-1 text-sm">Event Date:</label>
                     <input type="date" id="event-date" name="event-date" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
                     <label class="ml-1 text-sm">Event Fee (₱):</label>
@@ -231,7 +249,22 @@ $html->startBody();
                     <label class="ml-1 text-sm">Event Name:</label>
                     <input type="text" id="edit-event-name" name="edit-event-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
                     <label class="ml-1 text-sm">Event Description:</label>
-                    <textarea id="edit-event-desc" name="edit-event-desc" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required></textarea> 
+                    <textarea id="edit-event-desc" name="edit-event-desc" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required></textarea>
+                    <label class="ml-1 text-sm">Target Year Levels:</label>
+                    <div class="mb-4 flex flex-row justify-between bg-purple-100 border-2 border-custom-purple rounded-lg px-4 py-2">
+                        <label class="flex items-center">
+                            <input type="checkbox" name="edit-event-target[]" value="1" class="mr-2"> 1st year
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="edit-event-target[]" value="2" class="mr-2"> 2nd year
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="edit-event-target[]" value="3" class="mr-2"> 3rd year
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="edit-event-target[]" value="4" class="mr-2"> 4th year
+                        </label>
+                    </div>
                     <label class="ml-1 text-sm">Event Date:</label>
                     <input type="date" id="edit-event-date" name="edit-event-date" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 hover:cursor-pointer bg-purple-100" required>
                     <div id="tooltip-content-date" class="absolute whitespace-normal break-words rounded-lg bg-red-500 py-1.5 px-3 font-sans text-xs font-normal text-white shadow shadow-black focus:outline-none">
@@ -273,9 +306,18 @@ $html->startBody();
             $("#edit-event-id").val(row.cells[0].innerHTML);
             $("#edit-event-name").val(row.cells[1].innerHTML);
             $("#edit-event-desc").val(row.cells[2].innerHTML);
-            $("#edit-event-date").val(row.cells[3].innerHTML);
-            $("#edit-fee-per-event").val(row.cells[4].innerHTML);
-            $("#edit-sanction-fee").val(row.cells[5].innerHTML);
+            // Populate checkboxes for event-target
+            const targetYears = row.cells[3].innerHTML.split(','); // Split target years by commas
+            $("input[name='edit-event-target[]']").each(function() {
+                if (targetYears.includes($(this).val())) {
+                    $(this).prop('checked', true);
+                } else {
+                    $(this).prop('checked', false);
+                }
+            });
+            $("#edit-event-date").val(row.cells[4].innerHTML);
+            $("#edit-fee-per-event").val(row.cells[5].innerHTML);
+            $("#edit-sanction-fee").val(row.cells[6].innerHTML);
         }
 
         $('#edit-event-date').hover(
@@ -303,11 +345,12 @@ $html->startBody();
         $eventname = ucwords($_POST['event-name']);
         $eventdesc = $_POST['event-desc'];
         $eventdate = $_POST['event-date'];
+        $eventtarget = isset($_POST['event-target']) ? implode(',', $_POST['event-target']) : '';
         $feeperevent = $_POST['fee-per-event'];
         $sanctionfee = $_POST['sanction-fee'];
-        $sql_event = "INSERT INTO `events`(`event_name`, `event_description`, `event_date`, `event_fee`, `sanction_fee`) VALUES (?, ?, ?, ?, ?)";
+        $sql_event = "INSERT INTO `events`(`event_name`, `event_description`, `event_target`, `event_date`, `event_fee`, `sanction_fee`) VALUES (?, ?, ?, ?, ?, ?)";
         $stmt_event = $conn->prepare($sql_event);
-        $stmt_event->bind_param("sssii", $eventname, $eventdesc, $eventdate, $feeperevent, $sanctionfee);
+        $stmt_event->bind_param("ssssii", $eventname, $eventdesc, $eventtarget, $eventdate, $feeperevent, $sanctionfee);
         if ($stmt_event->execute()) {
             ?>
             <script>
@@ -323,26 +366,51 @@ $html->startBody();
     }
     // If Add Update Event is submitted
     if (isset($_POST['update-this-event'])) {
-        $eid = str_replace(" ", "", $_POST['edit-event-id']);
-        $eventname = ucwords($_POST['edit-event-name']);
-        $eventdesc = $_POST['edit-event-desc'];
-        $eventdate = $_POST['edit-event-date'];
-        $feeperevent = $_POST['edit-fee-per-event'];
-        $sanctionfee = $_POST['edit-sanction-fee'];
-        $sqlupdate_event = "UPDATE `events` SET `event_name`=?, `event_description`=?, `event_date`=?, `event_fee`=?, `sanction_fee`=? WHERE `event_id` = ?";
+        // Retrieve and sanitize inputs
+        $eid = trim($_POST['edit-event-id']);
+        $eventname = ucwords(trim($_POST['edit-event-name']));
+        $eventdesc = trim($_POST['edit-event-desc']);
+        $eventdate = trim($_POST['edit-event-date']);
+        $feeperevent = floatval($_POST['edit-fee-per-event']);
+        $sanctionfee = floatval($_POST['edit-sanction-fee']);
+        $eventtarget = (isset($_POST['edit-event-target']) && !empty($_POST['edit-event-target'])) ? implode(',', $_POST['edit-event-target']) : '';
+        // Update query
+        $sqlupdate_event = "UPDATE `events` 
+                            SET `event_name` = ?, 
+                                `event_description` = ?, 
+                                `event_target` = ?, 
+                                `event_date` = ?, 
+                                `event_fee` = ?, 
+                                `sanction_fee` = ? 
+                            WHERE `event_id` = ?";
         $stmt_update_event = $conn->prepare($sqlupdate_event);
-        $stmt_update_event->bind_param("sssiii", $eventname, $eventdesc, $eventdate, $feeperevent, $sanctionfee, $eid);
-        if ($stmt_update_event->execute()) {
-            ?>
-            <script>
-                swal('Event updated successfully!', '', 'success')
-                .then(() => {
-                    window.location.href = 'eventslist.php';
-                });
+        // Check if statement preparation is successful
+        if ($stmt_update_event) {
+            $stmt_update_event->bind_param("ssssidi", $eventname, $eventdesc, $eventtarget, $eventdate, $feeperevent, $sanctionfee, $eid);
+            if ($stmt_update_event->execute()) {
+                // Success
+                ?><script>
+                    swal('Event updated successfully!', '', 'success')
+                    .then(() => {
+                        window.location.href = 'eventslist.php';
+                    });
+                </script>
+                <?php
+            } else {
+                // Error during execution
+                ?><script>
+                    swal('Failed to update event!', '<?php echo $stmt_update_event->error; ?>', 'error');
+                </script>
+                <?php
+            }
+
+            $stmt_update_event->close();
+        } else {
+            // Error preparing statement
+            ?><script>
+                swal('Failed to prepare statement!', '<?php echo $conn->error; ?>', 'error');
             </script>
             <?php
-        } else {
-            ?><script>swal('Failed to update event!', '', 'error');</script>"<?php
         }
     }
     // If Delete Event is submitted

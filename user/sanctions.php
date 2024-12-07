@@ -44,6 +44,17 @@ $html->startBody();
                     <h3 class="text-gray-800 font-bold text-lg mb-4">Unregistered Past Events</h3>
                     <?php
                     $pendingfees = 0;
+                    // Fetch the student's year level dynamically
+                    $student_id = $_SESSION['cit-student-id'];
+                    $query_year_level = "SELECT year_and_section FROM `students` WHERE `student_id` = ?";
+                    $stmt_year_level = $conn->prepare($query_year_level);
+                    $stmt_year_level->bind_param("s", $student_id);
+                    $stmt_year_level->execute();
+                    $stmt_year_level->bind_result($year_and_section);
+                    $stmt_year_level->fetch();
+                    $stmt_year_level->close();
+                    // Extract the year level (e.g., '2C' -> '2')
+                    $year_level = substr($year_and_section, 0, 1);
                     $sql_unregistered_events = "
                         SELECT `events`.*, `events`.`event_fee` + `events`.`sanction_fee` AS `total_fee`,
                             (`events`.`event_fee` + `events`.`sanction_fee` - COALESCE(`sanctions`.`total_sanctions_paid`, 0)) AS `balance`
@@ -52,23 +63,26 @@ $html->startBody();
                         ON `events`.`event_id` = `registrations`.`event_id` 
                             AND `registrations`.`student_id` = ?
                         LEFT JOIN (
-                                SELECT 
-                                    `event_id`, 
-                                    `student_id`, 
-                                    SUM(`sanctions_paid`) AS `total_sanctions_paid`
-                                FROM 
-                                    `sanctions`
-                                GROUP BY 
-                                    `event_id`, `student_id`
-                            ) AS `sanctions` 
+                            SELECT 
+                                `event_id`, 
+                                `student_id`, 
+                                SUM(`sanctions_paid`) AS `total_sanctions_paid`
+                            FROM 
+                                `sanctions`
+                            GROUP BY 
+                                `event_id`, `student_id`
+                        ) AS `sanctions` 
                         ON `events`.`event_id` = `sanctions`.`event_id` AND `sanctions`.`student_id` = ?
                         WHERE `registrations`.`student_id` IS NULL 
                             AND `events`.`event_date` < CURDATE()
+                            AND FIND_IN_SET(?, `events`.`event_target`) > 0
                             AND (`events`.`event_fee` + `events`.`sanction_fee`) > COALESCE(`sanctions`.`total_sanctions_paid`, 0)";
+
                     $stmt_unregistered_events = $conn->prepare($sql_unregistered_events);
-                    $stmt_unregistered_events->bind_param("ss", $_SESSION['cit-student-id'], $_SESSION['cit-student-id']);
+                    $stmt_unregistered_events->bind_param("sss", $student_id, $student_id, $year_level);
                     $stmt_unregistered_events->execute();
                     $result_unregistered_events = $stmt_unregistered_events->get_result();
+
                     if ($result_unregistered_events->num_rows > 0) {
                         while ($row_event = $result_unregistered_events->fetch_assoc()) {
                             ?>
@@ -90,8 +104,21 @@ $html->startBody();
                 <div class="w-full p-4 bg-orange-300 rounded-lg shadow-lg mb-4">
                     <h3 class="text-gray-800 font-bold text-lg mb-4">Unsettled Registrations</h3>
                     <?php
+                    $student_id = $_SESSION['cit-student-id'];
+                    // Fetch the student's year level dynamically
+                    $query_year_level = "SELECT year_and_section FROM `students` WHERE `student_id` = ?";
+                    $stmt_year_level = $conn->prepare($query_year_level);
+                    $stmt_year_level->bind_param("s", $student_id);
+                    $stmt_year_level->execute();
+                    $stmt_year_level->bind_result($year_and_section);
+                    $stmt_year_level->fetch();
+                    $stmt_year_level->close();
+                    // Extract the year level (e.g., '2C' -> '2')
+                    $year_level = substr($year_and_section, 0, 1);
+
                     $sql_unsettledbalance_events = "
-                        SELECT `registrations`.`registration_date`, 
+                        SELECT 
+                            `registrations`.`registration_date`, 
                             `registrations`.`paid_fees`, 
                             `events`.*, 
                             CASE 
@@ -108,11 +135,14 @@ $html->startBody();
                         JOIN `registrations` ON `students`.`student_id` = `registrations`.`student_id` 
                         JOIN `events` ON `events`.`event_id` = `registrations`.`event_id` 
                         WHERE `students`.`student_id` = ? 
+                            AND FIND_IN_SET(?, `events`.`event_target`) > 0
                         HAVING `balance` <> 0";
+
                     $stmt_unsettledbalance_events = $conn->prepare($sql_unsettledbalance_events);
-                    $stmt_unsettledbalance_events->bind_param("s", $_SESSION['cit-student-id']);
+                    $stmt_unsettledbalance_events->bind_param("ss", $student_id, $year_level);
                     $stmt_unsettledbalance_events->execute();
                     $result_unsettledbalance_events = $stmt_unsettledbalance_events->get_result();
+
                     if ($result_unsettledbalance_events->num_rows > 0) {
                         while ($row_event = $result_unsettledbalance_events->fetch_assoc()) {
                             ?>
