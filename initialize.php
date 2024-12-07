@@ -33,7 +33,6 @@ CREATE TABLE `accounts` (
 ) ENGINE=InnoDB;
 
 INSERT INTO `accounts` (`account_id`, `email`, `password`, `student_id`, `type`) VALUES
-(1, 'jaspherjed.bobis@cbsua.edu.ph',  '".password_hash('cit-22-1342', PASSWORD_DEFAULT)."',  '22-1342',  'admin'),
 (10,  'jerick.gamboa@cbsua.edu.ph', '".password_hash('cit-22-1677', PASSWORD_DEFAULT)."',  '22-1677',  'user'),
 (18,  'anamae.menor@cbsua.edu.ph',  '".password_hash('cit-22-0880', PASSWORD_DEFAULT)."',  '22-0880',  'user'),
 (19,  'tdrgsfd.htdgrsg@cbsua.edu.ph', '".password_hash('cit-23-9563', PASSWORD_DEFAULT)."',  '23-9563',  'user'),
@@ -99,20 +98,18 @@ CREATE TABLE `students` (
 INSERT INTO `students` (`student_id`, `last_name`, `first_name`, `middle_initial`, `year_and_section`) VALUES
 ('21-6394', 'Ubnlbk', 'Ihgrsfda', 'O',  '3A'),
 ('22-0880', 'Menor',  'Ana Mae',  'M',  '2C'),
-('22-1342', 'Bobis',  'Jaspher Jed',  'A',  '2C'),
 ('22-1677', 'Gamboa', 'Jerick', 'D',  '2C'),
 ('23-9563', 'Htdgrsg',  'Tdrgsfd',  'G',  '1E');
 ";
 
 try {
-    $conn = new PDO("mysql:host=$host", $username, $password);
-    $conn->query("DROP DATABASE IF EXISTS `$db`");
-    $conn->query("CREATE DATABASE IF NOT EXISTS `$db`");
-    $conn = new PDO("mysql:host=$host;dbname=$db", $username, $password);
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $conn->query($import_sql);
-    echo "Database has been initialized/reset.<br><br>";
-    echo "<pre>".$import_sql."</pre>";
+  $conn = new PDO("mysql:host=$host", $username, $password);
+  $conn->query("DROP DATABASE IF EXISTS `$db`");
+  $conn->query("CREATE DATABASE IF NOT EXISTS `$db`");
+  $conn = new PDO("mysql:host=$host;dbname=$db", $username, $password);
+  $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+  $conn->query($import_sql);
+  echo "Database has been initialized/reset.<br><br>";
 	$stmt_student = $conn->prepare($sql_student);
 	$stmt_account = $conn->prepare($sql_account);
 	if ($stmt_student->execute([$sid, $lastname, $firstname, $mi, $yearsec]) && $stmt_account->execute([$email, $hash_password, $sid])) {
