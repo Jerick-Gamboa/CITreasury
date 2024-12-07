@@ -206,16 +206,16 @@ $html->startBody();
                     <label class="ml-1 text-sm">Target Year Levels:</label>
                     <div class="mb-4 flex flex-row justify-between bg-purple-100 border-2 border-custom-purple rounded-lg px-4 py-2">
                         <label class="flex items-center">
-                            <input type="checkbox" name="event-target[]" value="1" class="mr-2"> 1st year
+                            <input type="checkbox" name="event-target[]" value="1" class="mr-2" checked> 1st year
                         </label>
                         <label class="flex items-center">
-                            <input type="checkbox" name="event-target[]" value="2" class="mr-2"> 2nd year
+                            <input type="checkbox" name="event-target[]" value="2" class="mr-2" checked> 2nd year
                         </label>
                         <label class="flex items-center">
-                            <input type="checkbox" name="event-target[]" value="3" class="mr-2"> 3rd year
+                            <input type="checkbox" name="event-target[]" value="3" class="mr-2" checked> 3rd year
                         </label>
                         <label class="flex items-center">
-                            <input type="checkbox" name="event-target[]" value="4" class="mr-2"> 4th year
+                            <input type="checkbox" name="event-target[]" value="4" class="mr-2" checked> 4th year
                         </label>
                     </div>
                     <label class="ml-1 text-sm">Event Date:</label>
