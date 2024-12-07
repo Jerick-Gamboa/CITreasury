@@ -221,9 +221,9 @@ $html->startBody();
                     <label class="ml-1 text-sm">Event Date:</label>
                     <input type="date" id="event-date" name="event-date" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
                     <label class="ml-1 text-sm">Event Fee (₱):</label>
-                    <input type="number" id="fee-per-event" name="fee-per-event" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
+                    <input type="number" id="fee-per-event" name="fee-per-event" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" min="0" required>
                     <label class="ml-1 text-sm">Sanction Fee (₱):</label>
-                    <input type="number" id="sanction-fee" name="sanction-fee" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
+                    <input type="number" id="sanction-fee" name="sanction-fee" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" min="0" required>
                     <div class="flex items-center justify-center m-4">
                         <button type="submit" class="px-3 py-2 bg-custom-purple rounded-lg focus:outline-none focus:border-purple-500 text-base text-white font-bold hover:bg-custom-purplo" name="add-new-event">Add Event</button>
                     </div>
@@ -271,9 +271,9 @@ $html->startBody();
                         Be careful when changing event dates, as this changes the <br>total fee to be paid with respect to the current date.
                     </div>
                     <label class="ml-1 text-sm">Event Fee (₱):</label>
-                    <input type="number" id="edit-fee-per-event" name="edit-fee-per-event" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
+                    <input type="number" id="edit-fee-per-event" name="edit-fee-per-event" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" min="0" required>
                     <label class="ml-1 text-sm">Sanction Fee (₱):</label>
-                    <input type="number" id="edit-sanction-fee" name="edit-sanction-fee" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
+                    <input type="number" id="edit-sanction-fee" name="edit-sanction-fee" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" min="0" required>
                     <div class="flex items-center justify-center m-4">
                         <button type="submit" class="px-3 py-2 bg-custom-purple rounded-lg focus:outline-none focus:border-purple-500 text-base text-white font-bold hover:bg-custom-purplo" name="update-this-event">Update Event</button>
                     </div>
@@ -320,11 +320,9 @@ $html->startBody();
             $("#edit-sanction-fee").val(row.cells[6].innerHTML);
         }
 
-        $('#edit-event-date').hover(
-            () => {
+        $('#edit-event-date').hover(() => {
                 $('#tooltip-content-date').fadeIn(150);
-            }, 
-            () => {
+            }, () => {
                 $('#tooltip-content-date').fadeOut(150);
             }
         );
