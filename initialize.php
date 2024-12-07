@@ -51,9 +51,10 @@ CREATE TABLE `events` (
 ) ENGINE=InnoDB;
 
 INSERT INTO `events` (`event_id`, `event_name`, `event_description`, `event_date`, `event_fee`, `sanction_fee`) VALUES
-(101, 'IT Night', 'Aranuhan', '2024-05-19', 200,  20),
-(102, 'General Assembly', 'Basta',  '2024-05-21', 0,  40),
-(103, 'Arts Month', 'Nugagawen',  '2024-05-19', 100,  40);
+(101, 'IT Night', 'Aranuhan', '1,2,3,4',  '2024-05-19', 200,  20),
+(102, 'General Assembly', 'Basta',  '1,2,3,4',  '2024-05-21', 0,  40),
+(103, 'Arts Month', 'Nugagawen',  '1,2,3,4',  '2024-05-19', 100,  40),
+(104, 'Tribute To Seniors', 'Basta may baraylehan', '3,4',  '2025-02-14', 120,  20);
 
 DROP TABLE IF EXISTS `registrations`;
 CREATE TABLE `registrations` (
