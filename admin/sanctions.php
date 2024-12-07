@@ -87,9 +87,7 @@ $html->startBody();
                             </script>
                             <?php
                         }
-
                         $sql_unregisteredpast .= " ORDER BY `balance` DESC LIMIT ? OFFSET ?";
-
                         $stmt_unregisteredpast = $conn->prepare($sql_unregisteredpast);
                         if (isset($search)) {
                             $stmt_unregisteredpast->bind_param("ssssssi", $search, $search, $search, $search, $search, $results_per_page, $offset);
