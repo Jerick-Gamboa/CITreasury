@@ -43,6 +43,7 @@ CREATE TABLE `events` (
   `event_id` int(5) NOT NULL AUTO_INCREMENT,
   `event_name` varchar(100) NOT NULL,
   `event_description` varchar(255) NOT NULL,
+  `event_target` set('1','2','3','4') NOT NULL,
   `event_date` date NOT NULL,
   `event_fee` int(6) NOT NULL,
   `sanction_fee` int(3) NOT NULL,
