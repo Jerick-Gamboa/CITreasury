@@ -402,7 +402,8 @@ $html->startBody();
         if ($stmt_verify_register->execute() && $stmt_verify_register->get_result()->num_rows > 0) {
             ?><script>swal('You can\'t register a student twice in this event!', '', 'error');</script><?php
         } elseif($stmt_allow_to_register->execute() && $stmt_allow_to_register->get_result()->num_rows == 0) {
-            ?><script>swal('You are not allowed to register in this event!', '', 'error');</script><?php
+            # Else if year level for current student is not found on the event, it is now allowed for them to register
+            ?><script>swal('Student is not allowed to register in this event!', '', 'error');</script><?php
         } elseif ($stmt_register->execute()) { # Else if no result, insert data to database
             ?>
             <script>
