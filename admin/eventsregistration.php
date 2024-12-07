@@ -380,6 +380,7 @@ $html->startBody();
         $stmt_year_level->execute();
         $stmt_year_level->bind_result($year_and_section);
         $stmt_year_level->fetch();
+        $stmt_year_level->close();
         # Extract the year level (e.g., '2C' -> '2')
         $year_level = substr($year_and_section, 0, 1);
         $sql_allow_to_register = "SELECT `event_target` FROM `events` WHERE `event_id` = ? AND FIND_IN_SET(?, `events`.`event_target`) > 0";
