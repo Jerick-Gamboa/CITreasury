@@ -381,7 +381,6 @@ $html->startBody();
         $stmt_year_level->execute();
         $stmt_year_level->bind_result($year_and_section);
         $stmt_year_level->fetch();
-        $stmt_year_level->close();
         # Extract the year level (e.g., '2C' -> '2')
         $year_level = substr($year_and_section, 0, 1);
         $sql_allow_to_register = "SELECT `event_target` FROM `events` WHERE `event_id` = ? AND FIND_IN_SET(?, `events`.`event_target`) > 0";
@@ -401,7 +400,10 @@ $html->startBody();
         # If query returned with another result for current student, then it is already registered
         if ($stmt_verify_register->execute() && $stmt_verify_register->get_result()->num_rows > 0) {
             ?><script>swal('You can\'t register a student twice in this event!', '', 'error');</script><?php
-        } elseif($stmt_allow_to_register->execute() && $stmt_allow_to_register->get_result()->num_rows == 0) {
+        } elseif (!isset($year_and_section)) {
+            # Else if student is not found
+            ?><script>swal('Student not found!', '', 'error');</script><?php
+        } elseif ($stmt_allow_to_register->execute() && $stmt_allow_to_register->get_result()->num_rows == 0) {
             # Else if year level for current student is not found on the event, it is now allowed for them to register
             ?><script>swal('Student is not allowed to register in this event!', '', 'error');</script><?php
         } elseif ($stmt_register->execute()) { # Else if no result, insert data to database
