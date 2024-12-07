@@ -11,7 +11,7 @@ $sid = "22-1342";
 $lastname = "RMX";
 $firstname = "JHZ";
 $mi = "A";
-$yearsec = "2C";
+$yearsec = "3A";
 $email = strtolower(str_replace(" ", "", $firstname)) . "." . strtolower(str_replace(" ", "", $lastname)) . "@cbsua.edu.ph";
 $hash_password = password_hash("cit-" . $sid, PASSWORD_DEFAULT);
 # END TEST CREDENTIALS
