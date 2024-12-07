@@ -204,7 +204,7 @@ $html->startBody();
                     <label class="ml-1 text-sm">Event Description:</label>
                     <textarea name="event-desc" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required></textarea>
                     <label class="ml-1 text-sm">Target Year Levels:</label>
-                    <div class="mb-4 flex flex-row justify-between bg-purple-100 border-2 border-custom-purple rounded-lg px-4 py-2">
+                    <div class="mb-2 flex flex-row justify-between bg-purple-100 border-2 border-custom-purple rounded-lg px-4 py-2">
                         <label class="flex items-center">
                             <input type="checkbox" name="event-target[]" value="1" class="mr-2" checked> 1st year
                         </label>
@@ -251,7 +251,7 @@ $html->startBody();
                     <label class="ml-1 text-sm">Event Description:</label>
                     <textarea id="edit-event-desc" name="edit-event-desc" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required></textarea>
                     <label class="ml-1 text-sm">Target Year Levels:</label>
-                    <div class="mb-4 flex flex-row justify-between bg-purple-100 border-2 border-custom-purple rounded-lg px-4 py-2">
+                    <div class="mb-2 flex flex-row justify-between bg-purple-100 border-2 border-custom-purple rounded-lg px-4 py-2">
                         <label class="flex items-center">
                             <input type="checkbox" name="edit-event-target[]" value="1" class="mr-2"> 1st year
                         </label>
