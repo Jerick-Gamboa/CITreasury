@@ -1,43 +1,21 @@
-<!DOCTYPE html>
 <?php
+session_start();
 include '../connection.php';
+include '../helperfunctions.php';
+include '../components/menu.php';
+verifyAdminLoggedIn($conn);
+
+$html = new HTML("CITreasury - Account Privileges");
+$html->addLink('stylesheet', '../inter-variable.css');
+$html->addLink('icon', '../img/nobgcitsclogo.png');
+$html->addScript("../js/tailwind3.4.1.js");
+$html->addScript("../js/tailwind.config.js");
+$html->addScript("../js/sweetalert.min.js");
+$html->addScript("../js/jquery-3.7.1.min.js");
+$html->addScript("../js/predefined-script.js");
+$html->addScript("../js/defer-script.js", true);
+$html->startBody();
 ?>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="../img/nobgcitsclogo.png">
-    <!-- Import JavaScript files -->
-    <script src="../js/tailwind3.4.1.js"></script>
-    <script src="../js/tailwind.config.js"></script>
-    <script src="../js/sweetalert.min.js"></script>
-    <script src="../js/jquery-3.7.1.min.js"></script>
-    <script src="../js/predefined-script.js"></script>
-    <script src="../js/defer-script.js" defer></script> <!-- Defer attribute means this javascript file will be executed once the HTML file is fully loaded -->
-    <title>CITreasury - Sanctions</title>
-</head>
-<body>
-    <?php
-    # Verify if login exists such that the cookie "cit-student-id" is found on browser
-    if (isset($_COOKIE['cit-student-id'])) {
-        $sql = "SELECT `type` FROM `accounts` WHERE `student_id` = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("s", $_COOKIE['cit-student-id']);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if ($result->num_rows > 0) {
-            $row = $result->fetch_assoc();
-            $type = $row['type'];
-            if ($type === 'user') { # If account type is user, redirect to user page
-                header("location: ../user/");
-            }
-        } else { # If account is not found, return to login page
-            header("location: ../");
-        }
-    } else { # If cookie is not found, return to login page
-        header("location: ../");
-    }
-    ?>
     <!-- Top Navigation Bar -->
     <nav class="fixed w-full bg-custom-purple flex flex-row shadow shadow-gray-800">
         <img src="../img/nobgcitsclogo.png" class="w-12 h-12 my-2 ml-6">
@@ -52,9 +30,11 @@ include '../connection.php';
     <div class="flex flex-col md:flex-row bg-custom-purplo min-h-screen">
         <div class="mt-18 md:mt-20 mx-2">
             <div id="menu-items" class="hidden md:inline-block w-60 h-full">
+                <?php menuContent(); ?>
             </div>
         </div>
         <div id="menu-items-mobile" class="fixed block md:hidden h-fit top-16 w-full p-4 bg-custom-purplo opacity-95">
+            <?php menuContent(); ?>
         </div>
         <div class="w-full bg-red-50 px-6 min-h-screen">
             <div class="mt-24 flex flex-col lg:flex-row justify-between">
@@ -107,7 +87,6 @@ include '../connection.php';
                                 <tr>
                                     <th scope="col" class="p-2 border-r border-black">Student ID</th>
                                     <th scope="col" class="p-2 border-r border-black">Email</th>
-                                    <th scope="col" class="p-2 border-r border-black">Password</th>
                                     <th scope="col" class="p-2 border-r border-black">Role</th>
                                     <th scope="col" class="p-2">Actions</th>
                                 </tr>
@@ -117,13 +96,11 @@ include '../connection.php';
                             while($row = $result->fetch_assoc()) {
                                 $sid = $row['student_id'];
                                 $email = $row['email'];
-                                $password = $row['password'];
                                 $type = $row['type'];
                                 ?>
                                 <tr class="border-t border-black">
                                     <td class="px-2 border-r border-black bg-purple-100"><?php echo $sid; ?></td>
                                     <td class="px-2 border-r border-black bg-purple-100"><?php echo $email; ?></td>
-                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $password; ?></td>
                                     <td class="px-2 border-r border-black bg-purple-100"><?php echo $type; ?></td>
                                     <td class="px-1 bg-purple-100">
                                         <button class="px-3 py-2 my-1 mx-1 bg-orange-500 text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-orange-400" onclick="editRow(this)">
@@ -142,13 +119,9 @@ include '../connection.php';
 
             </div>
             <!-- Pagination controls -->
-            <div id="has-result" class="w-full">
-                <p>Showing <?php echo $results_per_page; ?> entries per page</p>
-                <p>Results: <?php echo $result->num_rows; ?> row(s)</p>
-            </div>
             <div class="pagination my-2">
                 <?php
-                // Get the total number of records
+                # Get the total number of rows for pagination
                 $sql_total = "SELECT COUNT(*) FROM `accounts`";
                 if (isset($search)) {
                     $sql_total .= " WHERE (`student_id` LIKE ? OR `email` LIKE ? OR `type` LIKE ?)";
@@ -158,20 +131,22 @@ include '../connection.php';
                     $stmt_total = $conn->prepare($sql_total);
                 }
                 $stmt_total->execute();
-                $stmt_total->bind_result($total_records);
-                $stmt_total->fetch();
+                $total_records = $stmt_total->get_result()->fetch_assoc()['COUNT(*)'];
                 $stmt_total->close();
-                // Calculate total pages
-                $total_pages = ceil($total_records / $results_per_page);
-                // Display pagination buttons
-                for ($i = 1; $i <= $total_pages; $i++) {
-                    ?><a href='accountprivileges.php?page=<?php echo $i; ?>'><button class="px-3 py-2 my-1 mr-1 <?php echo $page == $i ? 'bg-purple-600' : 'bg-custom-purplo'; ?> text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-custom-purple"><?php echo $i; ?></button></a>
-                    <?php
-                }
-                if ($total_pages <= 0) {
+                if ($result->num_rows > 0) {
                     ?>
-                    <script>$("#has-result").html(null)</script>
+                     <div id="has-result" class="w-full mb-2">
+                        <p>Showing <?php echo $results_per_page; ?> entries per page</p>
+                        <p>Results: <?php echo $total_records; ?> row(s)</p>
+                    </div>
                     <?php
+                    # Calculate total pages
+                    $total_pages = ceil($total_records / $results_per_page);
+                    # Display pagination buttons
+                    for ($i = 1; $i <= $total_pages; $i++) {
+                        ?><a href='accountprivileges.php?page=<?php echo $i; ?>'><button class="px-3 py-2 my-1 mr-1 <?php echo $page == $i ? 'bg-purple-600' : 'bg-custom-purplo'; ?> text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-custom-purple"><?php echo $i; ?></button></a>
+                        <?php
+                    }
                 }
                 ?>
             </div>
@@ -192,8 +167,6 @@ include '../connection.php';
                     <input type="text" id="edit-student-id" name="edit-student-id" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" maxlength="7" readonly>
                     <label class="ml-1 text-sm">Email:</label>
                     <input type="email" id="edit-email" name="edit-email" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" readonly>
-                    <label class="ml-1 text-sm">Password:</label>
-                    <input type="text" id="edit-password" name="edit-password" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
                     <label class="ml-1 text-sm">Role:</label>
                     <select id="edit-account-type" name="edit-account-type" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 disabled:bg-gray-200 bg-purple-100" required>
                         <option value="user">User</option>
@@ -210,7 +183,7 @@ include '../connection.php';
         $("#edit-popup-bg, #edit-popup-item").removeClass("hidden");
         $("#edit-popup-bg, #edit-popup-item").hide();
 
-        function editRow(link) {
+        const editRow = (link) => {
             let row = link.parentNode.parentNode
             $("#edit-popup-bg").fadeIn(150);
             $("#edit-popup-item").delay(150).fadeIn(150);
@@ -219,9 +192,8 @@ include '../connection.php';
             });
             $("#edit-student-id").val(row.cells[0].innerHTML);
             $("#edit-email").val(row.cells[1].innerHTML);
-            $("#edit-password").val(row.cells[2].innerHTML);
-            $("#edit-account-type").val(row.cells[3].innerHTML);
-            if ($("#edit-student-id").val() === "<?php echo $_COOKIE['cit-student-id']; ?>") {
+            $("#edit-account-type").val(row.cells[2].innerHTML);
+            if ($("#edit-student-id").val() === "<?php echo $_SESSION['cit-student-id']; ?>") {
                 $("#edit-account-type").prop('disabled', true);
             } else {
                 $("#edit-account-type").prop('disabled', false);
@@ -230,12 +202,11 @@ include '../connection.php';
     </script>
     <?php
     if (isset($_POST['update-this-account'])) {
-        $password = $_POST['edit-password'];
         $acctype = $_POST['edit-account-type'];
         $sid = $_POST['edit-student-id'];
-        $sqlupdate_account = "UPDATE `accounts` SET `password`=?, `type`=? WHERE `student_id` = ?";
+        $sqlupdate_account = "UPDATE `accounts` SET `type`=? WHERE `student_id` = ?";
         $stmt_update_account = $conn->prepare($sqlupdate_account);
-        $stmt_update_account->bind_param("sss", $password, $acctype, $sid);
+        $stmt_update_account->bind_param("ss", $acctype, $sid);
         if ($stmt_update_account->execute()) {
             ?>
             <script>
@@ -250,5 +221,6 @@ include '../connection.php';
         }
     }
     ?>
-</body>
-</html>
+<?php
+$html->endBody();
+?>

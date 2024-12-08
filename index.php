@@ -1,19 +1,20 @@
 <?php
+session_start();
 include 'connection.php';
+include 'helperfunctions.php';
+include 'password_compat.php';
+
+$html = new HTML("Login");
+$html->addLink('stylesheet', 'inter-variable.css');
+$html->addLink('icon', 'img/nobgcitsclogo.png');
+$html->addScript("js/tailwind3.4.1.js");
+$html->addScript("js/tailwind.config.js");
+$html->addScript("js/sweetalert.min.js");
+$html->addScript("js/jquery-3.7.1.min.js");
+$html->addScript("js/predefined-script.js");
+$html->addScript("js/defer-script.js", true);
+$html->startBody();
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Import JavaScript files -->
-    <script src="js/tailwind3.4.1.js"></script>
-    <script src="js/tailwind.config.js"></script>
-    <script src="js/sweetalert.min.js"></script>
-    <script src="js/jquery-3.7.1.min.js"></script>
-    <script src="js/predefined-script.js"></script>
-    <link rel="icon" href="img/nobgcitsclogo.png">
-</head>
 <body class="bg-gradient-to-t from-custom-purple to-purple-200 h-screen flex items-center justify-center">
     <div class="w-112 bg-white shadow rounded-lg">
         <img src="img/headerlogo.png" class="w-full rounded-t-lg"><br>
@@ -32,11 +33,11 @@ include 'connection.php';
         </form>
     </div>
     <?php
-    # If cookie "cit-student-id" is found on the browser
-    if (isset($_COOKIE['cit-student-id'])) {
+    # If session "cit-student-id" is found
+    if (isset($_SESSION['cit-student-id'])) {
         $sql = "SELECT `type` FROM `accounts` WHERE `student_id` = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("s", $_COOKIE['cit-student-id']);
+        $stmt->bind_param("s", $_SESSION['cit-student-id']);
         $stmt->execute();
         $result = $stmt->get_result();
         if ($result->num_rows > 0) {
@@ -66,10 +67,8 @@ include 'connection.php';
         $result = $stmt->get_result();
         if ($result->num_rows > 0) {
             if ($row = $result->fetch_assoc()) {
-                if ($row['password'] === $password) { # If password is equal to submitted password
+                if (password_verify($password, $row['password'])) { # If hashed password matches
                     $_SESSION['cit-student-id'] = $row['student_id'];
-                    # Store cookie in the browser for 1 month login access
-                    setcookie('cit-student-id', $_SESSION['cit-student-id'], time() + (86400 * 30), '/');
                     if ($row['type'] === 'admin') {
                         ?>
                         <script>
@@ -109,5 +108,6 @@ include 'connection.php';
     <!-- script type="text/javascript">
         sendNotif("Welcome to CITreasury!", "What's up?", "nobgcitsclogo.png", null);
     </script -->
-</body>
-</html>
+<?php
+$html->endBody();
+?>

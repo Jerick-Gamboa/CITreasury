@@ -1,43 +1,22 @@
-<!DOCTYPE html>
 <?php
+session_start();
 include '../connection.php';
+include '../helperfunctions.php';
+include '../password_compat.php';
+include '../components/menu.php';
+verifyAdminLoggedIn($conn);
+
+$html = new HTML("CITreasury - Students");
+$html->addLink('stylesheet', '../inter-variable.css');
+$html->addLink('icon', '../img/nobgcitsclogo.png');
+$html->addScript("../js/tailwind3.4.1.js");
+$html->addScript("../js/tailwind.config.js");
+$html->addScript("../js/sweetalert.min.js");
+$html->addScript("../js/jquery-3.7.1.min.js");
+$html->addScript("../js/predefined-script.js");
+$html->addScript("../js/defer-script.js", true);
+$html->startBody();
 ?>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="../img/nobgcitsclogo.png">
-    <!-- Import JavaScript files -->
-    <script src="../js/tailwind3.4.1.js"></script>
-    <script src="../js/tailwind.config.js"></script>
-    <script src="../js/sweetalert.min.js"></script>
-    <script src="../js/jquery-3.7.1.min.js"></script>
-    <script src="../js/predefined-script.js"></script>
-    <script src="../js/defer-script.js" defer></script> <!-- Defer attribute means this javascript file will be executed once the HTML file is fully loaded -->
-    <title>CITreasury - Sanctions</title>
-</head>
-<body>
-    <?php
-    # Verify if login exists such that the cookie "cit-student-id" is found on browser
-    if (isset($_COOKIE['cit-student-id'])) {
-        $sql = "SELECT `type` FROM `accounts` WHERE `student_id` = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("s", $_COOKIE['cit-student-id']);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if ($result->num_rows > 0) {
-            $row = $result->fetch_assoc();
-            $type = $row['type'];
-            if ($type === 'user') { # If account type is user, redirect to user page
-                header("location: ../user/");
-            }
-        } else { # If account is not found, return to login page
-            header("location: ../");
-        }
-    } else { # If cookie is not found, return to login page
-        header("location: ../");
-    }
-    ?>
     <!-- Top Navigation Bar -->
     <nav class="fixed w-full bg-custom-purple flex flex-row shadow shadow-gray-800">
         <img src="../img/nobgcitsclogo.png" class="w-12 h-12 my-2 ml-6">
@@ -52,9 +31,11 @@ include '../connection.php';
     <div class="flex flex-col md:flex-row bg-custom-purplo min-h-screen">
         <div class="mt-18 md:mt-20 mx-2">
             <div id="menu-items" class="hidden md:inline-block w-60 h-full">
+                <?php menuContent(); ?>
             </div>
         </div>
         <div id="menu-items-mobile" class="fixed block md:hidden h-fit top-16 w-full p-4 bg-custom-purplo opacity-95">
+            <?php menuContent(); ?>
         </div>
         <div class="w-full bg-red-50 px-6 min-h-screen">
             <div class="fixed bottom-10 right-6">
@@ -72,6 +53,9 @@ include '../connection.php';
                   </form>
                 </div>
             </div>
+            <script>
+                const namesArray = [];
+            </script>
             <div class="mt-1 mb-5 overflow-x-auto rounded-lg shadow-lg">
                 <div class="overflow-x-auto rounded-lg border border-black">
                     <table class="w-full px-1 text-center">
@@ -97,9 +81,9 @@ include '../connection.php';
                         // Prepare the statement
                         $stmt = $conn->prepare($sql);
                         if (isset($search)) {
-                            $stmt->bind_param("ssssssi", $_COOKIE['cit-student-id'], $search, $search, $search, $search, $results_per_page, $offset);
+                            $stmt->bind_param("ssssssi", $_SESSION['cit-student-id'], $search, $search, $search, $search, $results_per_page, $offset);
                         } else {
-                            $stmt->bind_param("sii", $_COOKIE['cit-student-id'], $results_per_page, $offset);
+                            $stmt->bind_param("sii", $_SESSION['cit-student-id'], $results_per_page, $offset);
                         }
                         // Execute the statement
                         $stmt->execute();
@@ -115,9 +99,6 @@ include '../connection.php';
                                     <th scope="col" class="p-2">Actions</th>
                                 </tr>
                             </thead>
-                            <script>
-                                const namesArray = [];
-                            </script>
                             <?php
                             // Loop through the results
                             while($row = $result->fetch_assoc()) {
@@ -160,36 +141,35 @@ include '../connection.php';
                 </div>
             </div>
             <!-- Pagination controls -->
-            <div id="has-result" class="w-full">
-                <p>Showing <?php echo $results_per_page; ?> entries per page</p>
-                <p>Results: <?php echo $result->num_rows; ?> row(s)</p>
-            </div>
             <div class="pagination my-2">
                 <?php
-                // Get the total number of records
+                # Get the total number of rows for pagination
                 $sql_total = "SELECT COUNT(*) FROM `students` JOIN `accounts` ON `students`.`student_id` = `accounts`.`student_id` WHERE `accounts`.`student_id` != ?";
-                if (isset($search)) {
+                if (isset($_GET['search'])) {
                     $sql_total .= " AND (`students`.`student_id` LIKE ? OR `students`.`last_name` LIKE ? OR `students`.`first_name` LIKE ? OR `students`.`year_and_section` LIKE ?)";
                     $stmt_total = $conn->prepare($sql_total);
-                    $stmt_total->bind_param("sssss", $_COOKIE['cit-student-id'], $search, $search, $search, $search);
+                    $stmt_total->bind_param("sssss", $_SESSION['cit-student-id'], $search, $search, $search, $search);
                 } else {
                     $stmt_total = $conn->prepare($sql_total);
-                    $stmt_total->bind_param("s", $_COOKIE['cit-student-id']);
+                    $stmt_total->bind_param("s", $_SESSION['cit-student-id']);
                 }
                 $stmt_total->execute();
-                $row = $stmt_total->get_result()->fetch_assoc();
-                $total_records = $row['COUNT(*)'];
-                // Calculate total pages
-                $total_pages = ceil($total_records / $results_per_page);
-                // Display pagination buttons
-                for ($i = 1; $i <= $total_pages; $i++) {
-                    ?><a href='students.php?page=<?php echo $i; ?>'><button class="px-3 py-2 my-1 mr-1 <?php echo $page == $i ? 'bg-purple-600' : 'bg-custom-purplo'; ?> text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-custom-purple"><?php echo $i; ?></button></a>
-                    <?php
-                }
-                if ($total_pages <= 0) {
+                $total_records = $stmt_total->get_result()->fetch_assoc()['COUNT(*)'];
+                $stmt_total->close();
+                if ($result->num_rows > 0) {
                     ?>
-                    <script>$("#has-result").html(null)</script>
+                     <div id="has-result" class="w-full mb-2">
+                        <p>Showing <?php echo $results_per_page; ?> entries per page</p>
+                        <p>Results: <?php echo $total_records; ?> row(s)</p>
+                    </div>
                     <?php
+                    # Calculate total pages
+                    $total_pages = ceil($total_records / $results_per_page);
+                    # Display pagination buttons
+                    for ($i = 1; $i <= $total_pages; $i++) {
+                        ?><a href='students.php?<?php echo (isset($search)) ? "search=".htmlspecialchars($_GET['search'])."&" : ""; ?>page=<?php echo $i; ?>'><button class="px-3 py-2 my-1 mr-1 <?php echo $page == $i ? 'bg-purple-600' : 'bg-custom-purplo'; ?> text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-custom-purple"><?php echo $i; ?></button></a>
+                        <?php
+                    }
                 }
                 ?>
             </div>
@@ -232,7 +212,6 @@ include '../connection.php';
             </div>
         </div>
     </div>
-    <div id="edit-popup-bg" class="fixed top-0 w-full min-h-screen bg-black opacity-50 hidden"></div>
     <div id="edit-popup-item" class="fixed top-0 w-full min-h-screen hidden">
         <div class="w-full min-h-screen flex items-center justify-center">
             <div class="m-5 w-full py-3 px-5 sm:w-1/2 lg:w-1/3 xl:1/4 rounded bg-white h-fit shadow-lg shadow-black">
@@ -261,8 +240,8 @@ include '../connection.php';
         </div>
     </div>
     <script type="text/javascript">
-        $("#popup-bg, #popup-item, #edit-popup-bg, #edit-popup-item").removeClass("hidden");
-        $("#popup-bg, #popup-item, #edit-popup-bg, #edit-popup-item").hide();
+        $("#popup-bg, #popup-item, #edit-popup-item").removeClass("hidden");
+        $("#popup-bg, #popup-item, #edit-popup-item").hide();
         $("#add-student").click((event) => {
             $("#popup-bg").fadeIn(150);
             $("#popup-item").delay(150).fadeIn(150);
@@ -271,11 +250,11 @@ include '../connection.php';
             });
         });
 
-        function editRow(link) {
-            $("#edit-popup-bg").fadeIn(150);
+        const editRow = (link) => {
+            $("#popup-bg").fadeIn(150);
             $("#edit-popup-item").delay(150).fadeIn(150);
             $("#edit-close-popup").click(function() {
-                $("#edit-popup-bg, #edit-popup-item").fadeOut(150);
+                $("#popup-bg, #edit-popup-item").fadeOut(150);
             });
             
             const row = $(link).closest("tr");
@@ -305,6 +284,7 @@ include '../connection.php';
         $yearsec = strtoupper($_POST['yearsec']);
         $email = strtolower(str_replace(" ", "", $firstname)) . "." . strtolower(str_replace(" ", "", $lastname)) . "@cbsua.edu.ph";
         $password = "cit-" . $sid;
+        $hash_password = password_hash($password, PASSWORD_DEFAULT);
 
         $sql_student = "INSERT INTO `students`(`student_id`, `last_name`, `first_name`, `middle_initial`, `year_and_section`) VALUES (?, ?, ?, ?, ?)";
         $stmt_student = $conn->prepare($sql_student);
@@ -313,12 +293,12 @@ include '../connection.php';
         $stmt_account = $conn->prepare($sql_account);
 
         $stmt_student->bind_param("sssss", $sid, $lastname, $firstname, $mi, $yearsec);
-        $stmt_account->bind_param("sss", $email, $password, $sid);
+        $stmt_account->bind_param("sss", $email, $hash_password, $sid);
 
         if ($stmt_student->execute()) {
             ?>
             <script>
-                swal('Student added successfully!', '<?php echo $stmt_account->execute() ? "Default account for that student also created." : "But default student account failed to create." ?>', 'success')
+                swal('Student added successfully!', `<?php echo $stmt_account->execute() ? "Default account also created:\n\nEmail: ".$email."\nPassword: ".$password : "But default student account failed to create." ?>`, 'success')
                 .then(() => {
                     window.location.href = 'students.php';
                 });
@@ -358,24 +338,11 @@ include '../connection.php';
         }
     }
     if (isset($_POST['sid-to-delete'])) {
-        $sqldelete_account = "DELETE FROM `accounts` WHERE `student_id`= ?";
-        $stmt_delete_account = $conn->prepare($sqldelete_account);
-
-        $sqldelete_sanc = "DELETE FROM `sanctions` WHERE `student_id`= ?";
-        $stmt_delete_sanc = $conn->prepare($sqldelete_sanc);
-
-        $sqldelete_reg = "DELETE FROM `registrations` WHERE `student_id`= ?";
-        $stmt_delete_reg = $conn->prepare($sqldelete_reg);
-
         $sqldelete_student = "DELETE FROM `students` WHERE `student_id`= ?";
         $stmt_delete_student = $conn->prepare($sqldelete_student);
-
-        $stmt_delete_account->bind_param("s", $_POST['sid-to-delete']);
-        $stmt_delete_sanc->bind_param("s", $_POST['sid-to-delete']);
-        $stmt_delete_reg->bind_param("s", $_POST['sid-to-delete']);
         $stmt_delete_student->bind_param("s", $_POST['sid-to-delete']);
 
-        if ($stmt_delete_account->execute() && $stmt_delete_sanc->execute() && $stmt_delete_reg->execute() && $stmt_delete_student->execute()) {
+        if ($stmt_delete_student->execute()) {
             ?>
             <script>
                 swal('Student successfully deleted', '', 'success')
@@ -415,6 +382,8 @@ include '../connection.php';
                     } else {
                         rewind($file_handle);
                         fgetcsv($file_handle);
+                        $errors = '';
+                        $hasError = false;
                         while ($data = fgetcsv($file_handle)) {
                             $sid = $data[0];
                             $lastname = $data[1];
@@ -423,24 +392,33 @@ include '../connection.php';
                             $yearsec = $data[4];
                             $email = strtolower(str_replace(" ", "", $firstname)) . "." . strtolower(str_replace(" ", "", $lastname)) . "@cbsua.edu.ph";
                             $password = "cit-" . $sid;
+                            $hash_password = password_hash($password, PASSWORD_DEFAULT);
+                            try {
+                                $sql_student = "INSERT INTO `students`(`student_id`, `last_name`, `first_name`, `middle_initial`, `year_and_section`) VALUES (?, ?, ?, ?, ?)";
+                                $stmt_student = $conn->prepare($sql_student);
 
-                            $sql_student = "INSERT INTO `students`(`student_id`, `last_name`, `first_name`, `middle_initial`, `year_and_section`) VALUES (?, ?, ?, ?, ?)";
-                            $stmt_student = $conn->prepare($sql_student);
+                                $sql_account = "INSERT INTO `accounts`(`email`, `password`, `student_id`, `type`) VALUES (?, ?, ?, 'user')";
+                                $stmt_account = $conn->prepare($sql_account);
 
-                            $sql_account = "INSERT INTO `accounts`(`email`, `password`, `student_id`, `type`) VALUES (?, ?, ?, 'user')";
-                            $stmt_account = $conn->prepare($sql_account);
+                                $stmt_student->bind_param("sssss", $sid, $lastname, $firstname, $mi, $yearsec);
+                                $stmt_account->bind_param("sss", $email, $hash_password, $sid);
 
-                            $stmt_student->bind_param("sssss", $sid, $lastname, $firstname, $mi, $yearsec);
-                            $stmt_account->bind_param("sss", $email, $password, $sid);
-
-                            $stmt_student->execute();
-                            $stmt_account->execute();
+                                if ($stmt_student->execute()) {
+                                    $stmt_account->execute();
+                                } else {
+                                    $hasError = true;
+                                    $errors .= "ID '".$sid."' failed to insert.\n";
+                                }
+                            } catch (mysqli_sql_exception $e) {
+                                $hasError = true;
+                                $errors .= $e->getMessage() . '\n';
+                            }
                         }
                         fclose($file_handle);
                         $conn->close();
                         ?>
                         <script>
-                            swal('CSV File imported successfully!', '', 'success')
+                            swal(<?php if ($hasError) {?>'CSV File imported with errors!', `<?php echo $errors; ?>`, 'warning' <?php } else { ?>'CSV File imported successfully!', '', 'success' <?php } ?> )
                             .then((okay) => {
                                 window.location.href = 'students.php';
                             });
@@ -464,5 +442,6 @@ include '../connection.php';
         }
     }
     ?>
-</body>
-</html>
+<?php
+$html->endBody();
+?>

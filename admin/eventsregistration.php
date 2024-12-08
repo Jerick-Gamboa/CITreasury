@@ -1,43 +1,21 @@
-<!DOCTYPE html>
 <?php
+session_start();
 include '../connection.php';
+include '../helperfunctions.php';
+include '../components/menu.php';
+verifyAdminLoggedIn($conn);
+
+$html = new HTML("CITreasury - Events");
+$html->addLink('stylesheet', '../inter-variable.css');
+$html->addLink('icon', '../img/nobgcitsclogo.png');
+$html->addScript("../js/tailwind3.4.1.js");
+$html->addScript("../js/tailwind.config.js");
+$html->addScript("../js/sweetalert.min.js");
+$html->addScript("../js/jquery-3.7.1.min.js");
+$html->addScript("../js/predefined-script.js");
+$html->addScript("../js/defer-script.js", true);
+$html->startBody();
 ?>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="../img/nobgcitsclogo.png">
-    <!-- Import JavaScript files -->
-    <script src="../js/tailwind3.4.1.js"></script>
-    <script src="../js/tailwind.config.js"></script>
-    <script src="../js/sweetalert.min.js"></script>
-    <script src="../js/jquery-3.7.1.min.js"></script>
-    <script src="../js/predefined-script.js"></script>
-    <script src="../js/defer-script.js" defer></script> <!-- Defer attribute means this javascript file will be executed once the HTML file is fully loaded -->
-    <title>CITreasury - Events</title>
-</head>
-<body>
-    <?php
-    # Verify if login exists such that the cookie "cit-student-id" is found on browser
-    if (isset($_COOKIE['cit-student-id'])) {
-        $sql = "SELECT `type` FROM `accounts` WHERE `student_id` = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("s", $_COOKIE['cit-student-id']);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if ($result->num_rows > 0) {
-            $row = $result->fetch_assoc();
-            $type = $row['type'];
-            if ($type === 'user') { # If account type is user, redirect to user page
-                header("location: ../user/");
-            }
-        } else { # If account is not found, return to login page
-            header("location: ../");
-        }
-    } else { # If cookie is not found, return to login page
-        header("location: ../");
-    }
-    ?>
     <!-- Top Navigation Bar -->
     <nav class="fixed w-full bg-custom-purple flex flex-row shadow shadow-gray-800">
         <img src="../img/nobgcitsclogo.png" class="w-12 h-12 my-2 ml-6">
@@ -53,10 +31,12 @@ include '../connection.php';
         <!-- Side Bar Menu Items -->
         <div class="mt-18 md:mt-20 mx-2">
             <div id="menu-items" class="hidden md:inline-block w-60 h-full">
+                <?php menuContent(); ?>
             </div>
         </div>
         <!-- Harmonica Menu Items for mobile, hidden in medium to larger screens -->
         <div id="menu-items-mobile" class="fixed block md:hidden h-fit top-16 w-full p-4 bg-custom-purplo opacity-95">
+            <?php menuContent(); ?>
         </div>
         <div class="w-full bg-red-50 px-6 min-h-screen">
             <?php
@@ -70,6 +50,7 @@ include '../connection.php';
                 $stmt_title->bind_param("s", $_GET['event-id']);
                 $stmt_title->execute();
                 $result_title = $stmt_title->get_result();
+                $dateofcurrenteventinget = "";
                 if ($row_title = $result_title->fetch_assoc()) {
                     $dateofcurrenteventinget = $row_title['event_date'];
                     # Set event name in title using event-id in URL query
@@ -112,6 +93,9 @@ include '../connection.php';
                     <!-- Table of Registered Students -->
                     <table class="w-full px-1 text-center">
                         <?php
+                        $results_per_page = 10;
+                        $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
+                        $offset = ($page - 1) * $results_per_page;
                         $eventId = $_GET['event-id'];
                         # Query for displaying registered students in a particular event
                         # If the event was happened and the student has still balance, the total fees to paid would be the event fee + sanction fee
@@ -136,7 +120,7 @@ include '../connection.php';
                                 FROM `students` 
                                 JOIN `registrations` ON `students`.`student_id` = `registrations`.`student_id` 
                                 JOIN `events` ON `events`.`event_id` = `registrations`.`event_id` 
-                                WHERE `registrations`.`event_id` = ?";
+                                WHERE `registrations`.`event_id` = ? AND FIND_IN_SET(SUBSTRING(`students`.`year_and_section`, 1, 1), `events`.`event_target`) > 0";
                         if (isset($_GET['search'])) {
                             $search = '%' . $_GET['search'] . '%';
                             $sql .= " AND (`students`.`student_id` LIKE ? OR `students`.`last_name` LIKE ? OR `students`.`first_name` LIKE ? OR `students`.`year_and_section` LIKE ? OR `registrations`.`registration_date` LIKE ?)";
@@ -146,12 +130,12 @@ include '../connection.php';
                             </script>
                             <?php
                         }
-                        $sql .= " ORDER BY `balance` DESC";
+                        $sql .= " ORDER BY `balance` DESC LIMIT ? OFFSET ?";
                         $stmt = $conn->prepare($sql);
                         if (isset($search)) {
-                            $stmt->bind_param("isssss", $eventId, $search, $search, $search, $search, $search);
+                            $stmt->bind_param("issssssi", $eventId, $search, $search, $search, $search, $search, $results_per_page, $offset);
                         } else {
-                            $stmt->bind_param("i", $eventId);
+                            $stmt->bind_param("iii", $eventId, $results_per_page, $offset);
                         }
                         $stmt->execute();
                         $result = $stmt->get_result();
@@ -201,6 +185,47 @@ include '../connection.php';
                     </table>
                 </div>
             </div>
+            <!-- Pagination controls -->
+            <div class="pagination my-2">
+                <?php
+                # Get the total number of rows for pagination
+                $sql_total = "SELECT COUNT(*) FROM `students` 
+                    JOIN `registrations` ON `students`.`student_id` = `registrations`.`student_id` 
+                    JOIN `events` ON `events`.`event_id` = `registrations`.`event_id` 
+                    WHERE `registrations`.`event_id` = ? 
+                    AND FIND_IN_SET(SUBSTRING(`students`.`year_and_section`, 1, 1), `events`.`event_target`) > 0";
+                if (isset($_GET['search'])) {
+                    $sql_total .= " AND (`students`.`student_id` LIKE ? 
+                        OR `students`.`last_name` LIKE ? 
+                        OR `students`.`first_name` LIKE ? 
+                        OR `students`.`year_and_section` LIKE ? 
+                        OR `registrations`.`registration_date` LIKE ?)";
+                    $stmt_total = $conn->prepare($sql_total);
+                    $stmt_total->bind_param("ssssss", $_GET['event-id'], $search, $search, $search, $search, $search);
+                } else {
+                    $stmt_total = $conn->prepare($sql_total);
+                    $stmt_total->bind_param("s", $_GET['event-id']);
+                }
+                $stmt_total->execute();
+                $total_records = $stmt_total->get_result()->fetch_assoc()['COUNT(*)'];
+                $stmt_total->close();
+                if ($result->num_rows > 0) {
+                    ?>
+                     <div id="has-result" class="w-full mb-2">
+                        <p>Showing <?php echo $results_per_page; ?> entries per page</p>
+                        <p>Results: <?php echo $total_records; ?> row(s)</p>
+                    </div>
+                    <?php
+                    # Calculate total pages
+                    $total_pages = ceil($total_records / $results_per_page);
+                    # Display pagination buttons
+                    for ($i = 1; $i <= $total_pages; $i++) {
+                        ?><a href='eventsregistration.php?event-id=<?php echo $_GET['event-id']?>&<?php echo (isset($search)) ? "search=".htmlspecialchars($_GET['search'])."&" : ""; ?>page=<?php echo $i; ?>'><button class="px-3 py-2 my-1 mr-1 <?php echo $page == $i ? 'bg-purple-600' : 'bg-custom-purplo'; ?> text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-custom-purple"><?php echo $i; ?></button></a>
+                        <?php
+                    }
+                }
+                ?>
+            </div>
             <?php
             } else {
             # If event id is not found in URL query, default landing page of eventregistrations.php
@@ -240,7 +265,7 @@ include '../connection.php';
                                     </p>
                                 </div>
                                 <div class="w-full px-3 py-2 bg-<?php echo $randomColor; ?>-700 rounded-b">
-                                    <a href="eventsregistration.php?event-id=<?php echo $row_event['event_id']; ?>" class="text-xs font-bold text-white">View Registrations</a> <!-- Add URL query with event-id -->
+                                    <a href="eventsregistration.php?event-id=<?php echo $row_event['event_id']; ?>" class="text-xs font-bold text-white hover:underline">View Registrations</a> <!-- Add URL query with event-id -->
                                 </div>
                             </div>
                             <?php
@@ -331,7 +356,7 @@ include '../connection.php';
         });
 
         // If collect button is pressed, fade in modals for collection
-        function collect(link) {
+        const collect = (link) => {
             $("#collect-popup-bg").fadeIn(150);
             $("#collect-popup-item").delay(150).fadeIn(150);
             $("#collect-close-popup").click((event) => {
@@ -373,7 +398,9 @@ include '../connection.php';
         $sqlupdate_collect = "UPDATE `registrations` SET `paid_fees` = (`paid_fees` + ?) WHERE `event_id` = ? AND `student_id` = ? "; # Update fees of student
         $stmt_update_collect = $conn->prepare($sqlupdate_collect);
         $stmt_update_collect->bind_param("iis", $collectamount, $_GET['event-id'], $sid);
-        if ($stmt_update_collect->execute()) {
+        if ($collectamount > $totalfee) {
+            ?><script>swal('Invalid advance fee', '', 'error');</script><?php
+        } elseif ($stmt_update_collect->execute()) {
             ?>
             <!-- SweetAlert popup -->
             <script>
@@ -392,6 +419,20 @@ include '../connection.php';
         $sid = $_POST['register-student-id'];
         $advancefee = $_POST['register-advance-fee'];
 
+        # Check first if student is allowed to register in current event based on their year
+        $query_year_level = "SELECT `year_and_section` FROM `students` WHERE `student_id` = ?";
+        $stmt_year_level = $conn->prepare($query_year_level);
+        $stmt_year_level->bind_param("s", $sid);
+        $stmt_year_level->execute();
+        $stmt_year_level->bind_result($year_and_section);
+        $stmt_year_level->fetch();
+        $stmt_year_level->close();
+        # Extract the year level (e.g., '2C' -> '2')
+        $year_level = substr($year_and_section, 0, 1);
+        $sql_allow_to_register = "SELECT `event_target` FROM `events` WHERE `event_id` = ? AND FIND_IN_SET(?, `events`.`event_target`) > 0";
+        $stmt_allow_to_register = $conn->prepare($sql_allow_to_register);
+        $stmt_allow_to_register->bind_param("is", $_GET['event-id'], $year_level);
+
         # Check first if student is already registered in current event
         $sql_verify_register = "SELECT * FROM `registrations` WHERE `event_id` = ? AND `student_id` = ?";
         $stmt_verify_register = $conn->prepare($sql_verify_register);
@@ -405,6 +446,12 @@ include '../connection.php';
         # If query returned with another result for current student, then it is already registered
         if ($stmt_verify_register->execute() && $stmt_verify_register->get_result()->num_rows > 0) {
             ?><script>swal('You can\'t register a student twice in this event!', '', 'error');</script><?php
+        } elseif (!isset($year_and_section)) {
+            # Else if student is not found
+            ?><script>swal('Student not found!', '', 'error');</script><?php
+        } elseif ($stmt_allow_to_register->execute() && $stmt_allow_to_register->get_result()->num_rows == 0) {
+            # Else if year level for current student is not found on the event, it is now allowed for them to register
+            ?><script>swal('Student is not allowed to register in this event!', '', 'error');</script><?php
         } elseif ($stmt_register->execute()) { # Else if no result, insert data to database
             ?>
             <script>
@@ -419,5 +466,6 @@ include '../connection.php';
         }
     }
     ?>
-</body>
-</html>
+<?php
+$html->endBody();
+?>

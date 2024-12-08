@@ -1,44 +1,21 @@
-<!DOCTYPE html>
 <?php
+session_start();
 include '../connection.php';
+include '../helperfunctions.php';
+include '../components/menu.php';
+verifyAdminLoggedIn($conn);
+
+$html = new HTML("CITreasury - Sanctions");
+$html->addLink('stylesheet', '../inter-variable.css');
+$html->addLink('icon', '../img/nobgcitsclogo.png');
+$html->addScript("../js/tailwind3.4.1.js");
+$html->addScript("../js/tailwind.config.js");
+$html->addScript("../js/sweetalert.min.js");
+$html->addScript("../js/jquery-3.7.1.min.js");
+$html->addScript("../js/predefined-script.js");
+$html->addScript("../js/defer-script.js", true);
+$html->startBody();
 ?>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="../img/nobgcitsclogo.png">
-    <!-- Import JavaScript files -->
-    <script src="../js/tailwind3.4.1.js"></script>
-    <script src="../js/tailwind.config.js"></script>
-    <script src="../js/sweetalert.min.js"></script>
-    <script src="../js/jquery-3.7.1.min.js"></script>
-    <script src="../js/apexcharts.js"></script>
-    <script src="../js/predefined-script.js"></script>
-    <script src="../js/defer-script.js" defer></script> <!-- Defer attribute means this javascript file will be executed once the HTML file is fully loaded -->
-    <title>CITreasury - Sanctions</title>
-</head>
-<body>
-    <?php
-    # Verify if login exists such that the cookie "cit-student-id" is found on browser
-    if (isset($_COOKIE['cit-student-id'])) {
-        $sql = "SELECT `type` FROM `accounts` WHERE `student_id` = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("s", $_COOKIE['cit-student-id']);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if ($result->num_rows > 0) {
-            $row = $result->fetch_assoc();
-            $type = $row['type'];
-            if ($type === 'user') { # If account type is user, redirect to user page
-                header("location: ../user/");
-            }
-        } else { # If account is not found, return to login page
-            header("location: ../");
-        }
-    } else { # If cookie is not found, return to login page
-        header("location: ../");
-    }
-    ?>
     <!-- Top Navigation Bar -->
     <nav class="fixed w-full bg-custom-purple flex flex-row shadow shadow-gray-800">
         <img src="../img/nobgcitsclogo.png" class="w-12 h-12 my-2 ml-6">
@@ -52,9 +29,11 @@ include '../connection.php';
         <!-- Side Bar Menu Items -->
         <div class="mt-18 md:mt-20 mx-2">
             <div id="menu-items" class="hidden md:inline-block w-60 h-full">
+                <?php menuContent(); ?>
             </div>
         </div>
         <div id="menu-items-mobile" class="fixed block md:hidden h-fit top-16 w-full p-4 bg-custom-purplo opacity-95">
+            <?php menuContent(); ?>
         </div>
         <div class="w-full bg-red-50 px-6 min-h-screen">
             <div class="mt-24 flex flex-col lg:flex-row justify-between">
@@ -98,7 +77,7 @@ include '../connection.php';
                                         `student_id`, `event_id`
                                 ) AS `sanctions` 
                             ON `students`.`student_id` = `sanctions`.`student_id` AND `events`.`event_id` = `sanctions`.`event_id`
-                            WHERE `registrations`.`student_id` IS NULL AND `events`.`event_date` < CURDATE()";
+                            WHERE `registrations`.`student_id` IS NULL AND `students`.`student_id` != '".$_SESSION['cit-student-id']."' AND `events`.`event_date` < CURDATE() AND FIND_IN_SET(SUBSTRING(`students`.`year_and_section`, 1, 1), `events`.`event_target`) > 0";
                         if (isset($_GET['search'])) {
                             $search = '%' . $_GET['search'] . '%';
                             $sql_unregisteredpast .= " AND (`students`.`student_id` LIKE ? OR `students`.`last_name` LIKE ? OR `students`.`first_name` LIKE ? OR `students`.`year_and_section` LIKE ? OR `events`.`event_name` LIKE ?)";
@@ -108,9 +87,7 @@ include '../connection.php';
                             </script>
                             <?php
                         }
-
                         $sql_unregisteredpast .= " ORDER BY `balance` DESC LIMIT ? OFFSET ?";
-
                         $stmt_unregisteredpast = $conn->prepare($sql_unregisteredpast);
                         if (isset($search)) {
                             $stmt_unregisteredpast->bind_param("ssssssi", $search, $search, $search, $search, $search, $results_per_page, $offset);
@@ -170,37 +147,39 @@ include '../connection.php';
                     </table>
                 </div>
             </div>
-            <div id="has-result" class="w-full">
-                <p>Showing <?php echo $results_per_page; ?> entries per page</p>
-                <p>Results: <?php echo $result_unregisteredpast->num_rows; ?> row(s)</p>
-            </div>
+            <!-- Pagination controls -->
             <div class="pagination my-2">
                 <?php
-                // Get the total number of rows for pagination
+                # Get the total number of rows for pagination
                 $sql_count = "
                     SELECT COUNT(*) FROM `students`
                     CROSS JOIN `events`
                     LEFT JOIN `registrations` ON `students`.`student_id` = `registrations`.`student_id` AND `events`.`event_id` = `registrations`.`event_id`
-                    WHERE `registrations`.`student_id` IS NULL AND `events`.`event_date` < CURDATE()";
-                if (isset($search)) {
+                    WHERE `registrations`.`student_id` IS NULL AND `events`.`event_date` < CURDATE() AND FIND_IN_SET(SUBSTRING(`students`.`year_and_section`, 1, 1), `events`.`event_target`) > 0";
+                if (isset($_GET['search'])) {
                     $sql_count .= " AND (`students`.`student_id` LIKE ? OR `students`.`last_name` LIKE ? OR `students`.`first_name` LIKE ? OR `students`.`year_and_section` LIKE ? OR `events`.`event_name` LIKE ?)";
                 }
-                $stmt_count = $conn->prepare($sql_count);
-                if (isset($search)) {
-                    $stmt_count->bind_param("sssss", $search, $search, $search, $search, $search);
+                $stmt_total = $conn->prepare($sql_count);
+                if (isset($_GET['search'])) {
+                    $stmt_total->bind_param("sssss", $search, $search, $search, $search, $search);
                 }
-                $stmt_count->execute();
-                $row = $stmt_count->get_result()->fetch_assoc();
-                $total_records = $row['COUNT(*)'];
-                $total_pages = ceil($total_records / $results_per_page);
-                for ($i = 1; $i <= $total_pages; $i++) {
-                    ?><a href='sanctions.php?<?php echo (isset($search)) ? "search=".$_GET['search']."&" : ""; ?>page=<?php echo $i; ?>'><button class="px-3 py-2 my-1 mr-1 <?php echo $page == $i ? 'bg-purple-600' : 'bg-custom-purplo'; ?> text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-custom-purple"><?php echo $i; ?></button></a>
-                    <?php
-                }
-                if ($total_pages <= 0) {
+                $stmt_total->execute();
+                $total_records = $stmt_total->get_result()->fetch_assoc()['COUNT(*)'];
+                $stmt_total->close();
+                if ($result_unregisteredpast->num_rows > 0) {
                     ?>
-                    <script>$("#has-result").html(null)</script>
+                     <div id="has-result" class="w-full mb-2">
+                        <p>Showing <?php echo $results_per_page; ?> entries per page</p>
+                        <p>Results: <?php echo $total_records ?> row(s)</p>
+                    </div>
                     <?php
+                    # Calculate total pages
+                    $total_pages = ceil($total_records / $results_per_page);
+                    # Display pagination buttons
+                    for ($i = 1; $i <= $total_pages; $i++) {
+                        ?><a href='sanctions.php?<?php echo (isset($search)) ? "search=".htmlspecialchars($_GET['search'])."&" : ""; ?>page=<?php echo $i; ?>'><button class="px-3 py-2 my-1 mr-1 <?php echo $page == $i ? 'bg-purple-600' : 'bg-custom-purplo'; ?> text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-custom-purple"><?php echo $i; ?></button></a>
+                        <?php
+                    }
                 }
                 ?>
             </div>
@@ -241,7 +220,7 @@ include '../connection.php';
     </div>
     <script type="text/javascript">
     // If collect button is pressed, fade in modals for collection
-        function collect(link, eventId) {
+        const collect = (link, eventId) => {
             $("#collect-popup-bg").fadeIn(150);
             $("#collect-popup-item").delay(150).fadeIn(150);
             $("#collect-close-popup").click((event) => {
@@ -298,5 +277,6 @@ include '../connection.php';
         }
     }
     ?>
-</body>
-</html>
+<?php
+$html->endBody();
+?>

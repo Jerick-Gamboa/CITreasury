@@ -1,43 +1,21 @@
-<!DOCTYPE html>
 <?php
+session_start();
 include '../connection.php';
+include '../helperfunctions.php';
+include '../components/menu.php';
+verifyAdminLoggedIn($conn);
+
+$html = new HTML("CITreasury - Events");
+$html->addLink('stylesheet', '../inter-variable.css');
+$html->addLink('icon', '../img/nobgcitsclogo.png');
+$html->addScript("../js/tailwind3.4.1.js");
+$html->addScript("../js/tailwind.config.js");
+$html->addScript("../js/sweetalert.min.js");
+$html->addScript("../js/jquery-3.7.1.min.js");
+$html->addScript("../js/predefined-script.js");
+$html->addScript("../js/defer-script.js", true);
+$html->startBody();
 ?>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="../img/nobgcitsclogo.png">
-    <!-- Import JavaScript files -->
-    <script src="../js/tailwind3.4.1.js"></script>
-    <script src="../js/tailwind.config.js"></script>
-    <script src="../js/sweetalert.min.js"></script>
-    <script src="../js/jquery-3.7.1.min.js"></script>
-    <script src="../js/predefined-script.js"></script>
-    <script src="../js/defer-script.js" defer></script> <!-- Defer attribute means this javascript file will be executed once the HTML file is fully loaded -->
-    <title>CITreasury - Events</title>
-</head>
-<body>
-    <?php
-    # Verify if login exists such that the cookie "cit-student-id" is found on browser
-    if (isset($_COOKIE['cit-student-id'])) {
-        $sql = "SELECT `type` FROM `accounts` WHERE `student_id` = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("s", $_COOKIE['cit-student-id']);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if ($result->num_rows > 0) {
-            $row = $result->fetch_assoc();
-            $type = $row['type'];
-            if ($type === 'user') { # If account type is user, redirect to user page
-                header("location: ../user/");
-            }
-        } else { # If account is not found, return to login page
-            header("location: ../");
-        }
-    } else { # If cookie is not found, return to login page
-        header("location: ../");
-    }
-    ?>
     <!-- Top Navigation Bar -->
     <nav class="fixed w-full bg-custom-purple flex flex-row shadow shadow-gray-800">
         <img src="../img/nobgcitsclogo.png" class="w-12 h-12 my-2 ml-6">
@@ -53,10 +31,12 @@ include '../connection.php';
         <!-- Side Bar Menu Items -->
         <div class="mt-18 md:mt-20 mx-2">
             <div id="menu-items" class="hidden md:inline-block w-60 h-full">
+                <?php menuContent(); ?>
             </div>
         </div>
         <!-- Harmonica Menu Items for mobile, hidden in medium to larger screens -->
         <div id="menu-items-mobile" class="fixed block md:hidden h-fit top-16 w-full p-4 bg-custom-purplo opacity-95">
+            <?php menuContent(); ?>
         </div>
         <div class="w-full bg-red-50 px-6 min-h-screen">
             <div class="fixed bottom-10 right-6">
@@ -74,6 +54,9 @@ include '../connection.php';
                   </form>
                 </div>
             </div>
+            <script>
+                const deleteIds = []; // Declare array to store event-id
+            </script>
             <div class="mt-1 mb-5 overflow-x-auto rounded-lg shadow-lg">
                 <div class="overflow-x-auto rounded-lg border border-black">
                     <!-- Table of Events -->
@@ -115,21 +98,20 @@ include '../connection.php';
                                     <th scope="col" class="p-2 border-r border-black">Event ID</th>
                                     <th scope="col" class="p-2 border-r border-black">Event Name</th>
                                     <th scope="col" class="p-2 border-r border-black">Event Description</th>
+                                    <th scope="col" class="p-2 border-r border-black">Target Year</th>
                                     <th scope="col" class="p-2 border-r border-black">Event Date</th>
                                     <th scope="col" class="p-2 border-r border-black">Event Fee (₱)</th>
                                     <th scope="col" class="p-2 border-r border-black">Sanction Fee (₱)</th>
                                     <th scope="col" class="p-2">Actions</th>
                                 </tr>
                             </thead>
-                            <script>
-                                const deleteIds = []; // Declare array to store event-id
-                            </script>
                             <?php
                             // Loop through the results
                             while($row = $result->fetch_assoc()) {
                                 $eid = $row['event_id'];
                                 $eventname = $row['event_name'];
                                 $eventdesc = $row['event_description'];
+                                $eventtarget = $row['event_target'];
                                 $eventdate = $row['event_date'];
                                 $feeperevent = $row['event_fee'];
                                 $sanctionfee = $row['sanction_fee'];
@@ -138,6 +120,7 @@ include '../connection.php';
                                     <td class="px-2 border-r border-black bg-purple-100"><?php echo $eid; ?></td>
                                     <td class="px-2 border-r border-black bg-purple-100"><?php echo $eventname; ?></td>
                                     <td class="px-2 border-r border-black bg-purple-100"><?php echo $eventdesc; ?></td>
+                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $eventtarget; ?></td>
                                     <td class="px-2 border-r border-black bg-purple-100"><?php echo $eventdate; ?></td>
                                     <td class="px-2 border-r border-black bg-purple-100"><?php echo $feeperevent; ?></td>
                                     <td class="px-2 border-r border-black bg-purple-100"><?php echo $sanctionfee; ?></td>
@@ -169,15 +152,11 @@ include '../connection.php';
                 </div>
             </div>
             <!-- Pagination controls -->
-            <div id="has-result" class="w-full">
-                <p>Showing <?php echo $results_per_page; ?> entries per page</p>
-                <p>Results: <?php echo $result->num_rows; ?> row(s)</p>
-            </div>
             <div class="pagination my-2">
                 <?php
-                // Get the total number of records
+                # Get the total number of rows for pagination
                 $sql_total = "SELECT COUNT(*) FROM `events`";
-                if (isset($search)) {
+                if (isset($_GET['search'])) {
                     $sql_total .= " WHERE (`event_id` LIKE ? OR `event_name` LIKE ? OR `event_description` LIKE ? OR `event_date` LIKE ?)";
                     $stmt_total = $conn->prepare($sql_total);
                     $stmt_total->bind_param("ssss", $search, $search, $search, $search);
@@ -185,19 +164,22 @@ include '../connection.php';
                     $stmt_total = $conn->prepare($sql_total);
                 }
                 $stmt_total->execute();
-                $row = $stmt_total->get_result()->fetch_assoc();
-                $total_records = $row['COUNT(*)'];
-                // Calculate total pages
-                $total_pages = ceil($total_records / $results_per_page);
-                // Display pagination buttons
-                for ($i = 1; $i <= $total_pages; $i++) {
-                    ?><a href='eventslist.php?page=<?php echo $i; ?>'><button class="px-3 py-2 my-1 mr-1 <?php echo $page == $i ? 'bg-purple-600' : 'bg-custom-purplo'; ?> text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-custom-purple"><?php echo $i; ?></button></a>
-                    <?php
-                }
-                if ($total_pages <= 0) {
+                $total_records = $stmt_total->get_result()->fetch_assoc()['COUNT(*)'];
+                $stmt_total->close();
+                if ($result->num_rows > 0) {
                     ?>
-                    <script>$("#has-result").html(null)</script>
+                     <div id="has-result" class="w-full mb-2">
+                        <p>Showing <?php echo $results_per_page; ?> entries per page</p>
+                        <p>Results: <?php echo $total_records; ?> row(s)</p>
+                    </div>
                     <?php
+                    # Calculate total pages
+                    $total_pages = ceil($total_records / $results_per_page);
+                    # Display pagination buttons
+                    for ($i = 1; $i <= $total_pages; $i++) {
+                        ?><a href='eventslist.php?page=<?php echo $i; ?>'><button class="px-3 py-2 my-1 mr-1 <?php echo $page == $i ? 'bg-purple-600' : 'bg-custom-purplo'; ?> text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-custom-purple"><?php echo $i; ?></button></a>
+                        <?php
+                    }
                 }
                 ?>
             </div>
@@ -214,27 +196,40 @@ include '../connection.php';
                         <svg id="mdi-close-box-outline" class="mt-2 w-6 h-6 hover:fill-red-500" viewBox="0 0 24 24"><path d="M19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M19,19H5V5H19V19M17,8.4L13.4,12L17,15.6L15.6,17L12,13.4L8.4,17L7,15.6L10.6,12L7,8.4L8.4,7L12,10.6L15.6,7L17,8.4Z" /></svg>
                     </button>
                 </div>
-                <h3 class="text-2xl font-semibold text-custom-purple mb-3">Add Event</h3>
+                <h3 class="text-2xl font-semibold text-custom-purple mb-2">Add Event</h3>
                 <form method="POST">
                     <label class="ml-1 text-sm">Event Name:</label>
                     <input type="text" name="event-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
                     <label class="ml-1 text-sm">Event Description:</label>
                     <textarea name="event-desc" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required></textarea>
+                    <label class="ml-1 text-sm">Target Year Levels:</label>
+                    <div class="mb-2 flex flex-row justify-between bg-purple-100 border-2 border-custom-purple rounded-lg px-4 py-2">
+                        <label class="flex items-center">
+                            <input type="checkbox" name="event-target[]" value="1" class="mr-2" checked> 1st year
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="event-target[]" value="2" class="mr-2" checked> 2nd year
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="event-target[]" value="3" class="mr-2" checked> 3rd year
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="event-target[]" value="4" class="mr-2" checked> 4th year
+                        </label>
+                    </div>
                     <label class="ml-1 text-sm">Event Date:</label>
                     <input type="date" id="event-date" name="event-date" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
                     <label class="ml-1 text-sm">Event Fee (₱):</label>
-                    <input type="number" id="fee-per-event" name="fee-per-event" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
+                    <input type="number" id="fee-per-event" name="fee-per-event" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" min="0" required>
                     <label class="ml-1 text-sm">Sanction Fee (₱):</label>
-                    <input type="number" id="sanction-fee" name="sanction-fee" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
-                    <div class="flex items-center justify-center m-4">
+                    <input type="number" id="sanction-fee" name="sanction-fee" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" min="0" required>
+                    <div class="flex items-center justify-center m-2">
                         <button type="submit" class="px-3 py-2 bg-custom-purple rounded-lg focus:outline-none focus:border-purple-500 text-base text-white font-bold hover:bg-custom-purplo" name="add-new-event">Add Event</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
-    <!-- Darken Background for Modal, hidden by default -->
-    <div id="edit-popup-bg" class="fixed top-0 w-full min-h-screen bg-black opacity-50 hidden"></div>
     <!-- Popup Modal for Editing Events, hidden by default -->
     <div id="edit-popup-item" class="fixed top-0 w-full min-h-screen hidden">
         <div class="w-full min-h-screen flex items-center justify-center">
@@ -244,24 +239,39 @@ include '../connection.php';
                         <svg id="mdi-close-box-outline" class="mt-2 w-6 h-6 hover:fill-red-500" viewBox="0 0 24 24"><path d="M19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M19,19H5V5H19V19M17,8.4L13.4,12L17,15.6L15.6,17L12,13.4L8.4,17L7,15.6L10.6,12L7,8.4L8.4,7L12,10.6L15.6,7L17,8.4Z" /></svg>
                     </button>
                 </div>
-                <h3 class="text-2xl font-semibold text-custom-purple mb-3">Edit Event</h3>
+                <h3 class="text-2xl font-semibold text-custom-purple mb-2">Edit Event</h3>
                 <form method="POST">
                     <!--label class="ml-1 text-sm">Event ID:</label-->
                     <input type="hidden" id="edit-event-id" name="edit-event-id">
                     <label class="ml-1 text-sm">Event Name:</label>
                     <input type="text" id="edit-event-name" name="edit-event-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
                     <label class="ml-1 text-sm">Event Description:</label>
-                    <textarea id="edit-event-desc" name="edit-event-desc" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required></textarea> 
+                    <textarea id="edit-event-desc" name="edit-event-desc" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required></textarea>
+                    <label class="ml-1 text-sm">Target Year Levels:</label>
+                    <div class="mb-2 flex flex-row justify-between bg-purple-100 border-2 border-custom-purple rounded-lg px-4 py-2">
+                        <label class="flex items-center">
+                            <input type="checkbox" name="edit-event-target[]" value="1" class="mr-2"> 1st year
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="edit-event-target[]" value="2" class="mr-2"> 2nd year
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="edit-event-target[]" value="3" class="mr-2"> 3rd year
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="edit-event-target[]" value="4" class="mr-2"> 4th year
+                        </label>
+                    </div>
                     <label class="ml-1 text-sm">Event Date:</label>
                     <input type="date" id="edit-event-date" name="edit-event-date" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 hover:cursor-pointer bg-purple-100" required>
                     <div id="tooltip-content-date" class="absolute whitespace-normal break-words rounded-lg bg-red-500 py-1.5 px-3 font-sans text-xs font-normal text-white shadow shadow-black focus:outline-none">
                         Be careful when changing event dates, as this changes the <br>total fee to be paid with respect to the current date.
                     </div>
                     <label class="ml-1 text-sm">Event Fee (₱):</label>
-                    <input type="number" id="edit-fee-per-event" name="edit-fee-per-event" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
+                    <input type="number" id="edit-fee-per-event" name="edit-fee-per-event" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" min="0" required>
                     <label class="ml-1 text-sm">Sanction Fee (₱):</label>
-                    <input type="number" id="edit-sanction-fee" name="edit-sanction-fee" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
-                    <div class="flex items-center justify-center m-4">
+                    <input type="number" id="edit-sanction-fee" name="edit-sanction-fee" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" min="0" required>
+                    <div class="flex items-center justify-center m-2">
                         <button type="submit" class="px-3 py-2 bg-custom-purple rounded-lg focus:outline-none focus:border-purple-500 text-base text-white font-bold hover:bg-custom-purplo" name="update-this-event">Update Event</button>
                     </div>
                 </form>
@@ -269,8 +279,8 @@ include '../connection.php';
         </div>
     </div>
     <script type="text/javascript">
-        $("#popup-bg, #popup-item, #edit-popup-bg, #edit-popup-item").removeClass("hidden");
-        $("#popup-bg, #popup-item, #edit-popup-bg, #edit-popup-item, #tooltip-content-date").hide();
+        $("#popup-bg, #popup-item, #edit-popup-item").removeClass("hidden");
+        $("#popup-bg, #popup-item, #edit-popup-item, #tooltip-content-date").hide();
         // If (+) button is pressed, fade in modals
         $("#add-event").click((event) => {
             $("#popup-bg").fadeIn(150);
@@ -281,11 +291,11 @@ include '../connection.php';
         });
 
         // If edit button is pressed, fade in modals
-        function editRow(link) {
-            $("#edit-popup-bg").fadeIn(150);
+        const editRow = (link) => {
+            $("#popup-bg").fadeIn(150);
             $("#edit-popup-item").delay(150).fadeIn(150);
             $("#edit-close-popup").click((event) => { // If closed, fade out modals
-                $("#edit-popup-bg").fadeOut(150);
+                $("#popup-bg").fadeOut(150);
                 $("#edit-popup-item").fadeOut(150);
             });
             let row = link.parentNode.parentNode; // Get table data
@@ -293,16 +303,23 @@ include '../connection.php';
             $("#edit-event-id").val(row.cells[0].innerHTML);
             $("#edit-event-name").val(row.cells[1].innerHTML);
             $("#edit-event-desc").val(row.cells[2].innerHTML);
-            $("#edit-event-date").val(row.cells[3].innerHTML);
-            $("#edit-fee-per-event").val(row.cells[4].innerHTML);
-            $("#edit-sanction-fee").val(row.cells[5].innerHTML);
+            // Populate checkboxes for event-target
+            const targetYears = row.cells[3].innerHTML.split(','); // Split target years by commas
+            $("input[name='edit-event-target[]']").each(function() {
+                if (targetYears.includes($(this).val())) {
+                    $(this).prop('checked', true);
+                } else {
+                    $(this).prop('checked', false);
+                }
+            });
+            $("#edit-event-date").val(row.cells[4].innerHTML);
+            $("#edit-fee-per-event").val(row.cells[5].innerHTML);
+            $("#edit-sanction-fee").val(row.cells[6].innerHTML);
         }
 
-        $('#edit-event-date').hover(
-            () => {
+        $('#edit-event-date').hover(() => {
                 $('#tooltip-content-date').fadeIn(150);
-            }, 
-            () => {
+            }, () => {
                 $('#tooltip-content-date').fadeOut(150);
             }
         );
@@ -323,11 +340,12 @@ include '../connection.php';
         $eventname = ucwords($_POST['event-name']);
         $eventdesc = $_POST['event-desc'];
         $eventdate = $_POST['event-date'];
+        $eventtarget = isset($_POST['event-target']) ? implode(',', $_POST['event-target']) : '';
         $feeperevent = $_POST['fee-per-event'];
         $sanctionfee = $_POST['sanction-fee'];
-        $sql_event = "INSERT INTO `events`(`event_name`, `event_description`, `event_date`, `event_fee`, `sanction_fee`) VALUES (?, ?, ?, ?, ?)";
+        $sql_event = "INSERT INTO `events`(`event_name`, `event_description`, `event_target`, `event_date`, `event_fee`, `sanction_fee`) VALUES (?, ?, ?, ?, ?, ?)";
         $stmt_event = $conn->prepare($sql_event);
-        $stmt_event->bind_param("sssii", $eventname, $eventdesc, $eventdate, $feeperevent, $sanctionfee);
+        $stmt_event->bind_param("ssssii", $eventname, $eventdesc, $eventtarget, $eventdate, $feeperevent, $sanctionfee);
         if ($stmt_event->execute()) {
             ?>
             <script>
@@ -343,44 +361,60 @@ include '../connection.php';
     }
     // If Add Update Event is submitted
     if (isset($_POST['update-this-event'])) {
-        $eid = str_replace(" ", "", $_POST['edit-event-id']);
-        $eventname = ucwords($_POST['edit-event-name']);
-        $eventdesc = $_POST['edit-event-desc'];
-        $eventdate = $_POST['edit-event-date'];
-        $feeperevent = $_POST['edit-fee-per-event'];
-        $sanctionfee = $_POST['edit-sanction-fee'];
-        $sqlupdate_event = "UPDATE `events` SET `event_name`=?, `event_description`=?, `event_date`=?, `event_fee`=?, `sanction_fee`=? WHERE `event_id` = ?";
+        // Retrieve and sanitize inputs
+        $eid = trim($_POST['edit-event-id']);
+        $eventname = ucwords(trim($_POST['edit-event-name']));
+        $eventdesc = trim($_POST['edit-event-desc']);
+        $eventdate = trim($_POST['edit-event-date']);
+        $feeperevent = floatval($_POST['edit-fee-per-event']);
+        $sanctionfee = floatval($_POST['edit-sanction-fee']);
+        $eventtarget = (isset($_POST['edit-event-target']) && !empty($_POST['edit-event-target'])) ? implode(',', $_POST['edit-event-target']) : '';
+        // Update query
+        $sqlupdate_event = "UPDATE `events` 
+                            SET `event_name` = ?, 
+                                `event_description` = ?, 
+                                `event_target` = ?, 
+                                `event_date` = ?, 
+                                `event_fee` = ?, 
+                                `sanction_fee` = ? 
+                            WHERE `event_id` = ?";
         $stmt_update_event = $conn->prepare($sqlupdate_event);
-        $stmt_update_event->bind_param("sssiii", $eventname, $eventdesc, $eventdate, $feeperevent, $sanctionfee, $eid);
-        if ($stmt_update_event->execute()) {
-            ?>
-            <script>
-                swal('Event updated successfully!', '', 'success')
-                .then(() => {
-                    window.location.href = 'eventslist.php';
-                });
+        // Check if statement preparation is successful
+        if ($stmt_update_event) {
+            $stmt_update_event->bind_param("ssssidi", $eventname, $eventdesc, $eventtarget, $eventdate, $feeperevent, $sanctionfee, $eid);
+            if ($stmt_update_event->execute()) {
+                // Success
+                ?><script>
+                    swal('Event updated successfully!', '', 'success')
+                    .then(() => {
+                        window.location.href = 'eventslist.php';
+                    });
+                </script>
+                <?php
+            } else {
+                // Error during execution
+                ?><script>
+                    swal('Failed to update event!', '<?php echo $stmt_update_event->error; ?>', 'error');
+                </script>
+                <?php
+            }
+
+            $stmt_update_event->close();
+        } else {
+            // Error preparing statement
+            ?><script>
+                swal('Failed to prepare statement!', '<?php echo $conn->error; ?>', 'error');
             </script>
             <?php
-        } else {
-            ?><script>swal('Failed to update event!', '', 'error');</script>"<?php
         }
     }
     // If Delete Event is submitted
     if (isset($_POST['eid-to-delete'])) {
-        $sqldelete_sanc = "DELETE FROM `sanctions` WHERE `event_id` = ?";
-        $stmt_delete_sanc = $conn->prepare($sqldelete_sanc);
-
-        $sqldelete_reg = "DELETE FROM `registrations` WHERE `event_id` = ?";
-        $stmt_delete_reg = $conn->prepare($sqldelete_reg);
-
         $sqldelete_event = "DELETE FROM `events` WHERE `event_id` = ?";
         $stmt_delete_event = $conn->prepare($sqldelete_event);
-
-        $stmt_delete_sanc->bind_param("i", $_POST['eid-to-delete']);
-        $stmt_delete_reg->bind_param("i", $_POST['eid-to-delete']);
         $stmt_delete_event->bind_param("i", $_POST['eid-to-delete']);
 
-        if ($stmt_delete_sanc->execute() && $stmt_delete_reg->execute() && $stmt_delete_event->execute()) {
+        if ($stmt_delete_event->execute()) {
             ?>
             <script>
                 swal('Event successfully deleted', '', 'success')
@@ -395,5 +429,6 @@ include '../connection.php';
         }
     }
     ?>
-</body>
-</html>
+<?php
+$html->endBody();
+?>
