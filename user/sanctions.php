@@ -40,8 +40,8 @@ $html->startBody();
                 <h2 id="pending-fees" class="text-2xl text-white font-semibold">Pending Fees: ₱ --</h2>
             </div>
             <div class="flex lg:flex-row flex-col">
-                <div class="w-full p-4 bg-red-300 rounded-lg shadow-lg mr-5 mb-5">
-                    <h3 class="text-gray-800 font-bold text-lg mb-4">Unregistered Past Events</h3>
+                <div class="w-full p-4 bg-[#FC495E] rounded-lg shadow-lg mr-5 mb-5">
+                    <h3 class="text-white font-bold text-lg mb-4">Unregistered Past Events</h3>
                     <?php
                     $pendingfees = 0;
                     $student_id = $_SESSION['cit-student-id'];
@@ -78,7 +78,7 @@ $html->startBody();
                     if ($result_unregistered_events->num_rows > 0) {
                         while ($row_event = $result_unregistered_events->fetch_assoc()) {
                             ?>
-                            <div class="border-l-4 border-white m-2 p-3 bg-red-600 shadow-lg text-white">
+                            <div class="border-l-4 border-white m-2 p-3 bg-[#B00300] shadow-lg shadow-black mb-4 text-white">
                                 <h3 class="text-2xl font-bold mb-2"><?php echo $row_event['event_name']; ?></h3>
                                 <div class="text-sm font-semibold">
                                     <p>Date: <?php echo $row_event['event_date']; ?></p>
@@ -93,8 +93,8 @@ $html->startBody();
                     }
                     ?>
                 </div>
-                <div class="w-full p-4 bg-orange-300 rounded-lg shadow-lg mb-4">
-                    <h3 class="text-gray-800 font-bold text-lg mb-4">Unsettled Registrations</h3>
+                <div class="w-full p-4 bg-[#FF783E] rounded-lg shadow-lg mb-4">
+                    <h3 class="text-white font-bold text-lg mb-4">Unsettled Registrations</h3>
                     <?php
                     $student_id = $_SESSION['cit-student-id'];
                     $sql_unsettledbalance_events = "
@@ -128,7 +128,7 @@ $html->startBody();
                     if ($result_unsettledbalance_events->num_rows > 0) {
                         while ($row_event = $result_unsettledbalance_events->fetch_assoc()) {
                             ?>
-                            <div class="border-l-4 border-white m-2 p-3 bg-orange-600 shadow-lg text-white">
+                            <div class="border-l-4 border-white m-2 p-3 bg-[#CF5500] shadow-lg shadow-black mb-4 text-white">
                                 <h3 class="text-2xl font-bold mb-2"><?php echo $row_event['event_name']; ?></h3>
                                 <div class="text-sm font-semibold">
                                     <p>Registered: <?php echo $row_event['registration_date']; ?></p>

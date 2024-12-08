@@ -74,7 +74,7 @@ $html->startBody();
                         if ($result_upcoming_events->num_rows > 0) {
                             while ($row_event = $result_upcoming_events->fetch_assoc()) {
                                 ?>
-                                <div class="border-l-4 border-white m-2 p-3 bg-[#350839] shadow-lg shadow-black mb-4 text-white">
+                                <div class="border-l-4 border-white m-2 p-3 bg-[#46064C] shadow-lg shadow-black mb-4 text-white">
                                     <h3 class="text-2xl font-bold mb-2"><?php echo $row_event['event_name']; ?></h3>
                                     <div class="text-sm">
                                         <p class="mb-2"><?php echo $row_event['event_description']; ?></p>
@@ -102,7 +102,7 @@ $html->startBody();
                         if ($result_registered_events->num_rows > 0) {
                             while ($row_event = $result_registered_events->fetch_assoc()) {
                                 ?>
-                                <div class="border-l-4 border-white m-2 p-3 bg-[#350839] shadow-lg shadow-black mb-4 text-white">
+                                <div class="border-l-4 border-white m-2 p-3 bg-[#46064C] shadow-lg shadow-black mb-4 text-white">
                                     <h3 class="text-2xl font-bold mb-2"><?php echo $row_event['event_name']; ?></h3>
                                     <div class="text-sm">
                                         <p class="mb-2"><?php echo $row_event['event_description']; ?></p>
