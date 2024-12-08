@@ -166,6 +166,7 @@ $html->startBody();
                 $stmt_count->execute();
                 $row = $stmt_count->get_result()->fetch_assoc();
                 $total_records = $row['COUNT(*)'];
+                $stmt_total->close();
                 $total_pages = ceil($total_records / $results_per_page);
                 if ($result_unregisteredpast->num_rows > 0) {
                     ?>

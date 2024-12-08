@@ -154,8 +154,8 @@ $html->startBody();
                     $stmt_total->bind_param("s", $_SESSION['cit-student-id']);
                 }
                 $stmt_total->execute();
-                $row = $stmt_total->get_result()->fetch_assoc();
-                $total_records = $row['COUNT(*)'];
+                $total_records = $stmt_total->get_result()->fetch_assoc()['COUNT(*)'];
+                $stmt_total->close();
                 if ($result->num_rows > 0) {
                     ?>
                      <div id="has-result" class="w-full mb-2">

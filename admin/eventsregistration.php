@@ -200,15 +200,15 @@ $html->startBody();
                         OR `students`.`first_name` LIKE ? 
                         OR `students`.`year_and_section` LIKE ? 
                         OR `registrations`.`registration_date` LIKE ?)";
-                    $stmt_count = $conn->prepare($sql_total);
-                    $stmt_count->bind_param("ssssss", $_GET['event-id'], $search, $search, $search, $search, $search);
+                    $stmt_total = $conn->prepare($sql_total);
+                    $stmt_total->bind_param("ssssss", $_GET['event-id'], $search, $search, $search, $search, $search);
                 } else {
-                    $stmt_count = $conn->prepare($sql_total);
-                    $stmt_count->bind_param("s", $_GET['event-id']);
+                    $stmt_total = $conn->prepare($sql_total);
+                    $stmt_total->bind_param("s", $_GET['event-id']);
                 }
-                $stmt_count->execute();
-                $result_count = $stmt_count->get_result();
-                $total_records = $result_count->fetch_assoc()['COUNT(*)'];
+                $stmt_total->execute();
+                $total_records = $stmt_total->get_result()->fetch_assoc()['COUNT(*)'];
+                $stmt_total->close();
                 if ($result->num_rows > 0) {
                     ?>
                      <div id="has-result" class="w-full mb-2">
