@@ -410,20 +410,11 @@ $html->startBody();
     }
     // If Delete Event is submitted
     if (isset($_POST['eid-to-delete'])) {
-        $sqldelete_sanc = "DELETE FROM `sanctions` WHERE `event_id` = ?";
-        $stmt_delete_sanc = $conn->prepare($sqldelete_sanc);
-
-        $sqldelete_reg = "DELETE FROM `registrations` WHERE `event_id` = ?";
-        $stmt_delete_reg = $conn->prepare($sqldelete_reg);
-
         $sqldelete_event = "DELETE FROM `events` WHERE `event_id` = ?";
         $stmt_delete_event = $conn->prepare($sqldelete_event);
-
-        $stmt_delete_sanc->bind_param("i", $_POST['eid-to-delete']);
-        $stmt_delete_reg->bind_param("i", $_POST['eid-to-delete']);
         $stmt_delete_event->bind_param("i", $_POST['eid-to-delete']);
 
-        if ($stmt_delete_sanc->execute() && $stmt_delete_reg->execute() && $stmt_delete_event->execute()) {
+        if ($stmt_delete_event->execute()) {
             ?>
             <script>
                 swal('Event successfully deleted', '', 'success')

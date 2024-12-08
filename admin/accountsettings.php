@@ -229,24 +229,11 @@ $html->startBody();
     if (isset($_POST['delete-account'])) {
         $sid = $_SESSION['cit-student-id'];
         if (password_verify($_POST['delete-acc-password'], $currentpass)) { # If hashed password matches
-            $sqldelete_account = "DELETE FROM `accounts` WHERE `student_id`= ?";
-            $stmt_delete_account = $conn->prepare($sqldelete_account);
-
-            $sqldelete_sanc = "DELETE FROM `sanctions` WHERE `student_id`= ?";
-            $stmt_delete_sanc = $conn->prepare($sqldelete_sanc);
-
-            $sqldelete_reg = "DELETE FROM `registrations` WHERE `student_id`= ?";
-            $stmt_delete_reg = $conn->prepare($sqldelete_reg);
-
             $sqldelete_student = "DELETE FROM `students` WHERE `student_id`= ?";
             $stmt_delete_student = $conn->prepare($sqldelete_student);
-
-            $stmt_delete_account->bind_param("s", $sid);
-            $stmt_delete_sanc->bind_param("s", $sid);
-            $stmt_delete_reg->bind_param("s", $sid);
             $stmt_delete_student->bind_param("s", $sid);
 
-            if ($stmt_delete_account->execute() && $stmt_delete_sanc->execute() && $stmt_delete_reg->execute() && $stmt_delete_student->execute()) {
+            if ($stmt_delete_student->execute()) {
                 session_unset();
                 session_destroy();
                 ?>
