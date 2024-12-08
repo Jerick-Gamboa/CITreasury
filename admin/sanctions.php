@@ -159,13 +159,12 @@ $html->startBody();
                 if (isset($_GET['search'])) {
                     $sql_count .= " AND (`students`.`student_id` LIKE ? OR `students`.`last_name` LIKE ? OR `students`.`first_name` LIKE ? OR `students`.`year_and_section` LIKE ? OR `events`.`event_name` LIKE ?)";
                 }
-                $stmt_count = $conn->prepare($sql_count);
+                $stmt_total = $conn->prepare($sql_count);
                 if (isset($_GET['search'])) {
-                    $stmt_count->bind_param("sssss", $search, $search, $search, $search, $search);
+                    $stmt_total->bind_param("sssss", $search, $search, $search, $search, $search);
                 }
-                $stmt_count->execute();
-                $row = $stmt_count->get_result()->fetch_assoc();
-                $total_records = $row['COUNT(*)'];
+                $stmt_total->execute();
+                $total_records = $stmt_total->get_result()->fetch_assoc()['COUNT(*)'];
                 $stmt_total->close();
                 $total_pages = ceil($total_records / $results_per_page);
                 if ($result_unregisteredpast->num_rows > 0) {
