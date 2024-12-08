@@ -144,8 +144,8 @@ $html->startBody();
         </div>
     </div>
     <script type="text/javascript">
-        $("#popup-bg, #popup-item, #chp-popup-item").removeClass("hidden");
-        $("#popup-bg, #popup-item, #chp-popup-item").hide();
+        $("#popup-bg, #popup-item, #chp-popup-item, #dlacc-popup-item").removeClass("hidden");
+        $("#popup-bg, #popup-item, #chp-popup-item, #dlacc-popup-item").hide();
 
         const closePopup = (button_id, bg, popup_item, close_popup) => {
             $(button_id).click((event) => {

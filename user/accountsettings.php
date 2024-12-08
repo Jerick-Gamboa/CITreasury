@@ -125,25 +125,6 @@ $html->startBody();
             </div>
         </div>
     </div>
-    <div id="dlacc-popup-item" class="fixed top-0 w-full min-h-screen hidden">
-        <div class="w-full min-h-screen flex items-center justify-center">
-            <div class="m-5 w-full py-3 px-5 sm:w-1/2 lg:w-1/3 xl:1/4 rounded bg-white h-fit shadow-lg shadow-black">
-                <div class="w-full flex justify-end">
-                    <button class="focus:outline-none" id="dlacc-close-popup">
-                        <svg id="mdi-close-box-outline" class="mt-2 w-6 h-6 hover:fill-red-500" viewBox="0 0 24 24"><path d="M19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M19,19H5V5H19V19M17,8.4L13.4,12L17,15.6L15.6,17L12,13.4L8.4,17L7,15.6L10.6,12L7,8.4L8.4,7L12,10.6L15.6,7L17,8.4Z" /></svg>
-                    </button>
-                </div>
-                <h3 class="text-xl font-semibold text-center text-custom-purple mb-3">This action can't be undone!</h3>
-                <form id="password-form" method="POST">
-                    <label class="ml-1 text-sm">Enter Password to continue:</label>
-                    <input type="password" id="delete-acc-password" name="delete-acc-password" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
-                    <div class="flex items-center justify-center m-4">
-                        <button type="submit" class="px-3 py-2 bg-red-700 rounded-lg focus:outline-none focus:border-purple-500 text-base text-white font-bold hover:bg-red-600" name="delete-account">Delete Account</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
     <script type="text/javascript">
         $("#popup-bg, #popup-item, #chp-popup-item").removeClass("hidden");
         $("#popup-bg, #popup-item, #chp-popup-item").hide();
@@ -160,7 +141,10 @@ $html->startBody();
 
         closePopup("#change-information-btn", "#popup-bg", "#popup-item", "#close-popup");
         closePopup("#change-password-btn", "#popup-bg", "#chp-popup-item", "#chp-close-popup");
-        closePopup("#delete-account-btn", "#popup-bg", "#dlacc-popup-item", "#dlacc-close-popup");
+
+        $("#delete-account-btn").click(() => {
+            swal('', 'Only admins are allowed to delete your account!', 'error');
+        });
 
         // While editing in new and confirm password
         $("#new-password, #confirm-password").on('input', () => {
@@ -226,48 +210,6 @@ $html->startBody();
                 </script>
                 <?php
             }
-        }
-    }
-    if (isset($_POST['delete-account'])) {
-        $sid = $_SESSION['cit-student-id'];
-        if (password_verify($_POST['delete-acc-password'], $currentpass)) { # If hashed password matches
-            $sqldelete_account = "DELETE FROM `accounts` WHERE `student_id`= ?";
-            $stmt_delete_account = $conn->prepare($sqldelete_account);
-
-            $sqldelete_sanc = "DELETE FROM `sanctions` WHERE `student_id`= ?";
-            $stmt_delete_sanc = $conn->prepare($sqldelete_sanc);
-
-            $sqldelete_reg = "DELETE FROM `registrations` WHERE `student_id`= ?";
-            $stmt_delete_reg = $conn->prepare($sqldelete_reg);
-
-            $sqldelete_student = "DELETE FROM `students` WHERE `student_id`= ?";
-            $stmt_delete_student = $conn->prepare($sqldelete_student);
-
-            $stmt_delete_account->bind_param("s", $sid);
-            $stmt_delete_sanc->bind_param("s", $sid);
-            $stmt_delete_reg->bind_param("s", $sid);
-            $stmt_delete_student->bind_param("s", $sid);
-
-            if ($stmt_delete_account->execute() && $stmt_delete_sanc->execute() && $stmt_delete_reg->execute() && $stmt_delete_student->execute()) {
-                session_unset();
-                session_destroy();
-                ?>
-                <script>
-                    swal('Account Deletion Successful!', '', 'success')
-                    .then(() => {
-                        window.location.href = '../';
-                    });
-                </script>
-                <?php
-            } else {
-                ?>
-                <script>swal('Account Deletion Failed', '', 'error');</script>
-                <?php
-            }
-        } else {
-            ?>
-            <script> swal('Incorrect password', '', 'error');</script>
-            <?php
         }
     }
     ?>
