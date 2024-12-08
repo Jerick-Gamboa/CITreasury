@@ -53,10 +53,10 @@ $html->startBody();
                     }
                     return "--";
                 }
-                $totalfirstyear = getQueryString($conn, "SELECT COUNT(`student_id`) FROM `students` WHERE `year_and_section` LIKE '1%'", "COUNT(`student_id`)");
-                $totalsecondyear = getQueryString($conn, "SELECT COUNT(`student_id`) FROM `students` WHERE `year_and_section` LIKE '2%'", "COUNT(`student_id`)");
-                $totalthirdyear = getQueryString($conn, "SELECT COUNT(`student_id`) FROM `students` WHERE `year_and_section` LIKE '3%'", "COUNT(`student_id`)");
-                $totalfourthyear = getQueryString($conn, "SELECT COUNT(`student_id`) FROM `students` WHERE `year_and_section` LIKE '4%'", "COUNT(`student_id`)");
+                $totalfirstyear = getQueryString($conn, "SELECT getYearlyStudentCount('1') AS FirstYearCount;", "FirstYearCount");
+                $totalsecondyear = getQueryString($conn, "SELECT getYearlyStudentCount('2') AS SecondYearCount;", "SecondYearCount");
+                $totalthirdyear = getQueryString($conn, "SELECT getYearlyStudentCount('3') AS ThirdYearCount;", "ThirdYearCount");
+                $totalfourthyear = getQueryString($conn, "SELECT getYearlyStudentCount('4') AS FourthYearCount;", "FourthYearCount");
                 ?>
                 <div class="flex lg:flex-row flex-col">
                     <div class="w-full bg-green-600 rounded shadow-lg mr-4 mb-4">
