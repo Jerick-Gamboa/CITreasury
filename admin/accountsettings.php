@@ -13,6 +13,7 @@ if (isset($_SESSION['cit-student-id'])) {
     $result = $stmt->get_result();
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
+        $currentpass = $row['password']; # Get account password
         $type = $row['type'];
         $lastname = $row['last_name'];
         $firstname = $row['first_name'];
@@ -136,7 +137,7 @@ $html->startBody();
                     <label class="ml-1 text-sm">Enter Password to continue:</label>
                     <input type="password" id="delete-acc-password" name="delete-acc-password" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
                     <div class="flex items-center justify-center m-4">
-                        <button type="submit" class="px-3 py-2 bg-red-700 rounded-lg focus:outline-none focus:border-purple-500 text-base text-white font-bold disabled:bg-gray-400 hover:bg-red-600" name="delete-account">Delete Account</button>
+                        <button type="submit" class="px-3 py-2 bg-red-700 rounded-lg focus:outline-none focus:border-purple-500 text-base text-white font-bold hover:bg-red-600" name="delete-account">Delete Account</button>
                     </div>
                 </form>
             </div>
@@ -199,16 +200,6 @@ $html->startBody();
         }
     }
     if (isset($_POST['update-password'])) {
-        $currentpass = null;
-        $sql = "SELECT `password` FROM `accounts` WHERE `student_id` = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("s", $_SESSION['cit-student-id']);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if ($result->num_rows > 0) {
-            $row = $result->fetch_assoc();
-            $currentpass = $row['password']; # Get account password
-        }
         if (!password_verify($_POST['old-password'], $currentpass)) { # If old password is not the same as current password
             ?>
             <script>
@@ -237,7 +228,46 @@ $html->startBody();
         }
     }
     if (isset($_POST['delete-account'])) {
+        $sid = $_SESSION['cit-student-id'];
+        if (password_verify($_POST['delete-acc-password'], $currentpass)) { # If hashed password matches
+            $sqldelete_account = "DELETE FROM `accounts` WHERE `student_id`= ?";
+            $stmt_delete_account = $conn->prepare($sqldelete_account);
 
+            $sqldelete_sanc = "DELETE FROM `sanctions` WHERE `student_id`= ?";
+            $stmt_delete_sanc = $conn->prepare($sqldelete_sanc);
+
+            $sqldelete_reg = "DELETE FROM `registrations` WHERE `student_id`= ?";
+            $stmt_delete_reg = $conn->prepare($sqldelete_reg);
+
+            $sqldelete_student = "DELETE FROM `students` WHERE `student_id`= ?";
+            $stmt_delete_student = $conn->prepare($sqldelete_student);
+
+            $stmt_delete_account->bind_param("s", $sid);
+            $stmt_delete_sanc->bind_param("s", $sid);
+            $stmt_delete_reg->bind_param("s", $sid);
+            $stmt_delete_student->bind_param("s", $sid);
+
+            if ($stmt_delete_account->execute() && $stmt_delete_sanc->execute() && $stmt_delete_reg->execute() && $stmt_delete_student->execute()) {
+                session_unset();
+                session_destroy();
+                ?>
+                <script>
+                    swal('Account Deletion Successful!', '', 'success')
+                    .then(() => {
+                        window.location.href = '../';
+                    });
+                </script>
+                <?php
+            } else {
+                ?>
+                <script>swal('Account Deletion Failed', '', 'error');</script>
+                <?php
+            }
+        } else {
+            ?>
+            <script> swal('Incorrect password', '', 'error');</script>
+            <?php
+        }
     }
     ?>
 <?php
