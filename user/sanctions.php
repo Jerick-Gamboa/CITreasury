@@ -36,7 +36,7 @@ $html->startBody();
             <div class="mt-24">
                 <h1 class="text-3xl text-custom-purplo font-bold mb-5">Your Sanctions</h1>
             </div>
-            <div class="w-full p-4 bg-custom-purplo rounded-lg shadow-lg mb-4">
+            <div class="w-full p-4 bg-custom-purple rounded-lg shadow-lg mb-4">
                 <h2 id="pending-fees" class="text-2xl text-white font-semibold">Pending Fees: ₱ --</h2>
             </div>
             <div class="flex lg:flex-row flex-col">
