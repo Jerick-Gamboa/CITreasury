@@ -21,6 +21,22 @@ $sql_account = "INSERT INTO `accounts`(`email`, `password`, `student_id`, `type`
 $import_sql = "SET foreign_key_checks = 0;
 SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';
 
+DROP TABLE IF EXISTS `students`;
+CREATE TABLE `students` (
+  `student_id` varchar(7) NOT NULL,
+  `last_name` varchar(100) NOT NULL,
+  `first_name` varchar(100) NOT NULL,
+  `middle_initial` varchar(2) NOT NULL,
+  `year_and_section` varchar(2) NOT NULL,
+  PRIMARY KEY (`student_id`)
+) ENGINE=InnoDB;
+
+INSERT INTO `students` (`student_id`, `last_name`, `first_name`, `middle_initial`, `year_and_section`) VALUES
+('21-6394', 'Ubnlbk', 'Ihgrsfda', 'O',  '3A'),
+('22-0880', 'Menor',  'Ana Mae',  'M',  '2C'),
+('22-1677', 'Gamboa', 'Jerick', 'D',  '2C'),
+('23-9563', 'Htdgrsg',  'Tdrgsfd',  'G',  '1E');
+
 DROP TABLE IF EXISTS `accounts`;
 CREATE TABLE `accounts` (
   `account_id` int(5) NOT NULL AUTO_INCREMENT,
@@ -29,7 +45,7 @@ CREATE TABLE `accounts` (
   `student_id` varchar(7) NOT NULL,
   `type` varchar(5) NOT NULL,
   PRIMARY KEY (`account_id`),
-  FOREIGN KEY (`student_id`) REFERENCES `students` (`student_id`)
+  FOREIGN KEY (`student_id`) REFERENCES `students` (`student_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 INSERT INTO `accounts` (`account_id`, `email`, `password`, `student_id`, `type`) VALUES
@@ -65,8 +81,8 @@ CREATE TABLE `registrations` (
   `paid_fees` int(11) NOT NULL,
   `status` varchar(30) DEFAULT NULL,
   PRIMARY KEY (`registration_id`),
-  FOREIGN KEY (`event_id`) REFERENCES `events` (`event_id`),
-  FOREIGN KEY (`student_id`) REFERENCES `students` (`student_id`)
+  FOREIGN KEY (`event_id`) REFERENCES `events` (`event_id`) ON DELETE CASCADE,
+  FOREIGN KEY (`student_id`) REFERENCES `students` (`student_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 INSERT INTO `registrations` (`registration_id`, `event_id`, `student_id`, `registration_date`, `paid_fees`, `status`) VALUES
@@ -82,26 +98,9 @@ CREATE TABLE `sanctions` (
   `event_id` int(5) NOT NULL,
   `sanctions_paid` int(3) NOT NULL,
   PRIMARY KEY (`sanction_id`),
-  FOREIGN KEY (`event_id`) REFERENCES `events` (`event_id`),
-  FOREIGN KEY (`student_id`) REFERENCES `students` (`student_id`)
+  FOREIGN KEY (`event_id`) REFERENCES `events` (`event_id`) ON DELETE CASCADE,
+  FOREIGN KEY (`student_id`) REFERENCES `students` (`student_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB;
-
-
-DROP TABLE IF EXISTS `students`;
-CREATE TABLE `students` (
-  `student_id` varchar(7) NOT NULL,
-  `last_name` varchar(100) NOT NULL,
-  `first_name` varchar(100) NOT NULL,
-  `middle_initial` varchar(2) NOT NULL,
-  `year_and_section` varchar(2) NOT NULL,
-  PRIMARY KEY (`student_id`)
-) ENGINE=InnoDB;
-
-INSERT INTO `students` (`student_id`, `last_name`, `first_name`, `middle_initial`, `year_and_section`) VALUES
-('21-6394', 'Ubnlbk', 'Ihgrsfda', 'O',  '3A'),
-('22-0880', 'Menor',  'Ana Mae',  'M',  '2C'),
-('22-1677', 'Gamboa', 'Jerick', 'D',  '2C'),
-('23-9563', 'Htdgrsg',  'Tdrgsfd',  'G',  '1E');
 ";
 
 try {
