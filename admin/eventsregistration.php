@@ -130,12 +130,12 @@ $html->startBody();
                             </script>
                             <?php
                         }
-                        $sql .= " ORDER BY `balance` DESC";
+                        $sql .= " ORDER BY `balance` DESC LIMIT ? OFFSET ?";
                         $stmt = $conn->prepare($sql);
                         if (isset($search)) {
-                            $stmt->bind_param("isssss", $eventId, $search, $search, $search, $search, $search);
+                            $stmt->bind_param("issssssi", $eventId, $search, $search, $search, $search, $search, $results_per_page, $offset);
                         } else {
-                            $stmt->bind_param("i", $eventId);
+                            $stmt->bind_param("iii", $eventId, $results_per_page, $offset);
                         }
                         $stmt->execute();
                         $result = $stmt->get_result();
@@ -206,10 +206,10 @@ $html->startBody();
                         OR `students`.`year_and_section` LIKE ? 
                         OR `registrations`.`registration_date` LIKE ?)";
                     $stmt_count = $conn->prepare($sql_total);
-                    $stmt_count->bind_param("ssssss", $_GET['event_id'], $search, $search, $search, $search, $search);
+                    $stmt_count->bind_param("ssssss", $_GET['event-id'], $search, $search, $search, $search, $search);
                 } else {
                     $stmt_count = $conn->prepare($sql_total);
-                    $stmt_count->bind_param("s", $_GET['event_id']);
+                    $stmt_count->bind_param("s", $_GET['event-id']);
                 }
                 $stmt_count->execute();
                 $result_count = $stmt_count->get_result();
@@ -218,7 +218,7 @@ $html->startBody();
                 $total_pages = ceil($total_records / $results_per_page);
                 // Display pagination buttons
                 for ($i = 1; $i <= $total_pages; $i++) {
-                    ?><a href='students.php?page=<?php echo $i; ?>'><button class="px-3 py-2 my-1 mr-1 <?php echo $page == $i ? 'bg-purple-600' : 'bg-custom-purplo'; ?> text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-custom-purple"><?php echo $i; ?></button></a>
+                    ?><a href='eventsregistration.php?event-id=<?php echo $_GET['event-id']?>&page=<?php echo $i; ?>'><button class="px-3 py-2 my-1 mr-1 <?php echo $page == $i ? 'bg-purple-600' : 'bg-custom-purplo'; ?> text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-custom-purple"><?php echo $i; ?></button></a>
                     <?php
                 }
                 if ($total_pages <= 0) {
@@ -336,7 +336,7 @@ $html->startBody();
                     <label class="ml-1 text-sm">Student ID:</label>
                     <input type="text" id="register-student-id" name="register-student-id" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" maxlength="7" required>
                     <label class="ml-1 text-sm">Advance Fee (₱):</label>
-                    <input type="number" id="register-advance-fee" name="register-advance-fee" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required value="0" min="0">
+                    <input type="number" id="register-advance-fee" name="register-advance-fee" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required value="0" min="0" max="<?php echo $totalfee; ?>">
                     <div class="flex items-center justify-center m-4">
                         <button type="submit" class="px-3 py-2 bg-custom-purple rounded-lg focus:outline-none focus:border-purple-500 text-base text-white font-bold hover:bg-custom-purplo" name="register-this-student">Register Student</button>
                     </div>
@@ -400,7 +400,9 @@ $html->startBody();
         $sqlupdate_collect = "UPDATE `registrations` SET `paid_fees` = (`paid_fees` + ?) WHERE `event_id` = ? AND `student_id` = ? "; # Update fees of student
         $stmt_update_collect = $conn->prepare($sqlupdate_collect);
         $stmt_update_collect->bind_param("iis", $collectamount, $_GET['event-id'], $sid);
-        if ($stmt_update_collect->execute()) {
+        if ($collectamount > $totalfee) {
+            ?><script>swal('Invalid advance fee', '', 'error');</script><?php
+        } elseif ($stmt_update_collect->execute()) {
             ?>
             <!-- SweetAlert popup -->
             <script>
