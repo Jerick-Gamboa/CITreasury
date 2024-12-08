@@ -265,7 +265,7 @@ $html->startBody();
                                     </p>
                                 </div>
                                 <div class="w-full px-3 py-2 bg-<?php echo $randomColor; ?>-700 rounded-b">
-                                    <a href="eventsregistration.php?event-id=<?php echo $row_event['event_id']; ?>" class="text-xs font-bold text-white">View Registrations</a> <!-- Add URL query with event-id -->
+                                    <a href="eventsregistration.php?event-id=<?php echo $row_event['event_id']; ?>" class="text-xs font-bold text-white hover:underline">View Registrations</a> <!-- Add URL query with event-id -->
                                 </div>
                             </div>
                             <?php
