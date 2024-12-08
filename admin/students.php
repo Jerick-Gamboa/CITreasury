@@ -298,7 +298,7 @@ $html->startBody();
         if ($stmt_student->execute()) {
             ?>
             <script>
-                swal('Student added successfully!', '<?php echo $stmt_account->execute() ? "Default account for that student also created." : "But default student account failed to create." ?>', 'success')
+                swal('Student added successfully!', `<?php echo $stmt_account->execute() ? "Default account also created:\n\nEmail: ".$email."\nPassword: ".$password : "But default student account failed to create." ?>`, 'success')
                 .then(() => {
                     window.location.href = 'students.php';
                 });
