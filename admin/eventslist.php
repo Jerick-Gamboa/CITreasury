@@ -54,6 +54,9 @@ $html->startBody();
                   </form>
                 </div>
             </div>
+            <script>
+                const deleteIds = []; // Declare array to store event-id
+            </script>
             <div class="mt-1 mb-5 overflow-x-auto rounded-lg shadow-lg">
                 <div class="overflow-x-auto rounded-lg border border-black">
                     <!-- Table of Events -->
@@ -102,9 +105,6 @@ $html->startBody();
                                     <th scope="col" class="p-2">Actions</th>
                                 </tr>
                             </thead>
-                            <script>
-                                const deleteIds = []; // Declare array to store event-id
-                            </script>
                             <?php
                             // Loop through the results
                             while($row = $result->fetch_assoc()) {
