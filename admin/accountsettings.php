@@ -216,13 +216,14 @@ $html->startBody();
             if ($stmt_update_account->execute()) {
                 ?>
                 <script>
-                    swal("Password changed successfully!" ,'', 'success').then(() => {
-                        window.location.href = "accountsettings.php";
-                    });
+                    swal("Password changed successfully!" ,'', 'success');
                 </script>
                 <?php
             }
         }
+    }
+    if (isset($_POST['delete-account'])) {
+        
     }
     ?>
 <?php
