@@ -154,7 +154,7 @@ $html->startBody();
             <!-- Pagination controls -->
             <div class="pagination my-2">
                 <?php
-                // Get the total number of records
+                # Get the total number of rows for pagination
                 $sql_total = "SELECT COUNT(*) FROM `events`";
                 if (isset($_GET['search'])) {
                     $sql_total .= " WHERE (`event_id` LIKE ? OR `event_name` LIKE ? OR `event_description` LIKE ? OR `event_date` LIKE ?)";
@@ -173,13 +173,13 @@ $html->startBody();
                         <p>Results: <?php echo $total_records; ?> row(s)</p>
                     </div>
                     <?php
-                }
-                // Calculate total pages
-                $total_pages = ceil($total_records / $results_per_page);
-                // Display pagination buttons
-                for ($i = 1; $i <= $total_pages; $i++) {
-                    ?><a href='eventslist.php?page=<?php echo $i; ?>'><button class="px-3 py-2 my-1 mr-1 <?php echo $page == $i ? 'bg-purple-600' : 'bg-custom-purplo'; ?> text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-custom-purple"><?php echo $i; ?></button></a>
-                    <?php
+                    # Calculate total pages
+                    $total_pages = ceil($total_records / $results_per_page);
+                    # Display pagination buttons
+                    for ($i = 1; $i <= $total_pages; $i++) {
+                        ?><a href='eventslist.php?page=<?php echo $i; ?>'><button class="px-3 py-2 my-1 mr-1 <?php echo $page == $i ? 'bg-purple-600' : 'bg-custom-purplo'; ?> text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-custom-purple"><?php echo $i; ?></button></a>
+                        <?php
+                    }
                 }
                 ?>
             </div>
