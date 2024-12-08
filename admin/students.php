@@ -140,16 +140,6 @@ $html->startBody();
                     </table>
                 </div>
             </div>
-            <?php
-            if ($result->num_rows > 0) {
-                ?>
-                 <div id="has-result" class="w-full">
-                    <p>Showing <?php echo $results_per_page; ?> entries per page</p>
-                    <p>Results: <?php echo $result->num_rows; ?> row(s)</p>
-                </div>
-                <?php
-            }
-            ?>
             <!-- Pagination controls -->
             <div class="pagination my-2">
                 <?php
@@ -166,6 +156,14 @@ $html->startBody();
                 $stmt_total->execute();
                 $row = $stmt_total->get_result()->fetch_assoc();
                 $total_records = $row['COUNT(*)'];
+                if ($result->num_rows > 0) {
+                    ?>
+                     <div id="has-result" class="w-full mb-2">
+                        <p>Showing <?php echo $results_per_page; ?> entries per page</p>
+                        <p>Results: <?php echo $total_records; ?> row(s)</p>
+                    </div>
+                    <?php
+                }
                 // Calculate total pages
                 $total_pages = ceil($total_records / $results_per_page);
                 // Display pagination buttons

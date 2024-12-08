@@ -185,16 +185,6 @@ $html->startBody();
                     </table>
                 </div>
             </div>
-            <?php
-            if ($result->num_rows > 0) {
-                ?>
-                 <div id="has-result" class="w-full">
-                    <p>Showing <?php echo $results_per_page; ?> entries per page</p>
-                    <p>Results: <?php echo $result->num_rows; ?> row(s)</p>
-                </div>
-                <?php
-            }
-            ?>
             <!-- Pagination controls -->
             <div class="pagination my-2">
                 <?php
@@ -219,9 +209,17 @@ $html->startBody();
                 $stmt_count->execute();
                 $result_count = $stmt_count->get_result();
                 $total_records = $result_count->fetch_assoc()['COUNT(*)'];
-                // Calculate total pages
+                if ($result->num_rows > 0) {
+                    ?>
+                     <div id="has-result" class="w-full mb-2">
+                        <p>Showing <?php echo $results_per_page; ?> entries per page</p>
+                        <p>Results: <?php echo $total_records; ?> row(s)</p>
+                    </div>
+                    <?php
+                }
+                # Calculate total pages
                 $total_pages = ceil($total_records / $results_per_page);
-                // Display pagination buttons
+                # Display pagination buttons
                 for ($i = 1; $i <= $total_pages; $i++) {
                     ?><a href='eventsregistration.php?event-id=<?php echo $_GET['event-id']?>&<?php echo (isset($search)) ? "search=".htmlspecialchars($_GET['search'])."&" : ""; ?>page=<?php echo $i; ?>'><button class="px-3 py-2 my-1 mr-1 <?php echo $page == $i ? 'bg-purple-600' : 'bg-custom-purplo'; ?> text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-custom-purple"><?php echo $i; ?></button></a>
                     <?php
