@@ -160,7 +160,7 @@ $html->startBody();
                 <?php
                 // Get the total number of records
                 $sql_total = "SELECT COUNT(*) FROM `events`";
-                if (isset($search)) {
+                if (isset($_GET['search'])) {
                     $sql_total .= " WHERE (`event_id` LIKE ? OR `event_name` LIKE ? OR `event_description` LIKE ? OR `event_date` LIKE ?)";
                     $stmt_total = $conn->prepare($sql_total);
                     $stmt_total->bind_param("ssss", $search, $search, $search, $search);

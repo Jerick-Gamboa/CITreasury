@@ -198,8 +198,7 @@ $html->startBody();
                     JOIN `events` ON `events`.`event_id` = `registrations`.`event_id` 
                     WHERE `registrations`.`event_id` = ? 
                     AND FIND_IN_SET(SUBSTRING(`students`.`year_and_section`, 1, 1), `events`.`event_target`) > 0";
-                if (isset($search)) {
-                    $search = '%' . $_GET['search'] . '%';
+                if (isset($_GET['search'])) {
                     $sql_total .= " AND (`students`.`student_id` LIKE ? 
                         OR `students`.`last_name` LIKE ? 
                         OR `students`.`first_name` LIKE ? 
@@ -218,7 +217,7 @@ $html->startBody();
                 $total_pages = ceil($total_records / $results_per_page);
                 // Display pagination buttons
                 for ($i = 1; $i <= $total_pages; $i++) {
-                    ?><a href='eventsregistration.php?event-id=<?php echo $_GET['event-id']?>&page=<?php echo $i; ?>'><button class="px-3 py-2 my-1 mr-1 <?php echo $page == $i ? 'bg-purple-600' : 'bg-custom-purplo'; ?> text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-custom-purple"><?php echo $i; ?></button></a>
+                    ?><a href='eventsregistration.php?event-id=<?php echo $_GET['event-id']?>&<?php echo (isset($search)) ? "search=".htmlspecialchars($_GET['search'])."&" : ""; ?>page=<?php echo $i; ?>'><button class="px-3 py-2 my-1 mr-1 <?php echo $page == $i ? 'bg-purple-600' : 'bg-custom-purplo'; ?> text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-custom-purple"><?php echo $i; ?></button></a>
                     <?php
                 }
                 if ($total_pages <= 0) {
