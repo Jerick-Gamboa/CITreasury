@@ -93,6 +93,9 @@ $html->startBody();
                     <!-- Table of Registered Students -->
                     <table class="w-full px-1 text-center">
                         <?php
+                        $results_per_page = 10;
+                        $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
+                        $offset = ($page - 1) * $results_per_page;
                         $eventId = $_GET['event-id'];
                         # Query for displaying registered students in a particular event
                         # If the event was happened and the student has still balance, the total fees to paid would be the event fee + sanction fee
@@ -181,6 +184,49 @@ $html->startBody();
                         ?>
                     </table>
                 </div>
+            </div>
+            <!-- Pagination controls -->
+            <div id="has-result" class="w-full">
+                <p>Showing <?php echo $results_per_page; ?> entries per page</p>
+                <p>Results: <?php echo $result->num_rows; ?> row(s)</p>
+            </div>
+            <div class="pagination my-2">
+                <?php
+                // Get the total number of records
+                $sql_total = "SELECT COUNT(*) FROM `students` 
+                    JOIN `registrations` ON `students`.`student_id` = `registrations`.`student_id` 
+                    JOIN `events` ON `events`.`event_id` = `registrations`.`event_id` 
+                    WHERE `registrations`.`event_id` = ? 
+                    AND FIND_IN_SET(SUBSTRING(`students`.`year_and_section`, 1, 1), `events`.`event_target`) > 0";
+                if (isset($search)) {
+                    $search = '%' . $_GET['search'] . '%';
+                    $sql_total .= " AND (`students`.`student_id` LIKE ? 
+                        OR `students`.`last_name` LIKE ? 
+                        OR `students`.`first_name` LIKE ? 
+                        OR `students`.`year_and_section` LIKE ? 
+                        OR `registrations`.`registration_date` LIKE ?)";
+                    $stmt_count = $conn->prepare($sql_total);
+                    $stmt_count->bind_param("ssssss", $_GET['event_id'], $search, $search, $search, $search, $search);
+                } else {
+                    $stmt_count = $conn->prepare($sql_total);
+                    $stmt_count->bind_param("s", $_GET['event_id']);
+                }
+                $stmt_count->execute();
+                $result_count = $stmt_count->get_result();
+                $total_records = $result_count->fetch_assoc()['COUNT(*)'];
+                // Calculate total pages
+                $total_pages = ceil($total_records / $results_per_page);
+                // Display pagination buttons
+                for ($i = 1; $i <= $total_pages; $i++) {
+                    ?><a href='students.php?page=<?php echo $i; ?>'><button class="px-3 py-2 my-1 mr-1 <?php echo $page == $i ? 'bg-purple-600' : 'bg-custom-purplo'; ?> text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-custom-purple"><?php echo $i; ?></button></a>
+                    <?php
+                }
+                if ($total_pages <= 0) {
+                    ?>
+                    <script>$("#has-result").html(null)</script>
+                    <?php
+                }
+                ?>
             </div>
             <?php
             } else {
@@ -290,7 +336,7 @@ $html->startBody();
                     <label class="ml-1 text-sm">Student ID:</label>
                     <input type="text" id="register-student-id" name="register-student-id" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" maxlength="7" required>
                     <label class="ml-1 text-sm">Advance Fee (₱):</label>
-                    <input type="number" id="register-advance-fee" name="register-advance-fee" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required value="0" min="0" max="<?php echo $totalfee; ?>">
+                    <input type="number" id="register-advance-fee" name="register-advance-fee" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required value="0" min="0">
                     <div class="flex items-center justify-center m-4">
                         <button type="submit" class="px-3 py-2 bg-custom-purple rounded-lg focus:outline-none focus:border-purple-500 text-base text-white font-bold hover:bg-custom-purplo" name="register-this-student">Register Student</button>
                     </div>
