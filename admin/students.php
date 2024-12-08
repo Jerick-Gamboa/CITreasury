@@ -213,7 +213,6 @@ $html->startBody();
             </div>
         </div>
     </div>
-    <div id="edit-popup-bg" class="fixed top-0 w-full min-h-screen bg-black opacity-50 hidden"></div>
     <div id="edit-popup-item" class="fixed top-0 w-full min-h-screen hidden">
         <div class="w-full min-h-screen flex items-center justify-center">
             <div class="m-5 w-full py-3 px-5 sm:w-1/2 lg:w-1/3 xl:1/4 rounded bg-white h-fit shadow-lg shadow-black">
@@ -242,8 +241,8 @@ $html->startBody();
         </div>
     </div>
     <script type="text/javascript">
-        $("#popup-bg, #popup-item, #edit-popup-bg, #edit-popup-item").removeClass("hidden");
-        $("#popup-bg, #popup-item, #edit-popup-bg, #edit-popup-item").hide();
+        $("#popup-bg, #popup-item, #edit-popup-item").removeClass("hidden");
+        $("#popup-bg, #popup-item, #edit-popup-item").hide();
         $("#add-student").click((event) => {
             $("#popup-bg").fadeIn(150);
             $("#popup-item").delay(150).fadeIn(150);
@@ -253,10 +252,10 @@ $html->startBody();
         });
 
         const editRow = (link) => {
-            $("#edit-popup-bg").fadeIn(150);
+            $("#popup-bg").fadeIn(150);
             $("#edit-popup-item").delay(150).fadeIn(150);
             $("#edit-close-popup").click(function() {
-                $("#edit-popup-bg, #edit-popup-item").fadeOut(150);
+                $("#popup-bg, #edit-popup-item").fadeOut(150);
             });
             
             const row = $(link).closest("tr");

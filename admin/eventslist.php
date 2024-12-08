@@ -231,8 +231,6 @@ $html->startBody();
             </div>
         </div>
     </div>
-    <!-- Darken Background for Modal, hidden by default -->
-    <div id="edit-popup-bg" class="fixed top-0 w-full min-h-screen bg-black opacity-50 hidden"></div>
     <!-- Popup Modal for Editing Events, hidden by default -->
     <div id="edit-popup-item" class="fixed top-0 w-full min-h-screen hidden">
         <div class="w-full min-h-screen flex items-center justify-center">
@@ -282,8 +280,8 @@ $html->startBody();
         </div>
     </div>
     <script type="text/javascript">
-        $("#popup-bg, #popup-item, #edit-popup-bg, #edit-popup-item").removeClass("hidden");
-        $("#popup-bg, #popup-item, #edit-popup-bg, #edit-popup-item, #tooltip-content-date").hide();
+        $("#popup-bg, #popup-item, #edit-popup-item").removeClass("hidden");
+        $("#popup-bg, #popup-item, #edit-popup-item, #tooltip-content-date").hide();
         // If (+) button is pressed, fade in modals
         $("#add-event").click((event) => {
             $("#popup-bg").fadeIn(150);
@@ -295,10 +293,10 @@ $html->startBody();
 
         // If edit button is pressed, fade in modals
         const editRow = (link) => {
-            $("#edit-popup-bg").fadeIn(150);
+            $("#popup-bg").fadeIn(150);
             $("#edit-popup-item").delay(150).fadeIn(150);
             $("#edit-close-popup").click((event) => { // If closed, fade out modals
-                $("#edit-popup-bg").fadeOut(150);
+                $("#popup-bg").fadeOut(150);
                 $("#edit-popup-item").fadeOut(150);
             });
             let row = link.parentNode.parentNode; // Get table data

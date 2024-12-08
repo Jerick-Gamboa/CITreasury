@@ -100,7 +100,6 @@ $html->startBody();
             </div>
         </div>
     </div>
-    <div id="chp-popup-bg" class="fixed top-0 w-full min-h-screen bg-black opacity-50 hidden"></div>
     <div id="chp-popup-item" class="fixed top-0 w-full min-h-screen hidden">
         <div class="w-full min-h-screen flex items-center justify-center">
             <div class="m-5 w-full py-3 px-5 sm:w-1/2 lg:w-1/3 xl:1/4 rounded bg-white h-fit shadow-lg shadow-black">
@@ -125,24 +124,21 @@ $html->startBody();
         </div>
     </div>
     <script type="text/javascript">
-        $("#popup-bg, #popup-item, #chp-popup-bg, #chp-popup-item").removeClass("hidden");
-        $("#popup-bg, #popup-item, #chp-popup-bg, #chp-popup-item").hide();
+        $("#popup-bg, #popup-item, #chp-popup-item").removeClass("hidden");
+        $("#popup-bg, #popup-item, #chp-popup-item").hide();
 
-        $("#change-information-btn").click((event) => {
-            $("#popup-bg").fadeIn(150);
-            $("#popup-item").delay(150).fadeIn(150);
-            $("#close-popup").click((event) => {
-                $("#popup-bg, #popup-item").fadeOut(150);
+        const closePopup = (button_id, bg, popup_item, close_popup) => {
+            $(button_id).click((event) => {
+                $(bg).fadeIn(150);
+                $(popup_item).delay(150).fadeIn(150);
+                $(close_popup).click((event) => {
+                    $(bg + ", " + popup_item).fadeOut(150);
+                });
             });
-        });
+        };
 
-        $("#change-password-btn").click((event) => {
-            $("#chp-popup-bg").fadeIn(150);
-            $("#chp-popup-item").delay(150).fadeIn(150);
-            $("#chp-close-popup").click((event) => {
-                $("#chp-popup-bg, #chp-popup-item").fadeOut(150);
-            });
-        });
+        closePopup("#change-information-btn", "#popup-bg", "#popup-item", "#close-popup");
+        closePopup("#change-password-btn", "#popup-bg", "#chp-popup-item", "#chp-close-popup");
 
         // While editing in new and confirm password
         $("#new-password, #confirm-password").on('input', () => {
@@ -151,6 +147,12 @@ $html->startBody();
                 $("#update-password").prop('disabled', true);
             } else {
                 $("#update-password").prop('disabled', false);
+            }
+        });
+
+        $("#delete-account-btn").click(() => {
+            if (prompt("THIS ACTION CAN'T BE UNDONE\n\nPlease input your password to confirm:")) {
+                alert('tite');
             }
         });
     </script>
