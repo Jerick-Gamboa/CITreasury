@@ -156,7 +156,6 @@ $html->startBody();
             }
         });
     </script>
-    </script>
     <?php
     if (isset($_POST['update-information'])) {
         $sid = $_SESSION['cit-student-id'];
