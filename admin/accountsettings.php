@@ -123,6 +123,25 @@ $html->startBody();
             </div>
         </div>
     </div>
+    <div id="dlacc-popup-item" class="fixed top-0 w-full min-h-screen hidden">
+        <div class="w-full min-h-screen flex items-center justify-center">
+            <div class="m-5 w-full py-3 px-5 sm:w-1/2 lg:w-1/3 xl:1/4 rounded bg-white h-fit shadow-lg shadow-black">
+                <div class="w-full flex justify-end">
+                    <button class="focus:outline-none" id="dlacc-close-popup">
+                        <svg id="mdi-close-box-outline" class="mt-2 w-6 h-6 hover:fill-red-500" viewBox="0 0 24 24"><path d="M19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M19,19H5V5H19V19M17,8.4L13.4,12L17,15.6L15.6,17L12,13.4L8.4,17L7,15.6L10.6,12L7,8.4L8.4,7L12,10.6L15.6,7L17,8.4Z" /></svg>
+                    </button>
+                </div>
+                <h3 class="text-xl font-semibold text-center text-custom-purple mb-3">This action can't be undone!</h3>
+                <form id="password-form" method="POST">
+                    <label class="ml-1 text-sm">Enter Password to continue:</label>
+                    <input type="password" id="delete-acc-password" name="delete-acc-password" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
+                    <div class="flex items-center justify-center m-4">
+                        <button type="submit" class="px-3 py-2 bg-red-700 rounded-lg focus:outline-none focus:border-purple-500 text-base text-white font-bold disabled:bg-gray-400 hover:bg-red-600" name="delete-account">Delete Account</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
     <script type="text/javascript">
         $("#popup-bg, #popup-item, #chp-popup-item").removeClass("hidden");
         $("#popup-bg, #popup-item, #chp-popup-item").hide();
@@ -139,6 +158,7 @@ $html->startBody();
 
         closePopup("#change-information-btn", "#popup-bg", "#popup-item", "#close-popup");
         closePopup("#change-password-btn", "#popup-bg", "#chp-popup-item", "#chp-close-popup");
+        closePopup("#delete-account-btn", "#popup-bg", "#dlacc-popup-item", "#dlacc-close-popup");
 
         // While editing in new and confirm password
         $("#new-password, #confirm-password").on('input', () => {
@@ -147,12 +167,6 @@ $html->startBody();
                 $("#update-password").prop('disabled', true);
             } else {
                 $("#update-password").prop('disabled', false);
-            }
-        });
-
-        $("#delete-account-btn").click(() => {
-            if (prompt("THIS ACTION CAN'T BE UNDONE\n\nPlease input your password to confirm:")) {
-                alert('tite');
             }
         });
     </script>
@@ -223,7 +237,7 @@ $html->startBody();
         }
     }
     if (isset($_POST['delete-account'])) {
-        
+
     }
     ?>
 <?php

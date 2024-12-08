@@ -158,7 +158,7 @@ $html->startBody();
                     SELECT COUNT(*) FROM `students`
                     CROSS JOIN `events`
                     LEFT JOIN `registrations` ON `students`.`student_id` = `registrations`.`student_id` AND `events`.`event_id` = `registrations`.`event_id`
-                    WHERE `registrations`.`student_id` IS NULL AND `events`.`event_date` < CURDATE()";
+                    WHERE `registrations`.`student_id` IS NULL AND `events`.`event_date` < CURDATE() AND FIND_IN_SET(SUBSTRING(`students`.`year_and_section`, 1, 1), `events`.`event_target`) > 0";
                 if (isset($search)) {
                     $sql_count .= " AND (`students`.`student_id` LIKE ? OR `students`.`last_name` LIKE ? OR `students`.`first_name` LIKE ? OR `students`.`year_and_section` LIKE ? OR `events`.`event_name` LIKE ?)";
                 }

@@ -312,7 +312,7 @@ $html->startBody();
         });
 
         // If collect button is pressed, fade in modals for collection
-        function collect(link) {
+        const collect = (link) => {
             $("#collect-popup-bg").fadeIn(150);
             $("#collect-popup-item").delay(150).fadeIn(150);
             $("#collect-close-popup").click((event) => {
