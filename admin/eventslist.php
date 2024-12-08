@@ -197,7 +197,7 @@ $html->startBody();
                         <svg id="mdi-close-box-outline" class="mt-2 w-6 h-6 hover:fill-red-500" viewBox="0 0 24 24"><path d="M19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M19,19H5V5H19V19M17,8.4L13.4,12L17,15.6L15.6,17L12,13.4L8.4,17L7,15.6L10.6,12L7,8.4L8.4,7L12,10.6L15.6,7L17,8.4Z" /></svg>
                     </button>
                 </div>
-                <h3 class="text-2xl font-semibold text-custom-purple mb-3">Add Event</h3>
+                <h3 class="text-2xl font-semibold text-custom-purple mb-2">Add Event</h3>
                 <form method="POST">
                     <label class="ml-1 text-sm">Event Name:</label>
                     <input type="text" name="event-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
@@ -224,7 +224,7 @@ $html->startBody();
                     <input type="number" id="fee-per-event" name="fee-per-event" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" min="0" required>
                     <label class="ml-1 text-sm">Sanction Fee (₱):</label>
                     <input type="number" id="sanction-fee" name="sanction-fee" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" min="0" required>
-                    <div class="flex items-center justify-center m-4">
+                    <div class="flex items-center justify-center m-2">
                         <button type="submit" class="px-3 py-2 bg-custom-purple rounded-lg focus:outline-none focus:border-purple-500 text-base text-white font-bold hover:bg-custom-purplo" name="add-new-event">Add Event</button>
                     </div>
                 </form>
@@ -242,7 +242,7 @@ $html->startBody();
                         <svg id="mdi-close-box-outline" class="mt-2 w-6 h-6 hover:fill-red-500" viewBox="0 0 24 24"><path d="M19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M19,19H5V5H19V19M17,8.4L13.4,12L17,15.6L15.6,17L12,13.4L8.4,17L7,15.6L10.6,12L7,8.4L8.4,7L12,10.6L15.6,7L17,8.4Z" /></svg>
                     </button>
                 </div>
-                <h3 class="text-2xl font-semibold text-custom-purple mb-3">Edit Event</h3>
+                <h3 class="text-2xl font-semibold text-custom-purple mb-2">Edit Event</h3>
                 <form method="POST">
                     <!--label class="ml-1 text-sm">Event ID:</label-->
                     <input type="hidden" id="edit-event-id" name="edit-event-id">
@@ -274,7 +274,7 @@ $html->startBody();
                     <input type="number" id="edit-fee-per-event" name="edit-fee-per-event" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" min="0" required>
                     <label class="ml-1 text-sm">Sanction Fee (₱):</label>
                     <input type="number" id="edit-sanction-fee" name="edit-sanction-fee" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" min="0" required>
-                    <div class="flex items-center justify-center m-4">
+                    <div class="flex items-center justify-center m-2">
                         <button type="submit" class="px-3 py-2 bg-custom-purple rounded-lg focus:outline-none focus:border-purple-500 text-base text-white font-bold hover:bg-custom-purplo" name="update-this-event">Update Event</button>
                     </div>
                 </form>
