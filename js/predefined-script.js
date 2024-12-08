@@ -1,4 +1,4 @@
-function sendNotif(notif_title, notif_body, notif_icon, notif_clicked_function) {
+const sendNotif = (notif_title, notif_body, notif_icon, notif_clicked_function) => {
   if ('Notification' in window) {
     Notification.requestPermission().then(function(result) {
       if (result === 'granted') {
@@ -13,7 +13,7 @@ function sendNotif(notif_title, notif_body, notif_icon, notif_clicked_function) 
   }
 }
 
-function deleteData(button_id, form_id, title_text, desc_text) {
+const deleteData = (button_id, form_id, title_text, desc_text) => {
   $(button_id).click((event) => {
       event.preventDefault(); // Prevent from submitting the form
       swal({

@@ -1,4 +1,4 @@
-function clickToShowHide(button_id, target_show_hide) {
+const clickToShowHide = (button_id, target_show_hide) => {
     const target = $(target_show_hide);
     target.hide();
     let isOpened = false;
@@ -17,7 +17,7 @@ clickToShowHide("#mdi-menu", "#menu-user-items-mobile");
 // clickToShowHide("#menu-items #account-set", "#menu-items #account-set-items");
 // clickToShowHide("#menu-items-mobile #account-set", "#menu-items-mobile #account-set-items");
 
-function logoutAction(button_id) {
+const logoutAction = (button_id) => {
     $(button_id).click((e) => {
         swal({
             title: "Logout?",

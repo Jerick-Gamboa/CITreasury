@@ -294,7 +294,7 @@ $html->startBody();
         });
 
         // If edit button is pressed, fade in modals
-        function editRow(link) {
+        const editRow = (link) => {
             $("#edit-popup-bg").fadeIn(150);
             $("#edit-popup-item").delay(150).fadeIn(150);
             $("#edit-close-popup").click((event) => { // If closed, fade out modals

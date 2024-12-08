@@ -218,7 +218,7 @@ $html->startBody();
     </div>
     <script type="text/javascript">
     // If collect button is pressed, fade in modals for collection
-        function collect(link, eventId) {
+        const collect = (link, eventId) => {
             $("#collect-popup-bg").fadeIn(150);
             $("#collect-popup-item").delay(150).fadeIn(150);
             $("#collect-close-popup").click((event) => {

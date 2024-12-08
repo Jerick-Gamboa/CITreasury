@@ -185,7 +185,7 @@ $html->startBody();
         $("#edit-popup-bg, #edit-popup-item").removeClass("hidden");
         $("#edit-popup-bg, #edit-popup-item").hide();
 
-        function editRow(link) {
+        const editRow = (link) => {
             let row = link.parentNode.parentNode
             $("#edit-popup-bg").fadeIn(150);
             $("#edit-popup-item").delay(150).fadeIn(150);
