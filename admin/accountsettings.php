@@ -201,6 +201,13 @@ $html->startBody();
                 swal("Wrong old password!" ,'', 'error');
             </script>
             <?php
+        } elseif ($_POST['new-password'] != $_POST['confirm-password']) {
+            # If new password is not equal to confirm password
+            ?>
+            <script>
+                swal("Password do not match" ,'', 'error');
+            </script>
+            <?php
         } else { # Else update student password
             $sqlupdate_account = "UPDATE `accounts` SET `password`=? WHERE `student_id` = ?";
             $stmt_update_account = $conn->prepare($sqlupdate_account);
