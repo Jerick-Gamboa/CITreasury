@@ -72,10 +72,13 @@ CREATE TABLE IF NOT EXISTS `sanctions` (
   FOREIGN KEY (`event_id`) REFERENCES `events` (`event_id`) ON DELETE CASCADE,
   FOREIGN KEY (`student_id`) REFERENCES `students` (`student_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB;
+
+DROP FUNCTION IF EXISTS `getYearlyStudentCount`;
+DROP PROCEDURE IF EXISTS `getTotalAmountPaid`;
 ";
 
 $stored_function_sql = "
-CREATE FUNCTION IF NOT EXISTS `getYearlyStudentCount`(year_level CHAR(1)) RETURNS int(11)
+CREATE FUNCTION `getYearlyStudentCount`(year_level CHAR(1)) RETURNS int(11)
     DETERMINISTIC
 BEGIN
     DECLARE student_count INT;
@@ -88,7 +91,7 @@ END;
 ";
 
 $stored_procedure_sql = "
-CREATE PROCEDURE IF NOT EXISTS `getTotalAmountPaid`(OUT total_amount_paid DECIMAL(10,2))
+CREATE PROCEDURE `getTotalAmountPaid`(OUT total_amount_paid DECIMAL(10,2))
 BEGIN
   SELECT IFNULL(SUM(total_paid), 0)
   INTO total_amount_paid
