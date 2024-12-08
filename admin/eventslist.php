@@ -151,11 +151,17 @@ $html->startBody();
                     </table>
                 </div>
             </div>
+            <?php
+            if ($result->num_rows > 0) {
+                ?>
+                 <div id="has-result" class="w-full">
+                    <p>Showing <?php echo $results_per_page; ?> entries per page</p>
+                    <p>Results: <?php echo $result->num_rows; ?> row(s)</p>
+                </div>
+                <?php
+            }
+            ?>
             <!-- Pagination controls -->
-            <div id="has-result" class="w-full">
-                <p>Showing <?php echo $results_per_page; ?> entries per page</p>
-                <p>Results: <?php echo $result->num_rows; ?> row(s)</p>
-            </div>
             <div class="pagination my-2">
                 <?php
                 // Get the total number of records
@@ -175,11 +181,6 @@ $html->startBody();
                 // Display pagination buttons
                 for ($i = 1; $i <= $total_pages; $i++) {
                     ?><a href='eventslist.php?page=<?php echo $i; ?>'><button class="px-3 py-2 my-1 mr-1 <?php echo $page == $i ? 'bg-purple-600' : 'bg-custom-purplo'; ?> text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-custom-purple"><?php echo $i; ?></button></a>
-                    <?php
-                }
-                if ($total_pages <= 0) {
-                    ?>
-                    <script>$("#has-result").html(null)</script>
                     <?php
                 }
                 ?>

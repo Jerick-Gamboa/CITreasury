@@ -53,6 +53,9 @@ $html->startBody();
                   </form>
                 </div>
             </div>
+            <script>
+                const namesArray = [];
+            </script>
             <div class="mt-1 mb-5 overflow-x-auto rounded-lg shadow-lg">
                 <div class="overflow-x-auto rounded-lg border border-black">
                     <table class="w-full px-1 text-center">
@@ -96,9 +99,6 @@ $html->startBody();
                                     <th scope="col" class="p-2">Actions</th>
                                 </tr>
                             </thead>
-                            <script>
-                                const namesArray = [];
-                            </script>
                             <?php
                             // Loop through the results
                             while($row = $result->fetch_assoc()) {
@@ -140,11 +140,17 @@ $html->startBody();
                     </table>
                 </div>
             </div>
+            <?php
+            if ($result->num_rows > 0) {
+                ?>
+                 <div id="has-result" class="w-full">
+                    <p>Showing <?php echo $results_per_page; ?> entries per page</p>
+                    <p>Results: <?php echo $result->num_rows; ?> row(s)</p>
+                </div>
+                <?php
+            }
+            ?>
             <!-- Pagination controls -->
-            <div id="has-result" class="w-full">
-                <p>Showing <?php echo $results_per_page; ?> entries per page</p>
-                <p>Results: <?php echo $result->num_rows; ?> row(s)</p>
-            </div>
             <div class="pagination my-2">
                 <?php
                 // Get the total number of records
@@ -165,11 +171,6 @@ $html->startBody();
                 // Display pagination buttons
                 for ($i = 1; $i <= $total_pages; $i++) {
                     ?><a href='students.php?<?php echo (isset($search)) ? "search=".htmlspecialchars($_GET['search'])."&" : ""; ?>page=<?php echo $i; ?>'><button class="px-3 py-2 my-1 mr-1 <?php echo $page == $i ? 'bg-purple-600' : 'bg-custom-purplo'; ?> text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-custom-purple"><?php echo $i; ?></button></a>
-                    <?php
-                }
-                if ($total_pages <= 0) {
-                    ?>
-                    <script>$("#has-result").html(null)</script>
                     <?php
                 }
                 ?>
