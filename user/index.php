@@ -59,12 +59,12 @@ $html->startBody();
                     }
                 }
                 ?>
-                <div class="w-full p-4 bg-custom-purplo rounded-lg shadow-lg mb-4">
+                <div class="w-full p-4 bg-custom-purple rounded-lg shadow-lg mb-4">
                     <h2 class="text-2xl text-white font-semibold">Total Paid Fees: ₱ <?php echo $totalpaid; ?></h2>
                 </div>
                 <div class="flex lg:flex-row flex-col">
-                    <div class="w-full p-4 bg-[#788dcf] rounded-lg shadow-lg mr-5 mb-5">
-                        <h3 class="text-gray-800 font-bold text-lg mb-4">Upcoming events</h3>
+                    <div class="w-full p-4 bg-custom-purplo rounded-lg shadow-lg mr-5 mb-5">
+                        <h3 class="text-white font-bold text-lg mb-4">Upcoming events</h3>
                         <?php
                         $sql_upcoming_events = "SELECT `events`.* FROM `students` INNER JOIN `events` ON FIND_IN_SET(SUBSTRING(`students`.`year_and_section`, 1, 1), `events`.`event_target`) > 0 WHERE `students`.`student_id` = ? AND `events`.`event_date` > CURDATE()";
                         $stmt_upcoming_events = $conn->prepare($sql_upcoming_events);
@@ -74,12 +74,14 @@ $html->startBody();
                         if ($result_upcoming_events->num_rows > 0) {
                             while ($row_event = $result_upcoming_events->fetch_assoc()) {
                                 ?>
-                                <div class="border-l-4 border-white m-2 p-3 bg-[#5314b4] shadow-lg text-white">
+                                <div class="border-l-4 border-white m-2 p-3 bg-[#350839] shadow-lg shadow-black mb-4 text-white">
                                     <h3 class="text-2xl font-bold mb-2"><?php echo $row_event['event_name']; ?></h3>
-                                    <div class="text-sm font-semibold">
+                                    <div class="text-sm">
                                         <p class="mb-2"><?php echo $row_event['event_description']; ?></p>
-                                        <p>Date: <?php echo $row_event['event_date']; ?></p>
-                                        <p>Event Fee: ₱ <?php echo $row_event['event_fee']; ?></p>
+                                        <div class="font-semibold">
+                                            <p>Date: <?php echo $row_event['event_date']; ?></p>
+                                            <p>Event Fee: ₱ <?php echo $row_event['event_fee']; ?></p>
+                                        </div>
                                     </div>
                                 </div>
                                 <?php
@@ -89,8 +91,8 @@ $html->startBody();
                         }
                         ?>
                     </div>
-                    <div class="w-full p-4 bg-[#6ac63e] rounded-lg shadow-lg mb-4">
-                        <h3 class="text-gray-800 font-bold text-lg mb-4">Registered events</h3>
+                    <div class="w-full p-4 bg-custom-purplo rounded-lg shadow-lg mb-4">
+                        <h3 class="text-white font-bold text-lg mb-4">Registered events</h3>
                         <?php
                         $sql_registered_events = "SELECT `events`.`event_name`, `events`.`event_description`, `events`.`event_fee`, `registrations`.`registration_date`, `registrations`.`paid_fees` FROM `events` JOIN `registrations` ON `events`.`event_id` = `registrations`.`event_id` WHERE `registrations`.`student_id` = ?";
                         $stmt_registered_events = $conn->prepare($sql_registered_events);
@@ -100,13 +102,15 @@ $html->startBody();
                         if ($result_registered_events->num_rows > 0) {
                             while ($row_event = $result_registered_events->fetch_assoc()) {
                                 ?>
-                                <div class="border-l-4 border-white m-2 p-3 bg-[#0f6217] shadow-lg text-white">
+                                <div class="border-l-4 border-white m-2 p-3 bg-[#350839] shadow-lg shadow-black mb-4 text-white">
                                     <h3 class="text-2xl font-bold mb-2"><?php echo $row_event['event_name']; ?></h3>
-                                    <div class="text-sm font-semibold">
+                                    <div class="text-sm">
                                         <p class="mb-2"><?php echo $row_event['event_description']; ?></p>
-                                        <p>Registered: <?php echo $row_event['registration_date']; ?></p>
-                                        <p>Event Fee: ₱ <?php echo $row_event['event_fee']; ?></p>
-                                        <p>Paid Fees: ₱ <?php echo $row_event['paid_fees']; ?></p>
+                                        <div class="font-semibold">
+                                            <p>Registered: <?php echo $row_event['registration_date']; ?></p>
+                                            <p>Event Fee: ₱ <?php echo $row_event['event_fee']; ?></p>
+                                            <p>Paid Fees: ₱ <?php echo $row_event['paid_fees']; ?></p>
+                                        </div>
                                     </div>
                                 </div>
                                 <?php
