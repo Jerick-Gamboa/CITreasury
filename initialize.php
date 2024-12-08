@@ -72,9 +72,6 @@ CREATE TABLE IF NOT EXISTS `sanctions` (
   FOREIGN KEY (`event_id`) REFERENCES `events` (`event_id`) ON DELETE CASCADE,
   FOREIGN KEY (`student_id`) REFERENCES `students` (`student_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB;
-
-DROP FUNCTION IF EXISTS `getYearlyStudentCount`;
-DROP PROCEDURE IF EXISTS `getTotalAmountPaid`;
 ";
 
 $stored_function_sql = "

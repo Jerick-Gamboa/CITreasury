@@ -135,7 +135,7 @@ END;
 try {
   $conn = new PDO("mysql:host=$host", $username, $password);
   $conn->query("DROP DATABASE IF EXISTS `$db`");
-  $conn->query("CREATE DATABASE IF NOT EXISTS `$db`");
+  $conn->query("CREATE DATABASE `$db`");
   $conn = new PDO("mysql:host=$host;dbname=$db", $username, $password);
   $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
   $conn->exec($import_sql);
