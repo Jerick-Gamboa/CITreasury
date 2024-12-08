@@ -87,7 +87,7 @@ $html->startBody();
                                 <?php
                             }
                         } else {
-                            ?><p class="text-sm">No upcoming events as of now.</p><?php
+                            ?><p class="text-sm text-white">No upcoming events as of now.</p><?php
                         }
                         ?>
                     </div>
@@ -116,7 +116,7 @@ $html->startBody();
                                 <?php
                             }
                         } else {
-                            ?><p class="text-sm">You haven't registered any events.</p><?php
+                            ?><p class="text-sm text-white">You haven't registered any events.</p><?php
                         }
                         ?>
                     </div>

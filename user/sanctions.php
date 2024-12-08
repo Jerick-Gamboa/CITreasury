@@ -89,7 +89,7 @@ $html->startBody();
                             $pendingfees += $row_event['total_fee'];
                         }
                     } else {
-                        ?><p class="text-sm">No events found.</p><?php
+                        ?><p class="text-sm text-white">No events found.</p><?php
                     }
                     ?>
                 </div>
@@ -140,7 +140,7 @@ $html->startBody();
                             $pendingfees += $row_event['balance'];
                         }
                     } else {
-                        ?><p class="text-sm">You have no unsettled balance during registration.</p><?php
+                        ?><p class="text-sm text-white">You have no unsettled balance during registration.</p><?php
                     }
                     ?>
                     <script>
