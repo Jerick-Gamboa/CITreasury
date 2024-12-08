@@ -66,8 +66,9 @@ $html->startBody();
                     <div class="w-full p-4 bg-[#788dcf] rounded-lg shadow-lg mr-5 mb-5">
                         <h3 class="text-gray-800 font-bold text-lg mb-4">Upcoming events</h3>
                         <?php
-                        $sql_upcoming_events = "SELECT * FROM `events` WHERE `event_date` > CURDATE()";
+                        $sql_upcoming_events = "SELECT `events`.* FROM `students` INNER JOIN `events` ON FIND_IN_SET(SUBSTRING(`students`.`year_and_section`, 1, 1), `events`.`event_target`) > 0 WHERE `students`.`student_id` = ? AND `events`.`event_date` > CURDATE()";
                         $stmt_upcoming_events = $conn->prepare($sql_upcoming_events);
+                        $stmt_upcoming_events->bind_param("s", $_SESSION['cit-student-id']);
                         $stmt_upcoming_events->execute();
                         $result_upcoming_events = $stmt_upcoming_events->get_result();
                         if ($result_upcoming_events->num_rows > 0) {
