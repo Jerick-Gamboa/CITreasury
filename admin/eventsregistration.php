@@ -45,7 +45,7 @@ $html->startBody();
             ?>
             <div class="mt-24 flex flex-col lg:flex-row justify-between">
                 <?php
-                $sql_title = "SELECT `event_name`, `event_date` FROM `events` WHERE `event_id` = ?";
+                $sql_title = "SELECT * FROM `events` WHERE `event_id` = ?";
                 $stmt_title = $conn->prepare($sql_title);
                 $stmt_title->bind_param("s", $_GET['event-id']);
                 $stmt_title->execute();
@@ -53,6 +53,7 @@ $html->startBody();
                 $dateofcurrenteventinget = "";
                 if ($row_title = $result_title->fetch_assoc()) {
                     $dateofcurrenteventinget = $row_title['event_date'];
+                    $currenteventfee = $row_title['event_fee'];
                     # Set event name in title using event-id in URL query
                     ?><h1 id="event-title" class="text-3xl text-custom-purplo font-bold mb-3"><?php echo $row_title['event_name']; ?></h1><?php
                 }
@@ -334,7 +335,7 @@ $html->startBody();
                     <label class="ml-1 text-sm">Student ID:</label>
                     <input type="text" id="register-student-id" name="register-student-id" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" maxlength="7" required>
                     <label class="ml-1 text-sm">Advance Fee (₱):</label>
-                    <input type="number" id="register-advance-fee" name="register-advance-fee" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required value="0" min="0" max="<?php echo $totalfee; ?>">
+                    <input type="number" id="register-advance-fee" name="register-advance-fee" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required value="0" min="0" max="<?php echo isset($totalfee) ? $totalfee : $currenteventfee ; ?>">
                     <div class="flex items-center justify-center m-4">
                         <button type="submit" class="px-3 py-2 bg-custom-purple rounded-lg focus:outline-none focus:border-purple-500 text-base text-white font-bold hover:bg-custom-purplo" name="register-this-student">Register Student</button>
                     </div>
