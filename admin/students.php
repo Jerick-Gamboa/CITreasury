@@ -9,7 +9,7 @@ verifyAdminLoggedIn($conn);
 $html = new HTML("CITreasury - Students");
 $html->addLink('stylesheet', '../inter-variable.css');
 $html->addLink('icon', '../img/nobgcitsclogo.png');
-$html->addScript("../js/tailwind3.4.1.js");
+$html->addScript("../js/tailwind3.4.15.js");
 $html->addScript("../js/tailwind.config.js");
 $html->addScript("../js/sweetalert.min.js");
 $html->addScript("../js/jquery-3.7.1.min.js");

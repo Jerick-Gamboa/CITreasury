@@ -33,7 +33,7 @@ if (isset($_SESSION['cit-student-id'])) {
 $html = new HTML("CITreasury - Account Settings");
 $html->addLink('stylesheet', '../inter-variable.css');
 $html->addLink('icon', '../img/nobgcitsclogo.png');
-$html->addScript("../js/tailwind3.4.1.js");
+$html->addScript("../js/tailwind3.4.15.js");
 $html->addScript("../js/tailwind.config.js");
 $html->addScript("../js/sweetalert.min.js");
 $html->addScript("../js/jquery-3.7.1.min.js");
@@ -68,7 +68,7 @@ $html->startBody();
                 </svg>
                 <div class="ml-2 mt-3">
                     <h2 class="text-xl text-custom-purple font-bold mb-1"><?php echo $fullname; ?></h2>
-                    <p class="mb-2 text-sm text-custom-purple font-bold"><?php echo ucfirst($type); ?></p>
+                    <p class="mb-3 text-sm text-custom-purple font-bold"><?php echo ucfirst($type); ?></p>
                     <p><button class="text-sm text-custom-purple font-semibold hover:underline hover:text-custom-purplo" id="change-information-btn">Change information</button></p>
                     <p><button class="text-sm text-custom-purple font-semibold hover:underline hover:text-custom-purplo" id="change-password-btn">Change password</button></p>
                     <p><button class="text-sm text-red-800 font-semibold hover:underline" id="delete-account-btn">Delete account</button></p>
