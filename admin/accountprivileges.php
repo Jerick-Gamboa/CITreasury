@@ -70,18 +70,20 @@ $html->startBody();
                         }
                         // Add limit and offset for pagination
                         $sql .= " LIMIT ? OFFSET ?";
-                        // Prepare the statement
                         $stmt = $conn->prepare($sql);
                         if (isset($search)) {
-                            $stmt->bind_param("sssii", $search, $search, $search, $results_per_page, $offset);
+                            $stmt->bindParam(1, $search, PDO::PARAM_STR);
+                            $stmt->bindParam(2, $search, PDO::PARAM_STR);
+                            $stmt->bindParam(3, $search, PDO::PARAM_STR);
+                            $stmt->bindParam(4, $results_per_page, PDO::PARAM_INT);
+                            $stmt->bindParam(5, $offset, PDO::PARAM_INT);
                         } else {
-                            $stmt->bind_param("ii", $results_per_page, $offset);
+                            $stmt->bindParam(1, $results_per_page, PDO::PARAM_INT);
+                            $stmt->bindParam(2, $offset, PDO::PARAM_INT);
                         }
-                        // Execute the statement
                         $stmt->execute();
-                        $result = $stmt->get_result();
-                        // Check if there are results
-                        if ($result->num_rows > 0) {
+                        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                        if (count($result) > 0) {
                             ?>
                             <thead class="text-white uppercase bg-custom-purplo ">
                                 <tr>
@@ -93,7 +95,7 @@ $html->startBody();
                             </thead>
                             <?php
                             // Loop through the results
-                            while($row = $result->fetch_assoc()) {
+                            foreach ($result as $row) {
                                 $sid = $row['student_id'];
                                 $email = $row['email'];
                                 $type = $row['type'];
@@ -126,14 +128,14 @@ $html->startBody();
                 if (isset($search)) {
                     $sql_total .= " WHERE (`student_id` LIKE ? OR `email` LIKE ? OR `type` LIKE ?)";
                     $stmt_total = $conn->prepare($sql_total);
-                    $stmt_total->bind_param("sss", $search, $search, $search);
+                    $stmt_total->execute([$search, $search, $search]);
                 } else {
                     $stmt_total = $conn->prepare($sql_total);
+                    $stmt_total->execute();
                 }
-                $stmt_total->execute();
-                $total_records = $stmt_total->get_result()->fetch_assoc()['COUNT(*)'];
-                $stmt_total->close();
-                if ($result->num_rows > 0) {
+                $total_records = $stmt_total->fetchColumn();
+                $stmt_total = null;
+                if (count($result) > 0) {
                     ?>
                      <div id="has-result" class="w-full mb-2">
                         <p>Showing <?php echo $results_per_page; ?> entries per page</p>
@@ -206,8 +208,7 @@ $html->startBody();
         $sid = $_POST['edit-student-id'];
         $sqlupdate_account = "UPDATE `accounts` SET `type`=? WHERE `student_id` = ?";
         $stmt_update_account = $conn->prepare($sqlupdate_account);
-        $stmt_update_account->bind_param("ss", $acctype, $sid);
-        if ($stmt_update_account->execute()) {
+        if ($stmt_update_account->execute([$acctype, $sid])) {
             ?>
             <script>
                 swal('Account updated successfully!', '', 'success')
@@ -222,5 +223,6 @@ $html->startBody();
     }
     ?>
 <?php
+$conn = null;
 $html->endBody();
 ?>

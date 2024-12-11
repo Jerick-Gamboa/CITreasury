@@ -37,11 +37,10 @@ $html->startBody();
     if (isset($_SESSION['cit-student-id'])) {
         $sql = "SELECT `type` FROM `accounts` WHERE `student_id` = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("s", $_SESSION['cit-student-id']);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if ($result->num_rows > 0) {
-            $row = $result->fetch_assoc();
+        $stmt->execute([ $_SESSION['cit-student-id'] ]);
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        if (count($result) > 0) {
+            $row = $result[0];
             $type = $row['type'];
             if ($type === 'admin') { # if account type is admin, redirect to admin
                 header("location: admin/");
@@ -62,41 +61,39 @@ $html->startBody();
         $password = $_POST['password'];
         $sql = "SELECT * FROM `accounts` WHERE `email` = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("s", $email);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if ($result->num_rows > 0) {
-            if ($row = $result->fetch_assoc()) {
-                if (password_verify($password, $row['password'])) { # If hashed password matches
-                    $_SESSION['cit-student-id'] = $row['student_id'];
-                    if ($row['type'] === 'admin') {
-                        ?>
-                        <script>
-                            swal('Login Successful!', 'Welcome admin!', 'success')
-                            .then(() => {
-                                window.location.href = 'admin/index.php';
-                            });
-                        </script>
-                        <?php
-                    } elseif ($row['type'] === 'user') {
-                        ?>
-                        <script>
-                            swal('Login Successful!', 'Welcome user!', 'success')
-                            .then(() => {
-                                window.location.href = 'user/index.php';
-                            });
-                        </script>
-                        <?php
-                    } else {
-                        ?>
-                        <script> swal('Invalid account', '', 'error');</script>
-                        <?php
-                    }
+        $stmt->execute([$email]);
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        if (count($result) > 0) {
+            $row = $result[0];
+            if (password_verify($password, $row['password'])) { # If hashed password matches
+                $_SESSION['cit-student-id'] = $row['student_id'];
+                if ($row['type'] === 'admin') {
+                    ?>
+                    <script>
+                        swal('Login Successful!', 'Welcome admin!', 'success')
+                        .then(() => {
+                            window.location.href = 'admin/index.php';
+                        });
+                    </script>
+                    <?php
+                } elseif ($row['type'] === 'user') {
+                    ?>
+                    <script>
+                        swal('Login Successful!', 'Welcome user!', 'success')
+                        .then(() => {
+                            window.location.href = 'user/index.php';
+                        });
+                    </script>
+                    <?php
                 } else {
                     ?>
-                    <script> swal('Incorrect password', '', 'error');</script>
+                    <script> swal('Invalid account', '', 'error');</script>
                     <?php
                 }
+            } else {
+                ?>
+                <script> swal('Incorrect password', '', 'error');</script>
+                <?php
             }
         } else { # If query did not return a result
             ?>
@@ -109,5 +106,6 @@ $html->startBody();
         sendNotif("Welcome to CITreasury!", "What's up?", "nobgcitsclogo.png", null);
     </script -->
 <?php
+$conn = null;
 $html->endBody();
 ?>

@@ -68,7 +68,6 @@ $html->startBody();
                         $offset = ($page - 1) * $results_per_page;
                         // SQL query for displaying all events
                         $sql = "SELECT * FROM `events`";
-                        // Check if search is set
                         if (isset($_GET['search'])) {
                             $search = '%' . $_GET['search'] . '%';
                             $sql .= " WHERE (`event_id` LIKE ? OR `event_name` LIKE ? OR `event_description` LIKE ? OR `event_date` LIKE ?)";
@@ -80,18 +79,21 @@ $html->startBody();
                         }
                         // Add limit and offset for pagination
                         $sql .= " LIMIT ? OFFSET ?";
-                        // Prepare the statement
                         $stmt = $conn->prepare($sql);
                         if (isset($search)) {
-                            $stmt->bind_param("ssssii", $search, $search, $search, $search, $results_per_page, $offset);
+                            $stmt->bindParam(1, $search, PDO::PARAM_STR);
+                            $stmt->bindParam(2, $search, PDO::PARAM_STR);
+                            $stmt->bindParam(3, $search, PDO::PARAM_STR);
+                            $stmt->bindParam(4, $search, PDO::PARAM_STR);
+                            $stmt->bindParam(5, $results_per_page, PDO::PARAM_INT);
+                            $stmt->bindParam(6, $offset, PDO::PARAM_INT);
                         } else {
-                            $stmt->bind_param("ii", $results_per_page, $offset);
+                            $stmt->bindParam(1, $results_per_page, PDO::PARAM_INT);
+                            $stmt->bindParam(2, $offset, PDO::PARAM_INT);
                         }
-                        // Execute the statement
                         $stmt->execute();
-                        $result = $stmt->get_result();
-                        // Check if there are results
-                        if ($result->num_rows > 0) {
+                        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                        if (count($result) > 0) {
                             ?>
                             <thead class="text-white uppercase bg-custom-purplo ">
                                 <tr>
@@ -107,7 +109,7 @@ $html->startBody();
                             </thead>
                             <?php
                             // Loop through the results
-                            while($row = $result->fetch_assoc()) {
+                            foreach ($result as $row) {
                                 $eid = $row['event_id'];
                                 $eventname = $row['event_name'];
                                 $eventdesc = $row['event_description'];
@@ -159,14 +161,14 @@ $html->startBody();
                 if (isset($_GET['search'])) {
                     $sql_total .= " WHERE (`event_id` LIKE ? OR `event_name` LIKE ? OR `event_description` LIKE ? OR `event_date` LIKE ?)";
                     $stmt_total = $conn->prepare($sql_total);
-                    $stmt_total->bind_param("ssss", $search, $search, $search, $search);
+                    $stmt_total->execute([$search, $search, $search, $search]);
                 } else {
                     $stmt_total = $conn->prepare($sql_total);
+                    $stmt_total->execute();
                 }
-                $stmt_total->execute();
-                $total_records = $stmt_total->get_result()->fetch_assoc()['COUNT(*)'];
-                $stmt_total->close();
-                if ($result->num_rows > 0) {
+                $total_records = $stmt_total->fetchColumn();
+                $stmt_total = null;
+                if (count($result) > 0) {
                     ?>
                      <div id="has-result" class="w-full mb-2">
                         <p>Showing <?php echo $results_per_page; ?> entries per page</p>
@@ -345,8 +347,7 @@ $html->startBody();
         $sanctionfee = $_POST['sanction-fee'];
         $sql_event = "INSERT INTO `events`(`event_name`, `event_description`, `event_target`, `event_date`, `event_fee`, `sanction_fee`) VALUES (?, ?, ?, ?, ?, ?)";
         $stmt_event = $conn->prepare($sql_event);
-        $stmt_event->bind_param("ssssii", $eventname, $eventdesc, $eventtarget, $eventdate, $feeperevent, $sanctionfee);
-        if ($stmt_event->execute()) {
+        if ($stmt_event->execute([$eventname, $eventdesc, $eventtarget, $eventdate, $feeperevent, $sanctionfee])) {
             ?>
             <script>
                 swal('Event added successfully!', '', 'success')
@@ -381,8 +382,7 @@ $html->startBody();
         $stmt_update_event = $conn->prepare($sqlupdate_event);
         // Check if statement preparation is successful
         if ($stmt_update_event) {
-            $stmt_update_event->bind_param("ssssidi", $eventname, $eventdesc, $eventtarget, $eventdate, $feeperevent, $sanctionfee, $eid);
-            if ($stmt_update_event->execute()) {
+            if ($stmt_update_event->execute([$eventname, $eventdesc, $eventtarget, $eventdate, $feeperevent, $sanctionfee, $eid])) {
                 // Success
                 ?><script>
                     swal('Event updated successfully!', '', 'success')
@@ -412,7 +412,7 @@ $html->startBody();
     if (isset($_POST['eid-to-delete'])) {
         $sqldelete_event = "DELETE FROM `events` WHERE `event_id` = ?";
         $stmt_delete_event = $conn->prepare($sqldelete_event);
-        $stmt_delete_event->bind_param("i", $_POST['eid-to-delete']);
+        $stmt_delete_event->bindParam(1, $_POST['eid-to-delete'], PDO::PARAM_INT);
 
         if ($stmt_delete_event->execute()) {
             ?>
@@ -430,5 +430,6 @@ $html->startBody();
     }
     ?>
 <?php
+$conn = null;
 $html->endBody();
 ?>

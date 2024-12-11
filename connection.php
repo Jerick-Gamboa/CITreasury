@@ -4,8 +4,13 @@ $host = "localhost";
 $username = "root";
 $password = "";
 $db = "citreasury";
-$conn = new mysqli($host, $username, $password, $db);
-if ($conn->connect_error) {
-    die("<script>alert('Connection failed.')</script>");
+$conn = null;
+
+try {
+    $conn = new PDO("mysql:host=$host;dbname=$db", $username, $password);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Connection failed: " . $e->getMessage());
 }
+
 ?>

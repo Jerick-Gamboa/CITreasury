@@ -78,18 +78,23 @@ $html->startBody();
                         }
                         // Add limit and offset for pagination
                         $sql .= " LIMIT ? OFFSET ?";
-                        // Prepare the statement
                         $stmt = $conn->prepare($sql);
                         if (isset($search)) {
-                            $stmt->bind_param("ssssssi", $_SESSION['cit-student-id'], $search, $search, $search, $search, $results_per_page, $offset);
+                            $stmt->bindParam(1, $_SESSION['cit-student-id'], PDO::PARAM_STR);
+                            $stmt->bindParam(2, $search, PDO::PARAM_STR);
+                            $stmt->bindParam(3, $search, PDO::PARAM_STR);
+                            $stmt->bindParam(4, $search, PDO::PARAM_STR);
+                            $stmt->bindParam(5, $search, PDO::PARAM_STR);
+                            $stmt->bindParam(6, $results_per_page, PDO::PARAM_INT);
+                            $stmt->bindParam(7, $offset, PDO::PARAM_INT);
                         } else {
-                            $stmt->bind_param("sii", $_SESSION['cit-student-id'], $results_per_page, $offset);
+                            $stmt->bindParam(1, $_SESSION['cit-student-id'], PDO::PARAM_STR);
+                            $stmt->bindParam(2, $results_per_page, PDO::PARAM_INT);
+                            $stmt->bindParam(3, $offset, PDO::PARAM_INT);
                         }
-                        // Execute the statement
                         $stmt->execute();
-                        $result = $stmt->get_result();
-                        // Check if there are results
-                        if ($result->num_rows > 0) {
+                        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                        if (count($result) > 0) {
                             ?>
                             <thead class="text-white uppercase bg-custom-purplo ">
                                 <tr>
@@ -101,7 +106,7 @@ $html->startBody();
                             </thead>
                             <?php
                             // Loop through the results
-                            while($row = $result->fetch_assoc()) {
+                            foreach ($result as $row) {
                                 $sid = $row['student_id'];
                                 $lastname = $row['last_name'];
                                 $firstname = $row['first_name'];
@@ -148,15 +153,14 @@ $html->startBody();
                 if (isset($_GET['search'])) {
                     $sql_total .= " AND (`students`.`student_id` LIKE ? OR `students`.`last_name` LIKE ? OR `students`.`first_name` LIKE ? OR `students`.`year_and_section` LIKE ?)";
                     $stmt_total = $conn->prepare($sql_total);
-                    $stmt_total->bind_param("sssss", $_SESSION['cit-student-id'], $search, $search, $search, $search);
+                    $stmt_total->execute([$_SESSION['cit-student-id'], $search, $search, $search, $search]);
                 } else {
                     $stmt_total = $conn->prepare($sql_total);
-                    $stmt_total->bind_param("s", $_SESSION['cit-student-id']);
+                    $stmt_total->execute([$_SESSION['cit-student-id']]);
                 }
-                $stmt_total->execute();
-                $total_records = $stmt_total->get_result()->fetch_assoc()['COUNT(*)'];
-                $stmt_total->close();
-                if ($result->num_rows > 0) {
+                $total_records = $stmt_total->fetchColumn();
+                $stmt_total = null;
+                if (count($result) > 0) {
                     ?>
                      <div id="has-result" class="w-full mb-2">
                         <p>Showing <?php echo $results_per_page; ?> entries per page</p>
@@ -292,13 +296,10 @@ $html->startBody();
         $sql_account = "INSERT INTO `accounts`(`email`, `password`, `student_id`, `type`) VALUES (?, ?, ?, 'user')";
         $stmt_account = $conn->prepare($sql_account);
 
-        $stmt_student->bind_param("sssss", $sid, $lastname, $firstname, $mi, $yearsec);
-        $stmt_account->bind_param("sss", $email, $hash_password, $sid);
-
-        if ($stmt_student->execute()) {
+        if ($stmt_student->execute([$sid, $lastname, $firstname, $mi, $yearsec])) {
             ?>
             <script>
-                swal('Student added successfully!', `<?php echo $stmt_account->execute() ? "Default account also created:\n\nEmail: ".$email."\nPassword: ".$password : "But default student account failed to create." ?>`, 'success')
+                swal('Student added successfully!', `<?php echo $stmt_account->execute([$email, $hash_password, $sid]) ? "Default account also created:\n\nEmail: ".$email."\nPassword: ".$password : "But default student account failed to create." ?>`, 'success')
                 .then(() => {
                     window.location.href = 'students.php';
                 });
@@ -322,12 +323,10 @@ $html->startBody();
         $sqlupdate_student = "UPDATE `students` SET `last_name`= ?, `first_name`= ?, `middle_initial`= ?, `year_and_section`= ? WHERE `student_id` = ?";
         $stmt_update_student = $conn->prepare($sqlupdate_student);
 
-        $stmt_update_account->bind_param("ss", $email, $sid);
-        $stmt_update_student->bind_param("sssss", $lastname, $firstname, $mi, $yearsec, $sid);
-        if ($stmt_update_student->execute()) {
+        if ($stmt_update_student->execute([$lastname, $firstname, $mi, $yearsec, $sid])) {
             ?>
             <script>
-                swal('Student updated successfully!', '<?php echo $stmt_update_account->execute() ? "Modifying the name can also modify the student\'s email." : "But student email failed to update." ?>', 'success')
+                swal('Student updated successfully!', '<?php echo $stmt_update_account->execute([$email, $sid]) ? "Modifying the name can also modify the student\'s email." : "But student email failed to update." ?>', 'success')
                 .then(() => {
                     window.location.href = 'students.php';
                 });
@@ -340,9 +339,8 @@ $html->startBody();
     if (isset($_POST['sid-to-delete'])) {
         $sqldelete_student = "DELETE FROM `students` WHERE `student_id`= ?";
         $stmt_delete_student = $conn->prepare($sqldelete_student);
-        $stmt_delete_student->bind_param("s", $_POST['sid-to-delete']);
 
-        if ($stmt_delete_student->execute()) {
+        if ($stmt_delete_student->execute([$_POST['sid-to-delete']])) {
             ?>
             <script>
                 swal('Student successfully deleted', '', 'success')
@@ -400,22 +398,18 @@ $html->startBody();
                                 $sql_account = "INSERT INTO `accounts`(`email`, `password`, `student_id`, `type`) VALUES (?, ?, ?, 'user')";
                                 $stmt_account = $conn->prepare($sql_account);
 
-                                $stmt_student->bind_param("sssss", $sid, $lastname, $firstname, $mi, $yearsec);
-                                $stmt_account->bind_param("sss", $email, $hash_password, $sid);
-
-                                if ($stmt_student->execute()) {
-                                    $stmt_account->execute();
+                                if ($stmt_student->execute([$sid, $lastname, $firstname, $mi, $yearsec])) {
+                                    $stmt_account->execute([$email, $hash_password, $sid]);
                                 } else {
                                     $hasError = true;
                                     $errors .= "ID '".$sid."' failed to insert.\n";
                                 }
-                            } catch (mysqli_sql_exception $e) {
+                            } catch (PDOException $e) {
                                 $hasError = true;
                                 $errors .= $e->getMessage() . '\n';
                             }
                         }
                         fclose($file_handle);
-                        $conn->close();
                         ?>
                         <script>
                             swal(<?php if ($hasError) {?>'CSV File imported with errors!', `<?php echo $errors; ?>`, 'warning' <?php } else { ?>'CSV File imported successfully!', '', 'success' <?php } ?> )
@@ -443,5 +437,6 @@ $html->startBody();
     }
     ?>
 <?php
+$conn = null;
 $html->endBody();
 ?>

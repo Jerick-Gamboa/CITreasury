@@ -90,14 +90,20 @@ $html->startBody();
                         $sql_unregisteredpast .= " ORDER BY `balance` DESC LIMIT ? OFFSET ?";
                         $stmt_unregisteredpast = $conn->prepare($sql_unregisteredpast);
                         if (isset($search)) {
-                            $stmt_unregisteredpast->bind_param("ssssssi", $search, $search, $search, $search, $search, $results_per_page, $offset);
+                            $stmt_unregisteredpast->bindParam(1, $search, PDO::PARAM_STR);
+                            $stmt_unregisteredpast->bindParam(2, $search, PDO::PARAM_STR);
+                            $stmt_unregisteredpast->bindParam(3, $search, PDO::PARAM_STR);
+                            $stmt_unregisteredpast->bindParam(4, $search, PDO::PARAM_STR);
+                            $stmt_unregisteredpast->bindParam(5, $search, PDO::PARAM_STR);
+                            $stmt_unregisteredpast->bindParam(6, $results_per_page, PDO::PARAM_INT);
+                            $stmt_unregisteredpast->bindParam(7, $offset, PDO::PARAM_INT);
                         } else {
-                            $stmt_unregisteredpast->bind_param("ii", $results_per_page, $offset);
+                            $stmt_unregisteredpast->bindParam(1, $results_per_page, PDO::PARAM_INT);
+                            $stmt_unregisteredpast->bindParam(2, $offset, PDO::PARAM_INT);
                         }
-
                         $stmt_unregisteredpast->execute();
-                        $result_unregisteredpast = $stmt_unregisteredpast->get_result();
-                        if ($result_unregisteredpast->num_rows > 0) {
+                        $result_unregisteredpast = $stmt_unregisteredpast->fetchAll(PDO::FETCH_ASSOC);
+                        if (count($result_unregisteredpast) > 0) {
                             ?>
                             <thead class="text-white uppercase bg-custom-purplo ">
                                 <tr>
@@ -112,7 +118,7 @@ $html->startBody();
                                 </tr>
                             </thead>
                             <?php
-                            while($row = $result_unregisteredpast->fetch_assoc()) {
+                            foreach ($result_unregisteredpast as $row) {
                                 $sid = $row['student_id'];
                                 $lastname = $row['last_name'];
                                 $firstname = $row['first_name'];
@@ -161,12 +167,13 @@ $html->startBody();
                 }
                 $stmt_total = $conn->prepare($sql_count);
                 if (isset($_GET['search'])) {
-                    $stmt_total->bind_param("sssss", $search, $search, $search, $search, $search);
+                    $stmt_total->execute([$search, $search, $search, $search, $search]);
+                } else {
+                    $stmt_total->execute();
                 }
-                $stmt_total->execute();
-                $total_records = $stmt_total->get_result()->fetch_assoc()['COUNT(*)'];
-                $stmt_total->close();
-                if ($result_unregisteredpast->num_rows > 0) {
+                $total_records = $stmt_total->fetchColumn();
+                $stmt_total = null;
+                if (count($result_unregisteredpast) > 0) {
                     ?>
                      <div id="has-result" class="w-full mb-2">
                         <p>Showing <?php echo $results_per_page; ?> entries per page</p>
@@ -278,5 +285,6 @@ $html->startBody();
     }
     ?>
 <?php
+$conn = null;
 $html->endBody();
 ?>

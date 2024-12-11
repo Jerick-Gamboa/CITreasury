@@ -25,11 +25,10 @@ function verifyAdminLoggedIn($conn) {
 	if (isset($_SESSION['cit-student-id'])) {
 	    $sql = "SELECT `type` FROM `accounts` WHERE `student_id` = ?";
 	    $stmt = $conn->prepare($sql);
-	    $stmt->bind_param("s", $_SESSION['cit-student-id']);
-	    $stmt->execute();
-	    $result = $stmt->get_result();
-	    if ($result->num_rows > 0) {
-	        $row = $result->fetch_assoc();
+	    $stmt->execute([$_SESSION['cit-student-id']]);
+		$result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		if (count($result) > 0) {
+		    $row = $result[0];
 	        $type = $row['type'];
 	        if ($type === 'user') { # If account type is user, redirect to user page
 	            header("location: ../user/");
@@ -46,11 +45,10 @@ function verifyUserLoggedIn($conn) {
 	if (isset($_SESSION['cit-student-id'])) {
 	    $sql = "SELECT `type` FROM `accounts` WHERE `student_id` = ?";
 	    $stmt = $conn->prepare($sql);
-	    $stmt->bind_param("s", $_SESSION['cit-student-id']);
-	    $stmt->execute();
-	    $result = $stmt->get_result();
-	    if ($result->num_rows > 0) {
-	        $row = $result->fetch_assoc();
+	    $stmt->execute([$_SESSION['cit-student-id']]);
+		$result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		if (count($result) > 0) {
+		    $row = $result[0];
 	        $type = $row['type'];
 	        if ($type === 'admin') { # If account type is admin, redirect to admin page
 	            header("location: ../admin/");

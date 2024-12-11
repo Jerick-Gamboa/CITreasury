@@ -8,11 +8,9 @@ include '../components/menu.php';
 if (isset($_SESSION['cit-student-id'])) {
     $sql = "SELECT `accounts`.`type`, `accounts`.`password`, `students`.*  FROM `accounts` JOIN `students` on `students`.`student_id` = `accounts`.`student_id` WHERE `accounts`.`student_id` = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("s", $_SESSION['cit-student-id']);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    if ($result->num_rows > 0) {
-        $row = $result->fetch_assoc();
+    $stmt->execute([$_SESSION['cit-student-id']]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($row) {
         $currentpass = $row['password']; # Get account password
         $type = $row['type'];
         $lastname = $row['last_name'];
@@ -166,15 +164,13 @@ $html->startBody();
         $yearsec = strtoupper($_POST['edit-yearsec']);
         $sqlupdate_student = "UPDATE `students` SET `last_name`= ?, `first_name`= ?, `middle_initial`= ?, `year_and_section`= ? WHERE `student_id` = ?";
         $stmt_update_student = $conn->prepare($sqlupdate_student);
-        $stmt_update_student->bind_param("sssss", $lastname, $firstname, $mi, $yearsec, $sid);
-        if ($stmt_update_student->execute()) {
+        if ($stmt_update_student->execute([$lastname, $firstname, $mi, $yearsec, $sid])) {
             $sqlupdate_account = "UPDATE `accounts` SET `email`=? WHERE `student_id` = ?";
             $stmt_update_account = $conn->prepare($sqlupdate_account);
-            $stmt_update_account->bind_param("ss", $email, $sid);
             $_SESSION['cit-student-id'] = $sid;
             ?>
             <script>
-                swal('Changes saved!', '<?php echo $stmt_update_account->execute() ? "Modifying the name can also modify the email." : "But student email failed to update." ?>', 'success').then(() => {
+                swal('Changes saved!', '<?php echo $stmt_update_account->execute([$email, $sid]) ? "Modifying the name can also modify the email." : "But student email failed to update." ?>', 'success').then(() => {
                     window.location.href = 'accountsettings.php';
                 });
             </script>
@@ -201,8 +197,7 @@ $html->startBody();
             $sqlupdate_account = "UPDATE `accounts` SET `password`=? WHERE `student_id` = ?";
             $stmt_update_account = $conn->prepare($sqlupdate_account);
             $hash_password = password_hash($_POST['new-password'], PASSWORD_DEFAULT);
-            $stmt_update_account->bind_param("ss", $hash_password, $_SESSION['cit-student-id']);
-            if ($stmt_update_account->execute()) {
+            if ($stmt_update_account->execute([$hash_password, $_SESSION['cit-student-id']])) {
                 ?>
                 <script>
                     swal("Password changed successfully!" ,'', 'success');
@@ -213,5 +208,6 @@ $html->startBody();
     }
     ?>
 <?php
+$conn = null;
 $html->endBody();
 ?>

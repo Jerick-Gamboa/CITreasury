@@ -37,10 +37,9 @@ $html->startBody();
                 <?php
                 $sql_title = "SELECT * FROM `students` WHERE `student_id` = ?";
                 $stmt_title = $conn->prepare($sql_title);
-                $stmt_title->bind_param("s", $_SESSION['cit-student-id']);
-                $stmt_title->execute();
-                $result_title = $stmt_title->get_result();
-                if ($row_title = $result_title->fetch_assoc()) {
+                $stmt_title->execute([$_SESSION['cit-student-id']]);
+                $row_title = $stmt_title->fetch(PDO::FETCH_ASSOC);
+                if ($row_title) {
                     $lastname = $row_title['last_name'];
                     $firstname = $row_title['first_name'];
                     $mi = !empty($row_title['middle_initial']) ? $row_title['middle_initial'] . '.' : "";
@@ -49,10 +48,9 @@ $html->startBody();
                 }
                 $sql_total = "SELECT SUM(total_paid) AS total_amount_paid FROM (SELECT SUM(`paid_fees`) AS total_paid FROM `registrations` WHERE `student_id` = ? UNION ALL SELECT SUM(`sanctions_paid`) AS total_paid FROM `sanctions` WHERE `student_id` = ?) AS combined_payments";
                 $stmt_total = $conn->prepare($sql_total);
-                $stmt_total->bind_param("ss", $_SESSION['cit-student-id'], $_SESSION['cit-student-id']);
-                $stmt_total->execute();
-                $result_total = $stmt_total->get_result();
-                if ($row = $result_total->fetch_assoc()) {
+                $stmt_total->execute([$_SESSION['cit-student-id'], $_SESSION['cit-student-id']]);
+                $row = $stmt_total->fetch(PDO::FETCH_ASSOC);
+                if ($row) {
                     $totalpaid = $row['total_amount_paid'];
                     if ($row['total_amount_paid'] === NULL) {
                         $totalpaid = "0";
@@ -68,11 +66,10 @@ $html->startBody();
                         <?php
                         $sql_upcoming_events = "SELECT `events`.* FROM `students` INNER JOIN `events` ON FIND_IN_SET(SUBSTRING(`students`.`year_and_section`, 1, 1), `events`.`event_target`) > 0 WHERE `students`.`student_id` = ? AND `events`.`event_date` > CURDATE()";
                         $stmt_upcoming_events = $conn->prepare($sql_upcoming_events);
-                        $stmt_upcoming_events->bind_param("s", $_SESSION['cit-student-id']);
-                        $stmt_upcoming_events->execute();
-                        $result_upcoming_events = $stmt_upcoming_events->get_result();
-                        if ($result_upcoming_events->num_rows > 0) {
-                            while ($row_event = $result_upcoming_events->fetch_assoc()) {
+                        $stmt_upcoming_events->execute([$_SESSION['cit-student-id']]);
+                        $result_upcoming_events = $stmt_upcoming_events->fetchAll(PDO::FETCH_ASSOC);
+                        if (count($result_upcoming_events) > 0) {
+                            foreach ($result_upcoming_events as $row_event) {
                                 ?>
                                 <div class="border-l-4 border-white m-2 p-3 bg-[#46064C] shadow-lg shadow-black mb-4 text-white">
                                     <h3 class="text-2xl font-bold mb-2"><?php echo $row_event['event_name']; ?></h3>
@@ -96,11 +93,10 @@ $html->startBody();
                         <?php
                         $sql_registered_events = "SELECT `events`.`event_name`, `events`.`event_description`, `events`.`event_fee`, `registrations`.`registration_date`, `registrations`.`paid_fees` FROM `events` JOIN `registrations` ON `events`.`event_id` = `registrations`.`event_id` WHERE `registrations`.`student_id` = ?";
                         $stmt_registered_events = $conn->prepare($sql_registered_events);
-                        $stmt_registered_events->bind_param("s", $_SESSION['cit-student-id']);
-                        $stmt_registered_events->execute();
-                        $result_registered_events = $stmt_registered_events->get_result();
-                        if ($result_registered_events->num_rows > 0) {
-                            while ($row_event = $result_registered_events->fetch_assoc()) {
+                        $stmt_registered_events->execute([$_SESSION['cit-student-id']]);
+                        $result_registered_events = $stmt_registered_events->fetchAll(PDO::FETCH_ASSOC);
+                        if (count($result_registered_events) > 0) {
+                            foreach ($result_registered_events as $row_event) {
                                 ?>
                                 <div class="border-l-4 border-white m-2 p-3 bg-[#46064C] shadow-lg shadow-black mb-4 text-white">
                                     <h3 class="text-2xl font-bold mb-2"><?php echo $row_event['event_name']; ?></h3>
@@ -125,5 +121,6 @@ $html->startBody();
         </div>
     </div>
 <?php
+$conn = null;
 $html->endBody();
 ?>

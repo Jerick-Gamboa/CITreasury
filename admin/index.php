@@ -44,8 +44,8 @@ $html->startBody();
                 function getQueryString($conn, $sql, $target) {
                     $stmt = $conn->prepare($sql);
                     $stmt->execute();
-                    $result = $stmt->get_result();
-                    if ($row = $result->fetch_assoc()) {
+                    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                    if ($row) {
                         if ($row[$target] === NULL) {
                             return "0";
                         }
@@ -167,5 +167,6 @@ $html->startBody();
         }
     </script>
 <?php
+$conn = null;
 $html->endBody();
 ?>

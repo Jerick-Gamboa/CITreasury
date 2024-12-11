@@ -71,12 +71,11 @@ $html->startBody();
                             AND (`events`.`event_fee` + `events`.`sanction_fee`) > COALESCE(`sanctions`.`total_sanctions_paid`, 0)";
 
                     $stmt_unregistered_events = $conn->prepare($sql_unregistered_events);
-                    $stmt_unregistered_events->bind_param("s", $student_id);
-                    $stmt_unregistered_events->execute();
-                    $result_unregistered_events = $stmt_unregistered_events->get_result();
+                    $stmt_unregistered_events->execute([$student_id]);
+                    $result_unregistered_events = $stmt_unregistered_events->fetchAll(PDO::FETCH_ASSOC);
 
-                    if ($result_unregistered_events->num_rows > 0) {
-                        while ($row_event = $result_unregistered_events->fetch_assoc()) {
+                    if (count($result_unregistered_events) > 0) {
+                        foreach ($result_unregistered_events as $row_event) {
                             ?>
                             <div class="border-l-4 border-white m-2 p-3 bg-[#B00300] shadow-lg shadow-black mb-4 text-white">
                                 <h3 class="text-2xl font-bold mb-2"><?php echo $row_event['event_name']; ?></h3>
@@ -121,12 +120,11 @@ $html->startBody();
                         HAVING `balance` <> 0";
 
                     $stmt_unsettledbalance_events = $conn->prepare($sql_unsettledbalance_events);
-                    $stmt_unsettledbalance_events->bind_param("s", $student_id);
-                    $stmt_unsettledbalance_events->execute();
-                    $result_unsettledbalance_events = $stmt_unsettledbalance_events->get_result();
+                    $stmt_unsettledbalance_events->execute([$student_id]);
+                    $result_unsettledbalance_events = $stmt_unsettledbalance_events->fetchAll(PDO::FETCH_ASSOC);
 
-                    if ($result_unsettledbalance_events->num_rows > 0) {
-                        while ($row_event = $result_unsettledbalance_events->fetch_assoc()) {
+                    if (count($result_unsettledbalance_events) > 0) {
+                        foreach ($result_unsettledbalance_events as $row_event) {
                             ?>
                             <div class="border-l-4 border-white m-2 p-3 bg-[#CF5500] shadow-lg shadow-black mb-4 text-white">
                                 <h3 class="text-2xl font-bold mb-2"><?php echo $row_event['event_name']; ?></h3>
@@ -151,5 +149,6 @@ $html->startBody();
         </div>
     </div>
 <?php
+$conn = null;
 $html->endBody();
 ?>

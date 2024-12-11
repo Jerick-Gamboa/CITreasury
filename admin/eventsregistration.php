@@ -47,11 +47,10 @@ $html->startBody();
                 <?php
                 $sql_title = "SELECT * FROM `events` WHERE `event_id` = ?";
                 $stmt_title = $conn->prepare($sql_title);
-                $stmt_title->bind_param("s", $_GET['event-id']);
+                $stmt_title->bindParam(1, $_GET['event-id'], PDO::PARAM_INT);
                 $stmt_title->execute();
-                $result_title = $stmt_title->get_result();
                 $dateofcurrenteventinget = "";
-                if ($row_title = $result_title->fetch_assoc()) {
+                if ($row_title = $stmt_title->fetch(PDO::FETCH_ASSOC)) {
                     $dateofcurrenteventinget = $row_title['event_date'];
                     $currenteventfee = $row_title['event_fee'];
                     # Set event name in title using event-id in URL query
@@ -64,7 +63,7 @@ $html->startBody();
                     AND `events`.`event_date` >= CURDATE() 
                     AND `events`.`event_fee` = `registrations`.`paid_fees`";
                 $stmt_update_status = $conn->prepare($sql_update_status);
-                $stmt_update_status->bind_param("i", $_GET['event-id']);
+                $stmt_update_status->bindParam(1, $_GET['event-id'], PDO::PARAM_INT);
                 $stmt_update_status->execute();
                 ?>
                 <!-- Search Bar -->
@@ -134,13 +133,22 @@ $html->startBody();
                         $sql .= " ORDER BY `balance` DESC LIMIT ? OFFSET ?";
                         $stmt = $conn->prepare($sql);
                         if (isset($search)) {
-                            $stmt->bind_param("issssssi", $eventId, $search, $search, $search, $search, $search, $results_per_page, $offset);
+                            $stmt->bindParam(1, $eventId, PDO::PARAM_INT);
+                            $stmt->bindParam(2, $search, PDO::PARAM_STR);
+                            $stmt->bindParam(3, $search, PDO::PARAM_STR);
+                            $stmt->bindParam(4, $search, PDO::PARAM_STR);
+                            $stmt->bindParam(5, $search, PDO::PARAM_STR);
+                            $stmt->bindParam(6, $search, PDO::PARAM_STR);
+                            $stmt->bindParam(7, $results_per_page, PDO::PARAM_INT);
+                            $stmt->bindParam(8, $offset, PDO::PARAM_INT);
                         } else {
-                            $stmt->bind_param("iii", $eventId, $results_per_page, $offset);
+                            $stmt->bindParam(1, $eventId, PDO::PARAM_INT);
+                            $stmt->bindParam(2, $results_per_page, PDO::PARAM_INT);
+                            $stmt->bindParam(3, $offset, PDO::PARAM_INT);
                         }
                         $stmt->execute();
-                        $result = $stmt->get_result();
-                        if ($result->num_rows > 0) {
+                        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                        if (count($result) > 0) {
                             ?>
                             <thead class="text-white uppercase bg-custom-purplo ">
                                 <tr>
@@ -154,7 +162,7 @@ $html->startBody();
                                 </tr>
                             </thead>
                             <?php
-                            while($row = $result->fetch_assoc()) {
+                            foreach ($result as $row) {
                                 $sid = $row['student_id'];
                                 $lastname = $row['last_name'];
                                 $firstname = $row['first_name'];
@@ -202,15 +210,14 @@ $html->startBody();
                         OR `students`.`year_and_section` LIKE ? 
                         OR `registrations`.`registration_date` LIKE ?)";
                     $stmt_total = $conn->prepare($sql_total);
-                    $stmt_total->bind_param("ssssss", $_GET['event-id'], $search, $search, $search, $search, $search);
+                    $stmt_total->execute([$search, $search, $search, $search, $search]);
                 } else {
                     $stmt_total = $conn->prepare($sql_total);
-                    $stmt_total->bind_param("s", $_GET['event-id']);
+                    $stmt_total->execute([$_GET['event-id']]);
                 }
-                $stmt_total->execute();
-                $total_records = $stmt_total->get_result()->fetch_assoc()['COUNT(*)'];
-                $stmt_total->close();
-                if ($result->num_rows > 0) {
+                $total_records = $stmt_total->fetchColumn();
+                $stmt_total = null;
+                if (count($result) > 0) {
                     ?>
                      <div id="has-result" class="w-full mb-2">
                         <p>Showing <?php echo $results_per_page; ?> entries per page</p>
@@ -241,10 +248,10 @@ $html->startBody();
                     $sql_event = "SELECT `events`.*, COALESCE(`registration_counts`.`registration_count`, 0) AS `registration_count` FROM `events` LEFT JOIN (SELECT `event_id`, COUNT(*) AS `registration_count` FROM `registrations` GROUP BY `event_id`) `registration_counts` ON `events`.`event_id` = `registration_counts`.`event_id`";
                     $stmt_event = $conn->prepare($sql_event);
                     $stmt_event->execute();
-                    $result_event = $stmt_event->get_result();
-                    if ($result_event->num_rows > 0) {
+                    $result_event = $stmt_event->fetchAll(PDO::FETCH_ASSOC);
+                    if (count($result_event) > 0) {
                         $i = 0;
-                        while ($row_event = $result_event->fetch_assoc()) {
+                        foreach ($result_event as $row_event) {
                             $randomColor = $colors[$i];
                             ?>
                             <!-- Card of Events -->
@@ -260,6 +267,9 @@ $html->startBody();
                                 <div class="w-full px-3 py-2 text-white">
                                     <p class="my-1 text-sm font-bold">
                                         Total Registered: <?php echo $row_event['registration_count']; ?>
+                                    </p>
+                                    <p class="my-1 text-xs">
+                                        Year Levels Required: <?php echo $row_event['event_target']; ?>
                                     </p>
                                     <p class="my-1 text-xs">
                                         Date: <?php echo $row_event['event_date']; ?>
@@ -398,7 +408,9 @@ $html->startBody();
         $collectamount = $_POST['collect-amount'];
         $sqlupdate_collect = "UPDATE `registrations` SET `paid_fees` = (`paid_fees` + ?) WHERE `event_id` = ? AND `student_id` = ? "; # Update fees of student
         $stmt_update_collect = $conn->prepare($sqlupdate_collect);
-        $stmt_update_collect->bind_param("iis", $collectamount, $_GET['event-id'], $sid);
+        $stmt_update_collect->bindParam(1, $collectamount, PDO::PARAM_INT);
+        $stmt_update_collect->bindParam(2, $_GET['event-id'], PDO::PARAM_INT);
+        $stmt_update_collect->bindParam(3, $sid, PDO::PARAM_STR);
         if ($collectamount > $totalfee) {
             ?><script>swal('Invalid advance fee', '', 'error');</script><?php
         } elseif ($stmt_update_collect->execute()) {
@@ -423,34 +435,36 @@ $html->startBody();
         # Check first if student is allowed to register in current event based on their year
         $query_year_level = "SELECT `year_and_section` FROM `students` WHERE `student_id` = ?";
         $stmt_year_level = $conn->prepare($query_year_level);
-        $stmt_year_level->bind_param("s", $sid);
-        $stmt_year_level->execute();
-        $stmt_year_level->bind_result($year_and_section);
-        $stmt_year_level->fetch();
-        $stmt_year_level->close();
+        $stmt_year_level->execute([$sid]);
+        $year_and_section = $stmt_year_level->fetch(PDO::FETCH_ASSOC)['year_and_section'];
+        $stmt_year_level = null;
         # Extract the year level (e.g., '2C' -> '2')
         $year_level = substr($year_and_section, 0, 1);
         $sql_allow_to_register = "SELECT `event_target` FROM `events` WHERE `event_id` = ? AND FIND_IN_SET(?, `events`.`event_target`) > 0";
         $stmt_allow_to_register = $conn->prepare($sql_allow_to_register);
-        $stmt_allow_to_register->bind_param("is", $_GET['event-id'], $year_level);
+        $stmt_allow_to_register->bindParam(1, $_GET['event-id'], PDO::PARAM_INT);
+        $stmt_allow_to_register->bindParam(2, $year_level, PDO::PARAM_STR);
 
         # Check first if student is already registered in current event
         $sql_verify_register = "SELECT * FROM `registrations` WHERE `event_id` = ? AND `student_id` = ?";
         $stmt_verify_register = $conn->prepare($sql_verify_register);
-        $stmt_verify_register->bind_param("is", $_GET['event-id'], $sid);
+        $stmt_verify_register->bindParam(1, $_GET['event-id'], PDO::PARAM_INT);
+        $stmt_verify_register->bindParam(2, $sid, PDO::PARAM_STR);
 
         # Preparation of inserting data to database
         $sql_register = "INSERT INTO `registrations`(`event_id`, `student_id`, `registration_date`, `paid_fees`) VALUES (?, ?, NOW(), ?)";
         $stmt_register = $conn->prepare($sql_register);
-        $stmt_register->bind_param("isi", $_GET['event-id'], $sid, $advancefee);
+        $stmt_register->bindParam(1, $_GET['event-id'], PDO::PARAM_INT);
+        $stmt_register->bindParam(2, $sid, PDO::PARAM_STR);
+        $stmt_register->bindParam(3, $advancefee, PDO::PARAM_INT);
 
         # If query returned with another result for current student, then it is already registered
-        if ($stmt_verify_register->execute() && $stmt_verify_register->get_result()->num_rows > 0) {
+        if ($stmt_verify_register->execute() && $stmt_verify_register->rowCount() > 0) {
             ?><script>swal('You can\'t register a student twice in this event!', '', 'error');</script><?php
         } elseif (!isset($year_and_section)) {
             # Else if student is not found
             ?><script>swal('Student not found!', '', 'error');</script><?php
-        } elseif ($stmt_allow_to_register->execute() && $stmt_allow_to_register->get_result()->num_rows == 0) {
+        } elseif ($stmt_allow_to_register->execute() && $stmt_allow_to_register->rowCount() == 0) {
             # Else if year level for current student is not found on the event, it is now allowed for them to register
             ?><script>swal('Student is not allowed to register in this event!', '', 'error');</script><?php
         } elseif ($stmt_register->execute()) { # Else if no result, insert data to database
@@ -468,5 +482,6 @@ $html->startBody();
     }
     ?>
 <?php
+$conn = null;
 $html->endBody();
 ?>
