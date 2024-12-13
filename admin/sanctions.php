@@ -268,8 +268,7 @@ $html->startBody();
         $collectamount = $_POST['collect-amount'];
         $sqladd_collect = "INSERT INTO `sanctions` (`student_id`, `event_id`, `sanctions_paid`) VALUES (?, ?, ?)";
         $stmt_add_collect = $conn->prepare($sqladd_collect);
-        $stmt_add_collect->bind_param("sii", $sid, $eventid, $collectamount);
-        if ($stmt_add_collect->execute()) {
+        if ($stmt_add_collect->execute([$sid, $eventid, $collectamount])) {
             ?>
             <!-- SweetAlert popup -->
             <script>
