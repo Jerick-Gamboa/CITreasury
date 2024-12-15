@@ -42,7 +42,7 @@ $html->startBody();
                     <?php
                     $pendingfees = 0;
                     $student_id = $_SESSION['cit-student-id'];
-                    $sql_unregistered_events = $sql_unregistered_events = "
+                    $sql_unregistered_events = "
                         SELECT 
                             `events`.*, 
                             (`events`.`event_fee` + `events`.`sanction_fee`) AS `total_fee`,
