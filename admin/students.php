@@ -3,9 +3,109 @@ session_start();
 include '../connection.php';
 include '../helperfunctions.php';
 include '../password_compat.php';
-include '../components/menu.php';
 verifyAdminLoggedIn($conn);
 
+// API Endpoint
+if (isset($_GET['api'])) {
+    header('Content-Type: application/json');
+    $postData = file_get_contents("php://input");
+    $data = json_decode($postData, true);
+    $response = [];
+    // Initial response
+    $response["status"] = "error";
+    $response["message"] = "Unknown";
+    $response["details"] = "";
+
+    if ($_GET['api'] == 'add') {
+        if (isset($data['student_id'], $data['last_name'], $data['first_name'], $data['middle_initial'], $data['yearsec'])) {
+            $sid = str_replace(" ", "", $data['student_id']);
+            $lastname = ucwords(trim($data['last_name']));
+            $firstname = ucwords(trim($data['first_name']));
+            $mi = ucwords(trim($data['middle_initial']));
+            $yearsec = strtoupper(trim($data['yearsec']));
+            $email = generateEmail($firstname, $lastname);
+            $password = "cit-" . $sid;
+            $hash_password = password_hash($password, PASSWORD_DEFAULT);
+            try {
+                $sql_student = "INSERT INTO `students`(`student_id`, `last_name`, `first_name`, `middle_initial`, `year_and_section`) VALUES (?, ?, ?, ?, ?)";
+                $stmt_student = $conn->prepare($sql_student);
+                $sql_account = "INSERT INTO `accounts`(`email`, `password`, `student_id`, `type`) VALUES (?, ?, ?, 'user')";
+                $stmt_account = $conn->prepare($sql_account);
+                if ($stmt_student->execute([$sid, $lastname, $firstname, $mi, $yearsec])) {
+                    $accountResult = $stmt_account->execute([$email, $hash_password, $sid]);
+                    $response["status"] = $accountResult ? "success" : "warning";
+                    $response["message"] = "Student added successfully";
+                    $response["details"] = $accountResult
+                        ? "Default account created:\n\nEmail: $email \nPassword: $password"
+                        : "But account creation failed.";
+                } else {
+                    $response["message"] = "Failed to insert student data.";
+                }
+            } catch (Exception $e) {
+                $response["message"] = "Database error";
+                $response["details"] = $e->getMessage();
+            }
+        } else {
+            $response["message"] = "Invalid data";
+        }
+    } elseif ($_GET['api'] == 'edit') {
+        if (isset($data['edit_student_id'], $data['edit_last_name'], $data['edit_first_name'], $data['edit_middle_initial'], $data['edit_yearsec'])) {
+            $sid = str_replace(" ", "", $data['edit_student_id']);
+            $lastname = ucwords(trim($data['edit_last_name']));
+            $firstname = ucwords(trim($data['edit_first_name']));
+            $mi = ucwords(trim($data['edit_middle_initial']));
+            $yearsec = strtoupper(trim($data['edit_yearsec']));
+            $email = generateEmail($firstname, $lastname);
+            try {
+                $sqlupdate_account = "UPDATE `accounts` SET `email`= ? WHERE `student_id` = ?";
+                $stmt_update_account = $conn->prepare($sqlupdate_account);
+                $sqlupdate_student = "UPDATE `students` SET `last_name`= ?, `first_name`= ?, `middle_initial`= ?, `year_and_section`= ? WHERE `student_id` = ?";
+                $stmt_update_student = $conn->prepare($sqlupdate_student);
+                if ($stmt_update_student->execute([$lastname, $firstname, $mi, $yearsec, $sid])) {
+                    $accountResult = $stmt_update_account->execute([$email, $sid]);
+                    $response["status"] = $accountResult ? "success" : "warning";
+                    $response["message"] = "Student updated successfully";
+                    $response["details"] = $accountResult
+                        ? "Modifying the name can also modify the student's email."
+                        : "But student email failed to update.";
+                } else {
+                    $response["message"] = "Failed to update student";
+                }
+            } catch (Exception $e) {
+                $response["message"] = "Database error";
+                $response["details"] = $e->getMessage();
+            }
+        } else {
+            $response["message"] = "Invalid data";
+        }
+    } elseif ($_GET['api'] == 'delete') {
+        if (isset($data['student_id'])) {
+            try {
+                $sql = "DELETE FROM `students` WHERE `student_id`= ?";
+                $stmt = $conn->prepare($sql);
+                if ($stmt->execute([$data['student_id']])) {
+                    $response["status"] = "success";
+                    $response["message"] = "Student successfully deleted";
+                } else {
+                    $response["message"] = "Student deletion failed";
+                }
+            } catch (Exception $e) {
+                $response["message"] = "Database error";
+                $response["details"] = $e->getMessage();
+            }
+        } else {
+            $response["message"] = "Invalid data";
+        }
+    } else {
+        $response["message"] = "Unknown get method";
+    }
+    echo json_encode($response);
+    exit();
+}
+
+// Default View
+include '../components/menu.php';
+include '../components/nav.php';
 $html = new HTML("CITreasury - Students");
 $html->addLink('stylesheet', '../inter-variable.css');
 $html->addLink('icon', '../img/nobgcitsclogo.png');
@@ -13,20 +113,12 @@ $html->addScript("../js/tailwind3.4.15.js");
 $html->addScript("../js/tailwind.config.js");
 $html->addScript("../js/sweetalert.min.js");
 $html->addScript("../js/jquery-3.7.1.min.js");
-$html->addScript("../js/predefined-script.js");
 $html->addScript("../js/defer-script.js", true);
+$html->addScript("students.js", true);
 $html->startBody();
 ?>
     <!-- Top Navigation Bar -->
-    <nav class="fixed w-full bg-custom-purple flex flex-row shadow shadow-gray-800">
-        <img src="../img/nobgcitsclogo.png" class="w-12 h-12 my-2 ml-6">
-        <h1 class="text-3xl p-3 font-bold text-white">CITreasury</h1>
-        <div class="w-full text-white">
-            <svg id="mdi-menu" class="w-8 h-8 mr-3 my-4 p-1 float-right fill-current rounded transition-all duration-300-ease-in-out md:hidden hover:bg-white hover:text-custom-purple hover:cursor-pointer" viewBox="0 0 24 24">
-              <path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z" />
-            </svg>
-        </div>
-    </nav>
+    <?php nav(); ?>
     <!-- Body -->
     <div class="flex flex-col md:flex-row bg-custom-purplo min-h-screen">
         <div class="mt-18 md:mt-20 mx-2">
@@ -78,68 +170,70 @@ $html->startBody();
                         }
                         // Add limit and offset for pagination
                         $sql .= " LIMIT ? OFFSET ?";
-                        $stmt = $conn->prepare($sql);
-                        if (isset($search)) {
-                            $stmt->bindParam(1, $_SESSION['cit-student-id'], PDO::PARAM_STR);
-                            $stmt->bindParam(2, $search, PDO::PARAM_STR);
-                            $stmt->bindParam(3, $search, PDO::PARAM_STR);
-                            $stmt->bindParam(4, $search, PDO::PARAM_STR);
-                            $stmt->bindParam(5, $search, PDO::PARAM_STR);
-                            $stmt->bindParam(6, $results_per_page, PDO::PARAM_INT);
-                            $stmt->bindParam(7, $offset, PDO::PARAM_INT);
-                        } else {
-                            $stmt->bindParam(1, $_SESSION['cit-student-id'], PDO::PARAM_STR);
-                            $stmt->bindParam(2, $results_per_page, PDO::PARAM_INT);
-                            $stmt->bindParam(3, $offset, PDO::PARAM_INT);
-                        }
-                        $stmt->execute();
-                        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                        if (count($result) > 0) {
-                            ?>
-                            <thead class="text-white uppercase bg-custom-purplo ">
-                                <tr>
-                                    <th scope="col" class="p-2 border-r border-black">Student ID</th>
-                                    <th scope="col" class="p-2 border-r border-black">Student Name</th>
-                                    <th scope="col" class="p-2 border-r border-black">Year & Section</th>
-                                    <th scope="col" class="p-2">Actions</th>
-                                </tr>
-                            </thead>
-                            <?php
-                            // Loop through the results
-                            foreach ($result as $row) {
-                                $sid = $row['student_id'];
-                                $lastname = $row['last_name'];
-                                $firstname = $row['first_name'];
-                                $mi = !empty($row['middle_initial']) ? $row['middle_initial'] . '.' : "";
-                                $yearsec = $row['year_and_section'];
+                        try {
+                            $stmt = $conn->prepare($sql);
+                            if (isset($search)) {
+                                $stmt->bindParam(1, $_SESSION['cit-student-id'], PDO::PARAM_STR);
+                                $stmt->bindParam(2, $search, PDO::PARAM_STR);
+                                $stmt->bindParam(3, $search, PDO::PARAM_STR);
+                                $stmt->bindParam(4, $search, PDO::PARAM_STR);
+                                $stmt->bindParam(5, $search, PDO::PARAM_STR);
+                                $stmt->bindParam(6, $results_per_page, PDO::PARAM_INT);
+                                $stmt->bindParam(7, $offset, PDO::PARAM_INT);
+                            } else {
+                                $stmt->bindParam(1, $_SESSION['cit-student-id'], PDO::PARAM_STR);
+                                $stmt->bindParam(2, $results_per_page, PDO::PARAM_INT);
+                                $stmt->bindParam(3, $offset, PDO::PARAM_INT);
+                            }
+                            $stmt->execute();
+                            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                            if (count($result) > 0) {
                                 ?>
-                                <tr class="border-t border-black">
-                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $sid; ?></td>
-                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $lastname . ', ' . $firstname . ' ' . $mi; ?></td>
-                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $yearsec; ?></td>
-                                    <td class="px-1 bg-purple-100">
-                                        <button class="px-3 py-2 my-1 mx-1 bg-yellow-500 text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-yellow-400" onclick="editRow(this)">
-                                            <svg id="mdi-pencil" class="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                                                <path d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z" />
-                                            </svg>
-                                        </button>
-                                        <form method="POST" class="inline-block" id="delete-current-<?php echo str_replace(' ', '', $sid); ?>">
-                                            <input type="hidden" name="sid-to-delete" value="<?php echo $sid; ?>">
-                                            <button id="delete-student-<?php echo str_replace(' ', '', $sid); ?>" class="px-3 py-2 mb-1 mx-1 bg-red-600 text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-red-500">
+                                <thead class="text-white uppercase bg-custom-purplo ">
+                                    <tr>
+                                        <th scope="col" class="p-2 border-r border-black">Student ID</th>
+                                        <th scope="col" class="p-2 border-r border-black">Student Name</th>
+                                        <th scope="col" class="p-2 border-r border-black">Year & Section</th>
+                                        <th scope="col" class="p-2">Actions</th>
+                                    </tr>
+                                </thead>
+                                <?php
+                                // Loop through the results
+                                foreach ($result as $row) {
+                                    $sid = $row['student_id'];
+                                    $lastname = $row['last_name'];
+                                    $firstname = $row['first_name'];
+                                    $mi = !empty($row['middle_initial']) ? $row['middle_initial'] . '.' : "";
+                                    $yearsec = $row['year_and_section'];
+                                    ?>
+                                    <tr class="border-t border-black">
+                                        <td class="px-2 border-r border-black bg-purple-100"><?php echo $sid; ?></td>
+                                        <td class="px-2 border-r border-black bg-purple-100"><?php echo $lastname . ', ' . $firstname . ' ' . $mi; ?></td>
+                                        <td class="px-2 border-r border-black bg-purple-100"><?php echo $yearsec; ?></td>
+                                        <td class="px-1 bg-purple-100">
+                                            <button class="px-3 py-2 my-1 mx-1 bg-yellow-500 text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-yellow-400" onclick="editRow(this)">
+                                                <svg id="mdi-pencil" class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                                                    <path d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z" />
+                                                </svg>
+                                            </button>
+                                            <button name="<?php echo htmlspecialchars($sid); ?>" class="px-3 py-2 m-1 bg-red-600 text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-red-500 delete-student">
                                                 <svg id="mdi-delete" class="w-4 h-4 fill-current" viewBox="0 0 24 24">
                                                     <path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" />
                                                 </svg>
                                             </button>
-                                        </form>
-                                    </td>
-                                </tr>
-                                <script>
-                                    namesArray.push(["<?php echo $sid; ?>", "<?php echo $lastname; ?>", "<?php echo $firstname; ?>", "<?php echo $mi; ?>", "<?php echo $yearsec; ?>"]);
-                                </script>
-                                <?php
+                                        </td>
+                                    </tr>
+                                    <script>
+                                        namesArray.push(["<?php echo $sid; ?>", "<?php echo $lastname; ?>", "<?php echo $firstname; ?>", "<?php echo $mi; ?>", "<?php echo $yearsec; ?>"]);
+                                    </script>
+                                    <?php
+                                }
+                            } else {
+                                ?><h3 class="p-4">No students found.</h3><?php
                             }
-                        } else {
-                            ?><h3 class="p-4">No students found.</h3><?php
+                        } catch (PDOException $e) {
+                            $result = [];
+                            ?><h3 class="p-4">Page not found.</h3><?php
                         }
                         ?>
                     </table>
@@ -172,7 +266,7 @@ $html->startBody();
                     # Display pagination buttons
                     for ($i = 1; $i <= $total_pages; $i++) {
                         ?><a href='students.php?<?php echo (isset($search)) ? "search=".htmlspecialchars($_GET['search'])."&" : ""; ?>page=<?php echo $i; ?>'><button class="px-3 py-2 my-1 mr-1 <?php echo $page == $i ? 'bg-purple-600' : 'bg-custom-purplo'; ?> text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-custom-purple"><?php echo $i; ?></button></a>
-                        <?php
+                            <?php
                     }
                 }
                 ?>
@@ -198,15 +292,15 @@ $html->startBody();
                     </button>
                 </div>
                 <h3 class="text-2xl font-semibold text-custom-purple mb-3">Add Student</h3>
-                <form method="POST">
+                <form id="add-student-form">
                     <label class="ml-1 text-sm">Student ID:</label>
-                    <input type="text" name="student-id" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" maxlength="7" pattern="[0-9-]*" required>
+                    <input type="text" name="student-id" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" maxlength="7" pattern="[0-9\-]*" required>
                     <label class="ml-1 text-sm">Last Name:</label>
-                    <input type="text" name="last-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" pattern="[a-zA-Z\s']+" required>
+                    <input type="text" name="last-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" pattern="[a-zA-ZñÑáéíóúÁÉÍÓÚüÜ\s']+" required>
                     <label class="ml-1 text-sm">First Name:</label>
-                    <input type="text" name="first-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" pattern="[a-zA-Z\s']+" required>
+                    <input type="text" name="first-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" pattern="[a-zA-ZñÑáéíóúÁÉÍÓÚüÜ\s']+" required>
                     <label class="ml-1 text-sm">Middle Initial:</label>
-                    <input type="text" name="middle-initial" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" maxlength="3" pattern="[a-zA-Z\s']+">
+                    <input type="text" name="middle-initial" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" maxlength="3" pattern="[a-zA-ZñÑáéíóúÁÉÍÓÚüÜ\s']+">
                     <label class="ml-1 text-sm">Year & Section:</label>
                     <input type="text" name="yearsec" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" maxlength="2" pattern="[A-Za-z0-9]+" required>
                     <div class="flex items-center justify-center m-4">
@@ -225,15 +319,15 @@ $html->startBody();
                     </button>
                 </div>
                 <h3 class="text-2xl font-semibold text-custom-purple mb-3">Edit Student</h3>
-                <form method="POST">
+                <form id="edit-student-form">
                     <label class="ml-1 text-sm">Student ID:</label>
-                    <input type="text" id="edit-student-id" name="edit-student-id" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" maxlength="7" readonly>
+                    <input type="text" id="edit-student-id" name="edit-student-id" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" maxlength="7" pattern="[0-9\-]*" readonly>
                     <label class="ml-1 text-sm">Last Name:</label>
-                    <input type="text" id="edit-last-name" name="edit-last-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" pattern="[a-zA-Z\s']+" required>
+                    <input type="text" id="edit-last-name" name="edit-last-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" pattern="[a-zA-ZñÑáéíóúÁÉÍÓÚüÜ\s']+" required>
                     <label class="ml-1 text-sm">First Name:</label>
-                    <input type="text" id="edit-first-name" name="edit-first-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" pattern="[a-zA-Z\s']+" required>
+                    <input type="text" id="edit-first-name" name="edit-first-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" pattern="[a-zA-ZñÑáéíóúÁÉÍÓÚüÜ\s']+" required>
                     <label class="ml-1 text-sm">Middle Initial:</label>
-                    <input type="text" id="edit-middle-initial" name="edit-middle-initial" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" maxlength="3" pattern="[a-zA-Z\s']+">
+                    <input type="text" id="edit-middle-initial" name="edit-middle-initial" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" maxlength="3" pattern="[a-zA-ZñÑáéíóúÁÉÍÓÚüÜ\s']+">
                     <label class="ml-1 text-sm">Year & Section:</label>
                     <input type="text" id="edit-yearsec" name="edit-yearsec" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" maxlength="2" pattern="[A-Za-z0-9]+" required>
                     <div class="flex items-center justify-center m-4">
@@ -243,117 +337,7 @@ $html->startBody();
             </div>
         </div>
     </div>
-    <script type="text/javascript">
-        $("#popup-bg, #popup-item, #edit-popup-item").removeClass("hidden");
-        $("#popup-bg, #popup-item, #edit-popup-item").hide();
-        $("#add-student").click((event) => {
-            $("#popup-bg").fadeIn(150);
-            $("#popup-item").delay(150).fadeIn(150);
-            $("#close-popup").click((event) => {
-                $("#popup-bg, #popup-item").fadeOut(150);
-            });
-        });
-
-        const editRow = (link) => {
-            $("#popup-bg").fadeIn(150);
-            $("#edit-popup-item").delay(150).fadeIn(150);
-            $("#edit-close-popup").click(function() {
-                $("#popup-bg, #edit-popup-item").fadeOut(150);
-            });
-            
-            const row = $(link).closest("tr");
-            const studentId = row.find("td:eq(0)").text();
-            const studentData = namesArray.find((student) => {
-                return student[0] === studentId;
-            });
-            if (studentData) {
-                $("#edit-student-id").val(studentData[0]);
-                $("#edit-last-name").val(studentData[1]);
-                $("#edit-first-name").val(studentData[2]);
-                $("#edit-middle-initial").val(studentData[3].replace(".", ""));
-                $("#edit-yearsec").val(studentData[4]);
-            }
-        }
-
-        for (let i=0; i<namesArray.length; i++) {
-            deleteData("#delete-student-" + namesArray[i][0], "#delete-current-" + namesArray[i][0], "Delete this student?", "This action can't be undone.");
-        }
-    </script>
     <?php
-    if (isset($_POST['add-new-student'])) {
-        $sid = str_replace(" ", "", $_POST['student-id']);
-        $lastname = ucwords($_POST['last-name']);
-        $firstname = ucwords($_POST['first-name']);
-        $mi = ucwords($_POST['middle-initial']);
-        $yearsec = strtoupper($_POST['yearsec']);
-        $email = strtolower(str_replace(" ", "", $firstname)) . "." . strtolower(str_replace(" ", "", $lastname)) . "@cbsua.edu.ph";
-        $password = "cit-" . $sid;
-        $hash_password = password_hash($password, PASSWORD_DEFAULT);
-
-        $sql_student = "INSERT INTO `students`(`student_id`, `last_name`, `first_name`, `middle_initial`, `year_and_section`) VALUES (?, ?, ?, ?, ?)";
-        $stmt_student = $conn->prepare($sql_student);
-
-        $sql_account = "INSERT INTO `accounts`(`email`, `password`, `student_id`, `type`) VALUES (?, ?, ?, 'user')";
-        $stmt_account = $conn->prepare($sql_account);
-
-        if ($stmt_student->execute([$sid, $lastname, $firstname, $mi, $yearsec])) {
-            ?>
-            <script>
-                swal('Student added successfully!', `<?php echo $stmt_account->execute([$email, $hash_password, $sid]) ? "Default account also created:\n\nEmail: ".$email."\nPassword: ".$password : "But default student account failed to create." ?>`, 'success')
-                .then(() => {
-                    window.location.href = 'students.php';
-                });
-            </script>
-            <?php
-        } else {
-            ?><script>swal('Failed to add student!', '', 'error');</script>"<?php
-        }
-    }
-    if (isset($_POST['update-this-student'])) {
-        $sid = str_replace(" ", "", $_POST['edit-student-id']);
-        $lastname = ucwords($_POST['edit-last-name']);
-        $firstname = ucwords($_POST['edit-first-name']);
-        $mi = ucwords($_POST['edit-middle-initial']);
-        $yearsec = strtoupper($_POST['edit-yearsec']);
-        $email = strtolower(str_replace(" ", "", $firstname)) . "." . strtolower(str_replace(" ", "", $lastname)) . "@cbsua.edu.ph";
-
-        $sqlupdate_account = "UPDATE `accounts` SET `email`=? WHERE `student_id` = ?";
-        $stmt_update_account = $conn->prepare($sqlupdate_account);
-
-        $sqlupdate_student = "UPDATE `students` SET `last_name`= ?, `first_name`= ?, `middle_initial`= ?, `year_and_section`= ? WHERE `student_id` = ?";
-        $stmt_update_student = $conn->prepare($sqlupdate_student);
-
-        if ($stmt_update_student->execute([$lastname, $firstname, $mi, $yearsec, $sid])) {
-            ?>
-            <script>
-                swal('Student updated successfully!', '<?php echo $stmt_update_account->execute([$email, $sid]) ? "Modifying the name can also modify the student\'s email." : "But student email failed to update." ?>', 'success')
-                .then(() => {
-                    window.location.href = 'students.php';
-                });
-            </script>
-            <?php
-        } else {
-            ?><script>swal('Failed to update student!', '', 'error');</script>"<?php
-        }
-    }
-    if (isset($_POST['sid-to-delete'])) {
-        $sqldelete_student = "DELETE FROM `students` WHERE `student_id`= ?";
-        $stmt_delete_student = $conn->prepare($sqldelete_student);
-
-        if ($stmt_delete_student->execute([$_POST['sid-to-delete']])) {
-            ?>
-            <script>
-                swal('Student successfully deleted', '', 'success')
-                .then(() => {
-                    window.location.href = "students.php"
-                });</script>
-            <?php
-        } else {
-            ?>
-            <script>swal('Student deletion failed', '', 'error');</script>
-            <?php
-        }
-    }
     if (isset($_POST['importcsv'])) {
         if (isset($_FILES['students-csv-file']) && $_FILES['students-csv-file']['error'] == UPLOAD_ERR_OK) {
             $file_name = $_FILES['students-csv-file']['name'];
@@ -388,7 +372,7 @@ $html->startBody();
                             $firstname = $data[2];
                             $mi = $data[3];
                             $yearsec = $data[4];
-                            $email = strtolower(str_replace(" ", "", $firstname)) . "." . strtolower(str_replace(" ", "", $lastname)) . "@cbsua.edu.ph";
+                            $email = generateEmail($firstname, $lastname);
                             $password = "cit-" . $sid;
                             $hash_password = password_hash($password, PASSWORD_DEFAULT);
                             try {

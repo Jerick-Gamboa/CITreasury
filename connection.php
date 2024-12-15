@@ -10,7 +10,12 @@ try {
     $conn = new PDO("mysql:host=$host;dbname=$db", $username, $password);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
-    die("Connection failed: " . $e->getMessage());
+    header('Content-Type: application/json');
+    $response = [];
+    $response["status"] = "error";
+    $response["message"] = "Connection Failed";
+    $response["details"] = $e->getMessage();
+    echo json_encode($response);
+    exit();
 }
-
 ?>

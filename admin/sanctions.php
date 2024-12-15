@@ -3,8 +3,49 @@ session_start();
 include '../connection.php';
 include '../helperfunctions.php';
 include '../components/menu.php';
+include '../components/nav.php';
 verifyAdminLoggedIn($conn);
 
+// API Endpoint
+if (isset($_GET['api'])) {
+    header('Content-Type: application/json');
+    $postData = file_get_contents("php://input");
+    $data = json_decode($postData, true);
+    $response = [];
+    // Initial response
+    $response["status"] = "error";
+    $response["message"] = "Unknown";
+    $response["details"] = "";
+
+    if ($_GET['api'] == 'collect') {
+        if (isset($data['collect_student_id'], $data['collect_event_id'], $data['collect_amount'])) {
+            $sid = $data['collect_student_id'];
+            $eventid = $data['collect_event_id'];
+            $collectamount = $data['collect_amount'];
+            try {
+                $sqladd_collect = "INSERT INTO `sanctions` (`student_id`, `event_id`, `sanctions_paid`) VALUES (?, ?, ?)";
+                $stmt_add_collect = $conn->prepare($sqladd_collect);
+                if ($stmt_add_collect->execute([$sid, $eventid, $collectamount])) {
+                    $response["status"] = "success";
+                    $response["message"] = "Sanction fees collected!";
+                } else {
+                    $response["message"] = "Failed to collect fee!";
+                }
+            } catch (Exception $e) {
+                $response["message"] = "Database error";
+                $response["details"] = $e->getMessage();
+            }
+        } else {
+            $response["message"] = "Invalid data";
+        }
+    } else {
+        $response["message"] = "Unknown get method";
+    }
+    echo json_encode($response);
+    exit();
+}
+
+// Default View
 $html = new HTML("CITreasury - Sanctions");
 $html->addLink('stylesheet', '../inter-variable.css');
 $html->addLink('icon', '../img/nobgcitsclogo.png');
@@ -14,16 +55,11 @@ $html->addScript("../js/sweetalert.min.js");
 $html->addScript("../js/jquery-3.7.1.min.js");
 $html->addScript("../js/predefined-script.js");
 $html->addScript("../js/defer-script.js", true);
+$html->addScript("sanctions.js", true);
 $html->startBody();
 ?>
     <!-- Top Navigation Bar -->
-    <nav class="fixed w-full bg-custom-purple flex flex-row shadow shadow-gray-800">
-        <img src="../img/nobgcitsclogo.png" class="w-12 h-12 my-2 ml-6">
-        <h1 class="text-3xl p-3 font-bold text-white">CITreasury</h1>
-        <div class="w-full text-white">
-            <svg id="mdi-menu" class="w-8 h-8 mr-3 my-4 p-1 float-right fill-current rounded transition-all duration-300-ease-in-out md:hidden hover:bg-white hover:text-custom-purple hover:cursor-pointer" viewBox="0 0 24 24"><path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z" /></svg>
-        </div>
-    </nav>
+    <?php nav(); ?>
     <!-- Body -->
     <div class="flex flex-col md:flex-row bg-custom-purplo min-h-screen">
         <!-- Side Bar Menu Items -->
@@ -88,66 +124,71 @@ $html->startBody();
                             <?php
                         }
                         $sql_unregisteredpast .= " ORDER BY `balance` DESC LIMIT ? OFFSET ?";
-                        $stmt_unregisteredpast = $conn->prepare($sql_unregisteredpast);
-                        if (isset($search)) {
-                            $stmt_unregisteredpast->bindParam(1, $search, PDO::PARAM_STR);
-                            $stmt_unregisteredpast->bindParam(2, $search, PDO::PARAM_STR);
-                            $stmt_unregisteredpast->bindParam(3, $search, PDO::PARAM_STR);
-                            $stmt_unregisteredpast->bindParam(4, $search, PDO::PARAM_STR);
-                            $stmt_unregisteredpast->bindParam(5, $search, PDO::PARAM_STR);
-                            $stmt_unregisteredpast->bindParam(6, $results_per_page, PDO::PARAM_INT);
-                            $stmt_unregisteredpast->bindParam(7, $offset, PDO::PARAM_INT);
-                        } else {
-                            $stmt_unregisteredpast->bindParam(1, $results_per_page, PDO::PARAM_INT);
-                            $stmt_unregisteredpast->bindParam(2, $offset, PDO::PARAM_INT);
-                        }
-                        $stmt_unregisteredpast->execute();
-                        $result_unregisteredpast = $stmt_unregisteredpast->fetchAll(PDO::FETCH_ASSOC);
-                        if (count($result_unregisteredpast) > 0) {
-                            ?>
-                            <thead class="text-white uppercase bg-custom-purplo ">
-                                <tr>
-                                    <th scope="col" class="p-2 border-r border-black">Student ID</th>
-                                    <th scope="col" class="p-2 border-r border-black">Student Name</th>
-                                    <th scope="col" class="p-2 border-r border-black">Year & Section</th>
-                                    <th scope="col" class="p-2 border-r border-black">Event Name</th>
-                                    <th scope="col" class="p-2 border-r border-black">Event Date</th>
-                                    <th scope="col" class="p-2 border-r border-black">Total Fees (₱)</th>
-                                    <th scope="col" class="p-2 border-r border-black">Balance (₱)</th>
-                                    <th scope="col" class="p-2">Actions</th>
-                                </tr>
-                            </thead>
-                            <?php
-                            foreach ($result_unregisteredpast as $row) {
-                                $sid = $row['student_id'];
-                                $lastname = $row['last_name'];
-                                $firstname = $row['first_name'];
-                                $mi = !empty($row['middle_initial']) ? $row['middle_initial'] . '.' : "";
-                                $yearsec = $row['year_and_section'];
-                                $eventid = $row['event_id'];
-                                $eventname = $row['event_name'];
-                                $eventdate = $row['event_date'];
-                                $totalfee = $row['total_fee'];
-                                $balance = $row['balance'];
-                                ?>
-                                <tr class="border-t border-black">
-                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $sid; ?></td>
-                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $lastname . ', ' . $firstname . ' ' . $mi; ?></td>
-                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $yearsec; ?></td>
-                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $eventname; ?></td>
-                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $eventdate; ?></td>
-                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $totalfee; ?></td>
-                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $balance; ?></td>
-                                    <td class="max-w-56 bg-purple-100">
-                                        <button class="px-3 py-2 my-1 mx-1 bg-green-500 text-white text-sm font-semibold rounded-lg focus:outline-none disabled:bg-gray-400 shadow hover:bg-green-400" onclick='collect(this, "<?php echo $eventid; ?>")' <?php if ($balance <= 0) echo 'disabled'; ?>>
-                                            <svg id="mdi-wallet-plus" class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M3 0V3H0V5H3V8H5V5H8V3H5V0H3M9 3V6H6V9H3V19C3 20.1 3.89 21 5 21H19C20.11 21 21 20.11 21 19V18H12C10.9 18 10 17.11 10 16V8C10 6.9 10.89 6 12 6H21V5C21 3.9 20.11 3 19 3H9M12 8V16H22V8H12M16 10.5C16.83 10.5 17.5 11.17 17.5 12C17.5 12.83 16.83 13.5 16 13.5C15.17 13.5 14.5 12.83 14.5 12C14.5 11.17 15.17 10.5 16 10.5Z" /></svg>
-                                        </button> <!-- Disable button if balance is zero -->
-                                    </td>
-                                </tr>
-                                <?php
+                        try {
+                            $stmt_unregisteredpast = $conn->prepare($sql_unregisteredpast);
+                            if (isset($search)) {
+                                $stmt_unregisteredpast->bindParam(1, $search, PDO::PARAM_STR);
+                                $stmt_unregisteredpast->bindParam(2, $search, PDO::PARAM_STR);
+                                $stmt_unregisteredpast->bindParam(3, $search, PDO::PARAM_STR);
+                                $stmt_unregisteredpast->bindParam(4, $search, PDO::PARAM_STR);
+                                $stmt_unregisteredpast->bindParam(5, $search, PDO::PARAM_STR);
+                                $stmt_unregisteredpast->bindParam(6, $results_per_page, PDO::PARAM_INT);
+                                $stmt_unregisteredpast->bindParam(7, $offset, PDO::PARAM_INT);
+                            } else {
+                                $stmt_unregisteredpast->bindParam(1, $results_per_page, PDO::PARAM_INT);
+                                $stmt_unregisteredpast->bindParam(2, $offset, PDO::PARAM_INT);
                             }
-                        } else { // If query returned no results, display this
-                            ?><h3 class="p-4">No unregistered students found.</h3><?php
+                            $stmt_unregisteredpast->execute();
+                            $result_unregisteredpast = $stmt_unregisteredpast->fetchAll(PDO::FETCH_ASSOC);
+                            if (count($result_unregisteredpast) > 0) {
+                                ?>
+                                <thead class="text-white uppercase bg-custom-purplo ">
+                                    <tr>
+                                        <th scope="col" class="p-2 border-r border-black">Student ID</th>
+                                        <th scope="col" class="p-2 border-r border-black">Student Name</th>
+                                        <th scope="col" class="p-2 border-r border-black">Year & Section</th>
+                                        <th scope="col" class="p-2 border-r border-black">Event Name</th>
+                                        <th scope="col" class="p-2 border-r border-black">Event Date</th>
+                                        <th scope="col" class="p-2 border-r border-black">Total Fees (₱)</th>
+                                        <th scope="col" class="p-2 border-r border-black">Balance (₱)</th>
+                                        <th scope="col" class="p-2">Actions</th>
+                                    </tr>
+                                </thead>
+                                <?php
+                                foreach ($result_unregisteredpast as $row) {
+                                    $sid = $row['student_id'];
+                                    $lastname = $row['last_name'];
+                                    $firstname = $row['first_name'];
+                                    $mi = !empty($row['middle_initial']) ? $row['middle_initial'] . '.' : "";
+                                    $yearsec = $row['year_and_section'];
+                                    $eventid = $row['event_id'];
+                                    $eventname = $row['event_name'];
+                                    $eventdate = $row['event_date'];
+                                    $totalfee = $row['total_fee'];
+                                    $balance = $row['balance'];
+                                    ?>
+                                    <tr class="border-t border-black">
+                                        <td class="px-2 border-r border-black bg-purple-100"><?php echo $sid; ?></td>
+                                        <td class="px-2 border-r border-black bg-purple-100"><?php echo $lastname . ', ' . $firstname . ' ' . $mi; ?></td>
+                                        <td class="px-2 border-r border-black bg-purple-100"><?php echo $yearsec; ?></td>
+                                        <td class="px-2 border-r border-black bg-purple-100"><?php echo $eventname; ?></td>
+                                        <td class="px-2 border-r border-black bg-purple-100"><?php echo $eventdate; ?></td>
+                                        <td class="px-2 border-r border-black bg-purple-100"><?php echo $totalfee; ?></td>
+                                        <td class="px-2 border-r border-black bg-purple-100"><?php echo $balance; ?></td>
+                                        <td class="max-w-56 bg-purple-100">
+                                            <button class="px-3 py-2 my-1 mx-1 bg-green-500 text-white text-sm font-semibold rounded-lg focus:outline-none disabled:bg-gray-400 shadow hover:bg-green-400" onclick='collect(this, "<?php echo $eventid; ?>")' <?php if ($balance <= 0) echo 'disabled'; ?>>
+                                                <svg id="mdi-wallet-plus" class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M3 0V3H0V5H3V8H5V5H8V3H5V0H3M9 3V6H6V9H3V19C3 20.1 3.89 21 5 21H19C20.11 21 21 20.11 21 19V18H12C10.9 18 10 17.11 10 16V8C10 6.9 10.89 6 12 6H21V5C21 3.9 20.11 3 19 3H9M12 8V16H22V8H12M16 10.5C16.83 10.5 17.5 11.17 17.5 12C17.5 12.83 16.83 13.5 16 13.5C15.17 13.5 14.5 12.83 14.5 12C14.5 11.17 15.17 10.5 16 10.5Z" /></svg>
+                                            </button> <!-- Disable button if balance is zero -->
+                                        </td>
+                                    </tr>
+                                    <?php
+                                }
+                            } else { // If query returned no results, display this
+                                ?><h3 class="p-4">No unregistered students found.</h3><?php
+                            }
+                        } catch (PDOException $e) {
+                            $result_unregisteredpast = [];
+                            ?><h3 class="p-4">Page not found.</h3><?php
                         }
                         ?>
                     </table>
@@ -185,7 +226,7 @@ $html->startBody();
                     # Display pagination buttons
                     for ($i = 1; $i <= $total_pages; $i++) {
                         ?><a href='sanctions.php?<?php echo (isset($search)) ? "search=".htmlspecialchars($_GET['search'])."&" : ""; ?>page=<?php echo $i; ?>'><button class="px-3 py-2 my-1 mr-1 <?php echo $page == $i ? 'bg-purple-600' : 'bg-custom-purplo'; ?> text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-custom-purple"><?php echo $i; ?></button></a>
-                        <?php
+                            <?php
                     }
                 }
                 ?>
@@ -204,7 +245,7 @@ $html->startBody();
                     </button>
                 </div>
                 <h3 class="text-2xl font-semibold text-custom-purple mb-3">Collect Sanction Fees</h3>
-                <form method="POST">
+                <form id="collect-sanction-form">
                     <label class="ml-1 text-sm">Student ID:</label>
                     <input type="text" id="collect-student-id" name="collect-student-id" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" maxlength="7" readonly>
                     <label class="ml-1 text-sm">Student Name:</label>
@@ -225,64 +266,6 @@ $html->startBody();
             </div>
         </div>
     </div>
-    <script type="text/javascript">
-    // If collect button is pressed, fade in modals for collection
-        const collect = (link, eventId) => {
-            $("#collect-popup-bg").fadeIn(150);
-            $("#collect-popup-item").delay(150).fadeIn(150);
-            $("#collect-close-popup").click((event) => {
-                $("#collect-popup-bg, #collect-popup-item").fadeOut(150);
-                $("#collect-amount").val(null);
-            });
-
-            let row = link.parentNode.parentNode; // Get table datas
-            // Transfer table data to input fields
-            $("#collect-student-id").val(row.cells[0].innerHTML);
-            $("#collect-student-name").val(row.cells[1].innerHTML);
-            $("#collect-event-name").val(row.cells[3].innerHTML);
-            $("#collect-event-id").val(eventId);
-            $("#collect-total-fee").val(row.cells[5].innerHTML); 
-            $("#collect-balance").val(row.cells[6].innerHTML);
-
-            $("#collect-amount").on('input', () => { // Input change in collected amount
-                let collectAmount = parseFloat($("#collect-amount").val());
-                let currentBalance = parseFloat(row.cells[6].innerHTML);
-
-                if (isNaN(collectAmount) || collectAmount > currentBalance || collectAmount <= 0) {
-                    // If collected amount is not valid, disable Collect Sanctions button and set balance input to default
-                    $("#collect-this-fee").prop('disabled', true);
-                    $("#collect-balance").val(currentBalance);
-                } else {
-                    // If valid, enable Collect Sanctions button and set balance = (current balance - collected amount)
-                    $("#collect-this-fee").prop('disabled', false);
-                    $("#collect-balance").val(currentBalance - parseFloat($("#collect-amount").val()));
-                }
-            });
-        }
-    </script>
-    <?php
-    # If collect fee is submitted
-    if (isset($_POST['collect-this-fee'])) {
-        $sid = $_POST['collect-student-id'];
-        $eventid = $_POST['collect-event-id'];
-        $collectamount = $_POST['collect-amount'];
-        $sqladd_collect = "INSERT INTO `sanctions` (`student_id`, `event_id`, `sanctions_paid`) VALUES (?, ?, ?)";
-        $stmt_add_collect = $conn->prepare($sqladd_collect);
-        if ($stmt_add_collect->execute([$sid, $eventid, $collectamount])) {
-            ?>
-            <!-- SweetAlert popup -->
-            <script>
-                swal('Sanction fees collected!', '', 'success')
-                .then(() => {
-                    window.location.href = 'sanctions.php';
-                });
-            </script>
-            <?php
-        } else {
-            ?><script>swal('Failed to collect fee!', '', 'error');</script><?php
-        }
-    }
-    ?>
 <?php
 $conn = null;
 $html->endBody();

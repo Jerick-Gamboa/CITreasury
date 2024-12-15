@@ -3,8 +3,47 @@ session_start();
 include '../connection.php';
 include '../helperfunctions.php';
 include '../components/menu.php';
+include '../components/nav.php';
 verifyAdminLoggedIn($conn);
 
+// API Endpoint
+if (isset($_GET['api'])) {
+    header('Content-Type: application/json');
+    $postData = file_get_contents("php://input");
+    $data = json_decode($postData, true);
+    $response = [];
+    // Initial response
+    $response["status"] = "error";
+    $response["message"] = "Unknown";
+    $response["details"] = "";
+
+    if ($_GET['api'] == 'edit') {
+        if (isset($data['edit_student_id'], $data['edit_account_type'])) {
+            $acctype = $data['edit_account_type'];
+            $sid = $data['edit_student_id'];
+            try {
+                $sqlupdate_account = "UPDATE `accounts` SET `type`=? WHERE `student_id` = ?";
+                $stmt_update_account = $conn->prepare($sqlupdate_account);
+                if ($stmt_update_account->execute([$acctype, $sid])) {
+                    $response["status"] = "success";
+                    $response["message"] = "Account updated successfully!";
+                } else {
+                    $response["message"] = "Failed to update account!";
+                }
+            } catch (Exception $e) {
+                $response["message"] = "Database error: " . $e->getMessage();
+            }
+        } else {
+            $response["message"] = "Invalid data";
+        }
+    } else {
+        $response["message"] = "Unknown get method";
+    }
+    echo json_encode($response);
+    exit();
+}
+
+// Default View
 $html = new HTML("CITreasury - Account Privileges");
 $html->addLink('stylesheet', '../inter-variable.css');
 $html->addLink('icon', '../img/nobgcitsclogo.png');
@@ -12,20 +51,12 @@ $html->addScript("../js/tailwind3.4.15.js");
 $html->addScript("../js/tailwind.config.js");
 $html->addScript("../js/sweetalert.min.js");
 $html->addScript("../js/jquery-3.7.1.min.js");
-$html->addScript("../js/predefined-script.js");
 $html->addScript("../js/defer-script.js", true);
+$html->addScript("accountprivileges.js", true);
 $html->startBody();
 ?>
     <!-- Top Navigation Bar -->
-    <nav class="fixed w-full bg-custom-purple flex flex-row shadow shadow-gray-800">
-        <img src="../img/nobgcitsclogo.png" class="w-12 h-12 my-2 ml-6">
-        <h1 class="text-3xl p-3 font-bold text-white">CITreasury</h1>
-        <div class="w-full text-white">
-            <svg id="mdi-menu" class="w-8 h-8 mr-3 my-4 p-1 float-right fill-current rounded transition-all duration-300-ease-in-out md:hidden hover:bg-white hover:text-custom-purple hover:cursor-pointer" viewBox="0 0 24 24">
-              <path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z" />
-            </svg>
-        </div>
-    </nav>
+    <?php nav(); ?>
     <!-- Body -->
     <div class="flex flex-col md:flex-row bg-custom-purplo min-h-screen">
         <div class="mt-18 md:mt-20 mx-2">
@@ -70,50 +101,55 @@ $html->startBody();
                         }
                         // Add limit and offset for pagination
                         $sql .= " LIMIT ? OFFSET ?";
-                        $stmt = $conn->prepare($sql);
-                        if (isset($search)) {
-                            $stmt->bindParam(1, $search, PDO::PARAM_STR);
-                            $stmt->bindParam(2, $search, PDO::PARAM_STR);
-                            $stmt->bindParam(3, $search, PDO::PARAM_STR);
-                            $stmt->bindParam(4, $results_per_page, PDO::PARAM_INT);
-                            $stmt->bindParam(5, $offset, PDO::PARAM_INT);
-                        } else {
-                            $stmt->bindParam(1, $results_per_page, PDO::PARAM_INT);
-                            $stmt->bindParam(2, $offset, PDO::PARAM_INT);
-                        }
-                        $stmt->execute();
-                        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                        if (count($result) > 0) {
-                            ?>
-                            <thead class="text-white uppercase bg-custom-purplo ">
-                                <tr>
-                                    <th scope="col" class="p-2 border-r border-black">Student ID</th>
-                                    <th scope="col" class="p-2 border-r border-black">Email</th>
-                                    <th scope="col" class="p-2 border-r border-black">Role</th>
-                                    <th scope="col" class="p-2">Actions</th>
-                                </tr>
-                            </thead>
-                            <?php
-                            // Loop through the results
-                            foreach ($result as $row) {
-                                $sid = $row['student_id'];
-                                $email = $row['email'];
-                                $type = $row['type'];
-                                ?>
-                                <tr class="border-t border-black">
-                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $sid; ?></td>
-                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $email; ?></td>
-                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $type; ?></td>
-                                    <td class="px-1 bg-purple-100">
-                                        <button class="px-3 py-2 my-1 mx-1 bg-orange-500 text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-orange-400" onclick="editRow(this)">
-                                            <svg id="mdi-pencil" class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z" /></svg>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <?php
+                        try {
+                            $stmt = $conn->prepare($sql);
+                            if (isset($search)) {
+                                $stmt->bindParam(1, $search, PDO::PARAM_STR);
+                                $stmt->bindParam(2, $search, PDO::PARAM_STR);
+                                $stmt->bindParam(3, $search, PDO::PARAM_STR);
+                                $stmt->bindParam(4, $results_per_page, PDO::PARAM_INT);
+                                $stmt->bindParam(5, $offset, PDO::PARAM_INT);
+                            } else {
+                                $stmt->bindParam(1, $results_per_page, PDO::PARAM_INT);
+                                $stmt->bindParam(2, $offset, PDO::PARAM_INT);
                             }
-                        } else {
-                            ?><h3 class="p-4">No accounts found.</h3><?php
+                            $stmt->execute();
+                            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                            if (count($result) > 0) {
+                                ?>
+                                <thead class="text-white uppercase bg-custom-purplo ">
+                                    <tr>
+                                        <th scope="col" class="p-2 border-r border-black">Student ID</th>
+                                        <th scope="col" class="p-2 border-r border-black">Email</th>
+                                        <th scope="col" class="p-2 border-r border-black">Role</th>
+                                        <th scope="col" class="p-2">Actions</th>
+                                    </tr>
+                                </thead>
+                                <?php
+                                // Loop through the results
+                                foreach ($result as $row) {
+                                    $sid = $row['student_id'];
+                                    $email = $row['email'];
+                                    $type = $row['type'];
+                                    ?>
+                                    <tr class="border-t border-black">
+                                        <td class="px-2 border-r border-black bg-purple-100"><?php echo $sid; ?></td>
+                                        <td class="px-2 border-r border-black bg-purple-100"><?php echo $email; ?></td>
+                                        <td class="px-2 border-r border-black bg-purple-100"><?php echo $type; ?></td>
+                                        <td class="px-1 bg-purple-100">
+                                            <button class="px-3 py-2 my-1 mx-1 bg-orange-500 text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-orange-400" onclick="editRow(this)">
+                                                <svg id="mdi-pencil" class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z" /></svg>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <?php
+                                }
+                            } else {
+                                ?><h3 class="p-4">No accounts found.</h3><?php
+                            }
+                        } catch (PDOException $e) {
+                            $result = [];
+                            ?><h3 class="p-4">Page not found.</h3><?php
                         }
                         ?>
                     </table>
@@ -147,7 +183,7 @@ $html->startBody();
                     # Display pagination buttons
                     for ($i = 1; $i <= $total_pages; $i++) {
                         ?><a href='accountprivileges.php?page=<?php echo $i; ?>'><button class="px-3 py-2 my-1 mr-1 <?php echo $page == $i ? 'bg-purple-600' : 'bg-custom-purplo'; ?> text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-custom-purple"><?php echo $i; ?></button></a>
-                        <?php
+                            <?php
                     }
                 }
                 ?>
@@ -164,7 +200,7 @@ $html->startBody();
                     </button>
                 </div>
                 <h3 class="text-2xl font-semibold text-custom-purple mb-3">Edit Account Privilege</h3>
-                <form method="POST">
+                <form id="edit-privilege-form">
                     <label class="ml-1 text-sm">Student ID:</label>
                     <input type="text" id="edit-student-id" name="edit-student-id" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" maxlength="7" readonly>
                     <label class="ml-1 text-sm">Email:</label>
@@ -181,47 +217,6 @@ $html->startBody();
             </div>
         </div>
     </div>
-    <script type="text/javascript">
-        $("#edit-popup-bg, #edit-popup-item").removeClass("hidden");
-        $("#edit-popup-bg, #edit-popup-item").hide();
-
-        const editRow = (link) => {
-            let row = link.parentNode.parentNode
-            $("#edit-popup-bg").fadeIn(150);
-            $("#edit-popup-item").delay(150).fadeIn(150);
-            $("#edit-close-popup").click(function() {
-                $("#edit-popup-bg, #edit-popup-item").fadeOut(150);
-            });
-            $("#edit-student-id").val(row.cells[0].innerHTML);
-            $("#edit-email").val(row.cells[1].innerHTML);
-            $("#edit-account-type").val(row.cells[2].innerHTML);
-            if ($("#edit-student-id").val() === "<?php echo $_SESSION['cit-student-id']; ?>") {
-                $("#edit-account-type").prop('disabled', true);
-            } else {
-                $("#edit-account-type").prop('disabled', false);
-            }
-        }
-    </script>
-    <?php
-    if (isset($_POST['update-this-account'])) {
-        $acctype = $_POST['edit-account-type'];
-        $sid = $_POST['edit-student-id'];
-        $sqlupdate_account = "UPDATE `accounts` SET `type`=? WHERE `student_id` = ?";
-        $stmt_update_account = $conn->prepare($sqlupdate_account);
-        if ($stmt_update_account->execute([$acctype, $sid])) {
-            ?>
-            <script>
-                swal('Account updated successfully!', '', 'success')
-                .then(() => {
-                    window.location.href = 'accountprivileges.php';
-                });
-            </script>
-            <?php
-        } else {
-            ?><script>swal('Failed to update account!', '', 'error');</script>"<?php
-        }
-    }
-    ?>
 <?php
 $conn = null;
 $html->endBody();

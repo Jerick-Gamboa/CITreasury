@@ -3,8 +3,95 @@ session_start();
 include '../connection.php';
 include '../helperfunctions.php';
 include '../components/menu.php';
+include '../components/nav.php';
 verifyAdminLoggedIn($conn);
 
+// API Endpoint
+if (isset($_GET['api'])) {
+    header('Content-Type: application/json');
+    $postData = file_get_contents("php://input");
+    $data = json_decode($postData, true);
+    $response = [];
+    // Initial response
+    $response["status"] = "error";
+    $response["message"] = "Unknown";
+    $response["details"] = "";
+
+    if ($_GET['api'] == 'add') {
+        if (isset($data['event_name'], $data['event_desc'], $data['event_target'], $data['event_date'], $data['fee_per_event'], $data['sanction_fee'])) {
+            $eventname = ucwords($data['event_name']);
+            $eventdesc = trim($data['event_desc']);
+            $eventdate = $data['event_date'];
+            $eventtarget = isset($data['event_target']) ? implode(',', $data['event_target']) : '';
+            $feeperevent = $data['fee_per_event'];
+            $sanctionfee = $data['sanction_fee'];
+            try {
+                $sql_event = "INSERT INTO `events`(`event_name`, `event_description`, `event_target`, `event_date`, `event_fee`, `sanction_fee`) VALUES (?, ?, ?, ?, ?, ?)";
+                $stmt_event = $conn->prepare($sql_event);
+                if ($stmt_event->execute([$eventname, $eventdesc, $eventtarget, $eventdate, $feeperevent, $sanctionfee])) {
+                    $response["status"] = "success";
+                    $response["message"] = "Event added successfully!";
+                } else {
+                    $response["message"] = "Failed to add event!";
+                }
+            } catch (Exception $e) {
+                $response["message"] = "Database error";
+                $response["details"] = $e->getMessage();
+            }
+        } else {
+            $response["message"] = "Invalid data";
+        }
+    } elseif ($_GET['api'] == 'edit') {
+        if (isset($data['edit_event_id'], $data['edit_event_name'], $data['edit_event_desc'], $data['edit_event_target'], $data['edit_event_date'], $data['edit_fee_per_event'], $data['edit_sanction_fee'])) {
+            $eid = trim($data['edit_event_id']);
+            $eventname = ucwords(trim($data['edit_event_name']));
+            $eventdesc = trim($data['edit_event_desc']);
+            $eventdate = trim($data['edit_event_date']);
+            $feeperevent = floatval($data['edit_fee_per_event']);
+            $sanctionfee = floatval($data['edit_sanction_fee']);
+            $eventtarget = (isset($data['edit_event_target']) && !empty($data['edit_event_target'])) ? implode(',', $data['edit_event_target']) : '';
+            try {
+                $sqlupdate_event = "UPDATE `events` SET `event_name` = ?, `event_description` = ?, `event_target` = ?, `event_date` = ?, `event_fee` = ?, `sanction_fee` = ? WHERE `event_id` = ?";
+                $stmt_update_event = $conn->prepare($sqlupdate_event);
+                if ($stmt_update_event->execute([$eventname, $eventdesc, $eventtarget, $eventdate, $feeperevent, $sanctionfee, $eid])) {
+                    $response["status"] = "success";
+                    $response["message"] = "Event updated successfully";
+                } else {
+                    $response["message"] = "Failed to update event!";
+                }
+            } catch (Exception $e) {
+                $response["message"] = "Database error";
+                $response["details"] = $e->getMessage();
+            }
+        } else {
+            $response["message"] = "Invalid data";
+        }
+    } elseif ($_GET['api'] == 'delete') {
+        if (isset($data['event_id'])) {
+            try {
+                $sql = "DELETE FROM `events` WHERE `event_id`= ?";
+                $stmt = $conn->prepare($sql);
+                if ($stmt->execute([$data['event_id']])) {
+                    $response["status"] = "success";
+                    $response["message"] = "Student successfully deleted";
+                } else {
+                    $response["message"] = "Student deletion failed";
+                }
+            } catch (Exception $e) {
+                $response["message"] = "Database error";
+                $response["details"] = $e->getMessage();
+            }
+        } else {
+            $response["message"] = "Invalid data";
+        }
+    } else {
+        $response["message"] = "Unknown get method";
+    }
+    echo json_encode($response);
+    exit();
+}
+
+// Default View
 $html = new HTML("CITreasury - Events");
 $html->addLink('stylesheet', '../inter-variable.css');
 $html->addLink('icon', '../img/nobgcitsclogo.png');
@@ -14,18 +101,11 @@ $html->addScript("../js/sweetalert.min.js");
 $html->addScript("../js/jquery-3.7.1.min.js");
 $html->addScript("../js/predefined-script.js");
 $html->addScript("../js/defer-script.js", true);
+$html->addScript("eventslist.js", true);
 $html->startBody();
 ?>
     <!-- Top Navigation Bar -->
-    <nav class="fixed w-full bg-custom-purple flex flex-row shadow shadow-gray-800">
-        <img src="../img/nobgcitsclogo.png" class="w-12 h-12 my-2 ml-6">
-        <h1 class="text-3xl p-3 font-bold text-white">CITreasury</h1>
-        <div class="w-full text-white">
-            <svg id="mdi-menu" class="w-8 h-8 mr-3 my-4 p-1 float-right fill-current rounded transition-all duration-300-ease-in-out md:hidden hover:bg-white hover:text-custom-purple hover:cursor-pointer" viewBox="0 0 24 24">
-              <path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z" />
-            </svg>
-        </div>
-    </nav>
+    <?php nav(); ?>
     <!-- Body -->
     <div class="flex flex-col md:flex-row bg-custom-purplo min-h-screen">
         <!-- Side Bar Menu Items -->
@@ -79,75 +159,77 @@ $html->startBody();
                         }
                         // Add limit and offset for pagination
                         $sql .= " LIMIT ? OFFSET ?";
-                        $stmt = $conn->prepare($sql);
-                        if (isset($search)) {
-                            $stmt->bindParam(1, $search, PDO::PARAM_STR);
-                            $stmt->bindParam(2, $search, PDO::PARAM_STR);
-                            $stmt->bindParam(3, $search, PDO::PARAM_STR);
-                            $stmt->bindParam(4, $search, PDO::PARAM_STR);
-                            $stmt->bindParam(5, $results_per_page, PDO::PARAM_INT);
-                            $stmt->bindParam(6, $offset, PDO::PARAM_INT);
-                        } else {
-                            $stmt->bindParam(1, $results_per_page, PDO::PARAM_INT);
-                            $stmt->bindParam(2, $offset, PDO::PARAM_INT);
-                        }
-                        $stmt->execute();
-                        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                        if (count($result) > 0) {
-                            ?>
-                            <thead class="text-white uppercase bg-custom-purplo ">
-                                <tr>
-                                    <th scope="col" class="p-2 border-r border-black">Event ID</th>
-                                    <th scope="col" class="p-2 border-r border-black">Event Name</th>
-                                    <th scope="col" class="p-2 border-r border-black">Event Description</th>
-                                    <th scope="col" class="p-2 border-r border-black">Target Year</th>
-                                    <th scope="col" class="p-2 border-r border-black">Event Date</th>
-                                    <th scope="col" class="p-2 border-r border-black">Event Fee (₱)</th>
-                                    <th scope="col" class="p-2 border-r border-black">Sanction Fee (₱)</th>
-                                    <th scope="col" class="p-2">Actions</th>
-                                </tr>
-                            </thead>
-                            <?php
-                            // Loop through the results
-                            foreach ($result as $row) {
-                                $eid = $row['event_id'];
-                                $eventname = $row['event_name'];
-                                $eventdesc = $row['event_description'];
-                                $eventtarget = $row['event_target'];
-                                $eventdate = $row['event_date'];
-                                $feeperevent = $row['event_fee'];
-                                $sanctionfee = $row['sanction_fee'];
-                                ?>
-                                <tr class="border-t border-black">
-                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $eid; ?></td>
-                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $eventname; ?></td>
-                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $eventdesc; ?></td>
-                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $eventtarget; ?></td>
-                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $eventdate; ?></td>
-                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $feeperevent; ?></td>
-                                    <td class="px-2 border-r border-black bg-purple-100"><?php echo $sanctionfee; ?></td>
-                                    <td class="px-1 bg-purple-100">
-                                        <a href="eventsregistration.php?event-id=<?php echo $eid ?>"><button class="px-3 py-2 my-1 mx-1 bg-blue-500 text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-blue-400">
-                                            <svg id="mdi-eye" class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z" /></svg>
-                                        </button></a>
-                                        <button class="px-3 py-2 my-1 mx-1 bg-yellow-500 text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-yellow-400" onclick="editRow(this)">
-                                            <svg id="mdi-pencil" class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z" /></svg>
-                                        </button>
-                                        <form method="POST" class="inline-block mt-1" id="delete-current-<?php echo $eid; ?>"> <!-- Add unique form ID for each event-id  -->
-                                            <input type="hidden" name="eid-to-delete" value="<?php echo $eid; ?>">
-                                            <button type="button" id="delete-event-<?php echo $eid; ?>" class="px-3 py-2 mb-1 mx-1 bg-red-600 text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-red-500">
-                                                <svg id="mdi-delete" class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" /></svg>
-                                            </button> <!-- Add unique button ID for each event-id  -->
-                                        </form>
-                                    </td>
-                                </tr>
-                                <script>
-                                    deleteIds.push("<?php echo $eid; ?>"); // Store event-ids in array for each query is executed
-                                </script>
-                                <?php
+                        try {
+                            $stmt = $conn->prepare($sql);
+                            if (isset($search)) {
+                                $stmt->bindParam(1, $search, PDO::PARAM_STR);
+                                $stmt->bindParam(2, $search, PDO::PARAM_STR);
+                                $stmt->bindParam(3, $search, PDO::PARAM_STR);
+                                $stmt->bindParam(4, $search, PDO::PARAM_STR);
+                                $stmt->bindParam(5, $results_per_page, PDO::PARAM_INT);
+                                $stmt->bindParam(6, $offset, PDO::PARAM_INT);
+                            } else {
+                                $stmt->bindParam(1, $results_per_page, PDO::PARAM_INT);
+                                $stmt->bindParam(2, $offset, PDO::PARAM_INT);
                             }
-                        } else {
-                            ?><h3 class="p-4">No events found.</h3><?php
+                            $stmt->execute();
+                            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                            if (count($result) > 0) {
+                                ?>
+                                <thead class="text-white uppercase bg-custom-purplo ">
+                                    <tr>
+                                        <th scope="col" class="p-2 border-r border-black">Event ID</th>
+                                        <th scope="col" class="p-2 border-r border-black">Event Name</th>
+                                        <th scope="col" class="p-2 border-r border-black">Event Description</th>
+                                        <th scope="col" class="p-2 border-r border-black">Target Year</th>
+                                        <th scope="col" class="p-2 border-r border-black">Event Date</th>
+                                        <th scope="col" class="p-2 border-r border-black">Event Fee (₱)</th>
+                                        <th scope="col" class="p-2 border-r border-black">Sanction Fee (₱)</th>
+                                        <th scope="col" class="p-2">Actions</th>
+                                    </tr>
+                                </thead>
+                                <?php
+                                // Loop through the results
+                                foreach ($result as $row) {
+                                    $eid = $row['event_id'];
+                                    $eventname = $row['event_name'];
+                                    $eventdesc = $row['event_description'];
+                                    $eventtarget = $row['event_target'];
+                                    $eventdate = $row['event_date'];
+                                    $feeperevent = $row['event_fee'];
+                                    $sanctionfee = $row['sanction_fee'];
+                                    ?>
+                                    <tr class="border-t border-black">
+                                        <td class="px-2 border-r border-black bg-purple-100"><?php echo $eid; ?></td>
+                                        <td class="px-2 border-r border-black bg-purple-100"><?php echo $eventname; ?></td>
+                                        <td class="px-2 border-r border-black bg-purple-100"><?php echo $eventdesc; ?></td>
+                                        <td class="px-2 border-r border-black bg-purple-100"><?php echo $eventtarget; ?></td>
+                                        <td class="px-2 border-r border-black bg-purple-100"><?php echo $eventdate; ?></td>
+                                        <td class="px-2 border-r border-black bg-purple-100"><?php echo $feeperevent; ?></td>
+                                        <td class="px-2 border-r border-black bg-purple-100"><?php echo $sanctionfee; ?></td>
+                                        <td class="px-1 bg-purple-100">
+                                            <a href="eventsregistration.php?event-id=<?php echo $eid ?>"><button class="px-3 py-2 my-1 mx-1 bg-blue-500 text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-blue-400">
+                                                <svg id="mdi-eye" class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z" /></svg>
+                                            </button></a>
+                                            <button class="px-3 py-2 my-1 mx-1 bg-yellow-500 text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-yellow-400" onclick="editRow(this)">
+                                                <svg id="mdi-pencil" class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z" /></svg>
+                                            </button>
+                                            <button name="<?php echo htmlspecialchars($eid); ?>" class="px-3 py-2 m-1 bg-red-600 text-white text-sm font-semibold rounded-lg focus:outline-none shadow hover:bg-red-500 delete-event">
+                                                <svg id="mdi-delete" class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" /></svg>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <script>
+                                        deleteIds.push("<?php echo $eid; ?>"); // Store event-ids in array for each query is executed
+                                    </script>
+                                    <?php
+                                }
+                            } else {
+                                ?><h3 class="p-4">No events found.</h3><?php
+                            }
+                        } catch (PDOException $e) {
+                            $result = [];
+                            ?><h3 class="p-4">Page not found.</h3><?php
                         }
                         ?>
                     </table>
@@ -199,7 +281,7 @@ $html->startBody();
                     </button>
                 </div>
                 <h3 class="text-2xl font-semibold text-custom-purple mb-2">Add Event</h3>
-                <form method="POST">
+                <form id="add-event-form">
                     <label class="ml-1 text-sm">Event Name:</label>
                     <input type="text" name="event-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
                     <label class="ml-1 text-sm">Event Description:</label>
@@ -242,7 +324,7 @@ $html->startBody();
                     </button>
                 </div>
                 <h3 class="text-2xl font-semibold text-custom-purple mb-2">Edit Event</h3>
-                <form method="POST">
+                <form id="edit-event-form">
                     <!--label class="ml-1 text-sm">Event ID:</label-->
                     <input type="hidden" id="edit-event-id" name="edit-event-id">
                     <label class="ml-1 text-sm">Event Name:</label>
@@ -280,155 +362,6 @@ $html->startBody();
             </div>
         </div>
     </div>
-    <script type="text/javascript">
-        $("#popup-bg, #popup-item, #edit-popup-item").removeClass("hidden");
-        $("#popup-bg, #popup-item, #edit-popup-item, #tooltip-content-date").hide();
-        // If (+) button is pressed, fade in modals
-        $("#add-event").click((event) => {
-            $("#popup-bg").fadeIn(150);
-            $("#popup-item").delay(150).fadeIn(150);
-            $("#close-popup").click((event) => { // If closed, fade out modals
-                $("#popup-bg, #popup-item").fadeOut(150);
-            });
-        });
-
-        // If edit button is pressed, fade in modals
-        const editRow = (link) => {
-            $("#popup-bg").fadeIn(150);
-            $("#edit-popup-item").delay(150).fadeIn(150);
-            $("#edit-close-popup").click((event) => { // If closed, fade out modals
-                $("#popup-bg").fadeOut(150);
-                $("#edit-popup-item").fadeOut(150);
-            });
-            let row = link.parentNode.parentNode; // Get table data
-            // Transfer table data to input fields
-            $("#edit-event-id").val(row.cells[0].innerHTML);
-            $("#edit-event-name").val(row.cells[1].innerHTML);
-            $("#edit-event-desc").val(row.cells[2].innerHTML);
-            // Populate checkboxes for event-target
-            const targetYears = row.cells[3].innerHTML.split(','); // Split target years by commas
-            $("input[name='edit-event-target[]']").each(function() {
-                if (targetYears.includes($(this).val())) {
-                    $(this).prop('checked', true);
-                } else {
-                    $(this).prop('checked', false);
-                }
-            });
-            $("#edit-event-date").val(row.cells[4].innerHTML);
-            $("#edit-fee-per-event").val(row.cells[5].innerHTML);
-            $("#edit-sanction-fee").val(row.cells[6].innerHTML);
-        }
-
-        $('#edit-event-date').hover(() => {
-                $('#tooltip-content-date').fadeIn(150);
-            }, () => {
-                $('#tooltip-content-date').fadeOut(150);
-            }
-        );
-
-        const today = new Date();
-        today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
-        const todayString = today.toISOString().split('T')[0];
-        $('#event-date').attr('min', todayString);
-
-        // Apply deletion of data using event-id to each unique form id and button id
-        for (let i=0; i<deleteIds.length; i++) {
-            deleteData("#delete-event-" + deleteIds[i], "#delete-current-" + deleteIds[i], "Delete this event?", "This will also delete all registrations made.");
-        }
-    </script>
-    <?php
-    // If Add Event is submitted
-    if (isset($_POST['add-new-event'])) {
-        $eventname = ucwords($_POST['event-name']);
-        $eventdesc = $_POST['event-desc'];
-        $eventdate = $_POST['event-date'];
-        $eventtarget = isset($_POST['event-target']) ? implode(',', $_POST['event-target']) : '';
-        $feeperevent = $_POST['fee-per-event'];
-        $sanctionfee = $_POST['sanction-fee'];
-        $sql_event = "INSERT INTO `events`(`event_name`, `event_description`, `event_target`, `event_date`, `event_fee`, `sanction_fee`) VALUES (?, ?, ?, ?, ?, ?)";
-        $stmt_event = $conn->prepare($sql_event);
-        if ($stmt_event->execute([$eventname, $eventdesc, $eventtarget, $eventdate, $feeperevent, $sanctionfee])) {
-            ?>
-            <script>
-                swal('Event added successfully!', '', 'success')
-                .then(() => {
-                    window.location.href = 'eventslist.php';
-                });
-            </script>
-            <?php
-        } else {
-            ?><script>swal('Failed to add event!', '', 'error');</script>"<?php
-        }
-    }
-    // If Add Update Event is submitted
-    if (isset($_POST['update-this-event'])) {
-        // Retrieve and sanitize inputs
-        $eid = trim($_POST['edit-event-id']);
-        $eventname = ucwords(trim($_POST['edit-event-name']));
-        $eventdesc = trim($_POST['edit-event-desc']);
-        $eventdate = trim($_POST['edit-event-date']);
-        $feeperevent = floatval($_POST['edit-fee-per-event']);
-        $sanctionfee = floatval($_POST['edit-sanction-fee']);
-        $eventtarget = (isset($_POST['edit-event-target']) && !empty($_POST['edit-event-target'])) ? implode(',', $_POST['edit-event-target']) : '';
-        // Update query
-        $sqlupdate_event = "UPDATE `events` 
-                            SET `event_name` = ?, 
-                                `event_description` = ?, 
-                                `event_target` = ?, 
-                                `event_date` = ?, 
-                                `event_fee` = ?, 
-                                `sanction_fee` = ? 
-                            WHERE `event_id` = ?";
-        $stmt_update_event = $conn->prepare($sqlupdate_event);
-        // Check if statement preparation is successful
-        if ($stmt_update_event) {
-            if ($stmt_update_event->execute([$eventname, $eventdesc, $eventtarget, $eventdate, $feeperevent, $sanctionfee, $eid])) {
-                // Success
-                ?><script>
-                    swal('Event updated successfully!', '', 'success')
-                    .then(() => {
-                        window.location.href = 'eventslist.php';
-                    });
-                </script>
-                <?php
-            } else {
-                // Error during execution
-                ?><script>
-                    swal('Failed to update event!', '<?php echo $stmt_update_event->error; ?>', 'error');
-                </script>
-                <?php
-            }
-
-            $stmt_update_event->close();
-        } else {
-            // Error preparing statement
-            ?><script>
-                swal('Failed to prepare statement!', '<?php echo $conn->error; ?>', 'error');
-            </script>
-            <?php
-        }
-    }
-    // If Delete Event is submitted
-    if (isset($_POST['eid-to-delete'])) {
-        $sqldelete_event = "DELETE FROM `events` WHERE `event_id` = ?";
-        $stmt_delete_event = $conn->prepare($sqldelete_event);
-        $stmt_delete_event->bindParam(1, $_POST['eid-to-delete'], PDO::PARAM_INT);
-
-        if ($stmt_delete_event->execute()) {
-            ?>
-            <script>
-                swal('Event successfully deleted', '', 'success')
-                .then(() => {
-                    window.location.href = "eventslist.php"
-                });</script>
-            <?php
-        } else {
-            ?>
-            <script>swal('Event deletion failed', '', 'error');</script>
-            <?php
-        }
-    }
-    ?>
 <?php
 $conn = null;
 $html->endBody();

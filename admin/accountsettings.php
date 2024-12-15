@@ -3,6 +3,7 @@ session_start();
 include '../connection.php';
 include '../helperfunctions.php';
 include '../components/menu.php';
+include '../components/nav.php';
 include '../password_compat.php';
 # Verify if login exists such that the session "cit-student-id" is found
 if (isset($_SESSION['cit-student-id'])) {
@@ -27,6 +28,81 @@ if (isset($_SESSION['cit-student-id'])) {
 } else { # If session is not found, return to login page
     header("location: ../");
 }
+
+// API Endpoint
+if (isset($_GET['api'])) {
+    header('Content-Type: application/json');
+    $postData = file_get_contents("php://input");
+    $data = json_decode($postData, true);
+    $response = [];
+    // Initial response
+    $response["status"] = "error";
+    $response["message"] = "Unknown";
+    $response["details"] = "";
+
+    if ($_GET['api'] == 'change-info') {
+        if (isset($data['edit_last_name'], $data['edit_first_name'], $data['edit_middle_initial'], $data['edit_yearsec'])) {
+            $sid = $_SESSION['cit-student-id'];
+            $lastname = ucwords($data['edit_last_name']);
+            $firstname = ucwords($data['edit_first_name']);
+            $mi = ucwords($data['edit_middle_initial']);
+            $email = generateEmail($firstname, $lastname);
+            $yearsec = strtoupper($data['edit_yearsec']);
+            try {
+                $sqlupdate_student = "UPDATE `students` SET `last_name`= ?, `first_name`= ?, `middle_initial`= ?, `year_and_section`= ? WHERE `student_id` = ?";
+                $stmt_update_student = $conn->prepare($sqlupdate_student);
+                if ($stmt_update_student->execute([$lastname, $firstname, $mi, $yearsec, $sid])) {
+                    $sqlupdate_account = "UPDATE `accounts` SET `email`=? WHERE `student_id` = ?";
+                    $stmt_update_account = $conn->prepare($sqlupdate_account);
+                    $accountResult = $stmt_update_account->execute([$email, $sid]);
+                    $_SESSION['cit-student-id'] = $sid;
+                    $response["status"] = $accountResult ? "success" : "warning";
+                    $response["message"] = "Changes saved!";
+                    $response["details"] = $accountResult ? "Modifying the name can also modify the email." : "But student email failed to update.";
+                } else {
+                    $response["message"] = "Failed to update information!";
+                }
+            } catch (Exception $e) {
+                $response["message"] = "Database error";
+                $response["details"] = $e->getMessage();
+            }
+        } else {
+            $response["message"] = "Invalid data";
+        }
+    } elseif ($_GET['api'] == 'change-pass') {
+        if (isset($data['old_password'], $data['new_password'], $data['confirm_password'])) {
+            if (!password_verify($data['old_password'], $currentpass)) { # If old password is not the same as current password
+                $response["message"] = "Wrong old password!";
+            } elseif ($data['new_password'] != $data['confirm_password']) {
+                # If new password is not equal to confirm password
+                $response["message"] = "Passwords do not match";
+            } else { # Else update student password
+                try {
+                    $sqlupdate_account = "UPDATE `accounts` SET `password`=? WHERE `student_id` = ?";
+                    $stmt_update_account = $conn->prepare($sqlupdate_account);
+                    $hash_password = password_hash($data['new_password'], PASSWORD_DEFAULT);
+                    if ($stmt_update_account->execute([$hash_password, $_SESSION['cit-student-id']])) {
+                        $response["status"] = "success";
+                        $response["message"] = "Password changed successfully!";
+                    } else {
+                        $response["message"] = "Password can't be changed right now";
+                    }
+                } catch (Exception $e) {
+                    $response["message"] = "Database error";
+                    $response["details"] = $e->getMessage();
+                }
+            }
+        } else {
+            $response["message"] = "Invalid data";
+        }
+    } else {
+        $response["message"] = "Unknown get method";
+    }
+    echo json_encode($response);
+    exit();
+}
+
+// Default View
 $html = new HTML("CITreasury - Account Settings");
 $html->addLink('stylesheet', '../inter-variable.css');
 $html->addLink('icon', '../img/nobgcitsclogo.png');
@@ -36,15 +112,12 @@ $html->addScript("../js/sweetalert.min.js");
 $html->addScript("../js/jquery-3.7.1.min.js");
 $html->addScript("../js/predefined-script.js");
 $html->addScript("../js/defer-script.js", true);
+$html->addScript("accountsettings.js", true);
 $html->startBody();
 ?>
-    <nav class="fixed w-full bg-custom-purple flex flex-row shadow shadow-gray-800">
-        <img src="../img/nobgcitsclogo.png" class="w-12 h-12 my-2 ml-6">
-        <h1 class="text-3xl p-3 font-bold text-white">CITreasury</h1>
-        <div class="w-full text-white">
-            <svg id="mdi-menu" class="w-8 h-8 mr-3 my-4 p-1 float-right fill-current rounded transition-all duration-300-ease-in-out md:hidden hover:bg-white hover:text-custom-purple hover:cursor-pointer" viewBox="0 0 24 24"><path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z" /></svg>
-        </div>
-    </nav>
+    <!-- Top Navigation Bar -->
+    <?php nav(); ?>
+    <!-- Body -->
     <div class="flex flex-col md:flex-row bg-custom-purplo min-h-screen">
         <div class="mt-18 md:mt-20 mx-2">
             <div id="menu-items" class="hidden md:inline-block w-60 h-full">
@@ -83,13 +156,13 @@ $html->startBody();
                     </button>
                 </div>
                 <h3 class="text-2xl font-semibold text-custom-purple mb-3">Change Information</h3>
-                <form id="password-form" method="POST">
+                <form id="change-info-form">
                     <label class="ml-1 text-sm">Last Name:</label>
-                    <input type="text" id="edit-last-name" name="edit-last-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" pattern="[a-zA-Z\s']+" value="<?php echo $lastname; ?>" required>
+                    <input type="text" id="edit-last-name" name="edit-last-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" pattern="[a-zA-ZñÑáéíóúÁÉÍÓÚüÜ\s']+" value="<?php echo $lastname; ?>" required>
                     <label class="ml-1 text-sm">First Name:</label>
-                    <input type="text" id="edit-first-name" name="edit-first-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" pattern="[a-zA-Z\s']+" value="<?php echo $firstname; ?>" required>
+                    <input type="text" id="edit-first-name" name="edit-first-name" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" pattern="[a-zA-ZñÑáéíóúÁÉÍÓÚüÜ\s']+" value="<?php echo $firstname; ?>" required>
                     <label class="ml-1 text-sm">Middle Initial:</label>
-                    <input type="text" id="edit-middle-initial" name="edit-middle-initial" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" maxlength="3" pattern="[a-zA-Z\s']+" value="<?php echo $mi; ?>">
+                    <input type="text" id="edit-middle-initial" name="edit-middle-initial" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" maxlength="3" pattern="[a-zA-ZñÑáéíóúÁÉÍÓÚüÜ\s']+" value="<?php echo $mi; ?>">
                     <label class="ml-1 text-sm">Year & Section:</label>
                     <input type="text" id="edit-yearsec" name="edit-yearsec" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" maxlength="2" pattern="[A-Za-z0-9]+" value="<?php echo $yearsec; ?>" required>
                     <div class="flex items-center justify-center m-4">
@@ -108,7 +181,7 @@ $html->startBody();
                     </button>
                 </div>
                 <h3 class="text-2xl font-semibold text-custom-purple mb-3">Change Password:</h3>
-                <form id="password-form" method="POST">
+                <form id="change-password-form">
                     <label class="ml-1 text-sm">Old Password:</label>
                     <input type="password" id="old-password" name="old-password" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
                     <label class="ml-1 text-sm">New Password:</label>
@@ -131,7 +204,7 @@ $html->startBody();
                     </button>
                 </div>
                 <h3 class="text-xl font-semibold text-center text-custom-purple mb-3">This action can't be undone!</h3>
-                <form id="password-form" method="POST">
+                <form method="POST">
                     <label class="ml-1 text-sm">Enter Password to continue:</label>
                     <input type="password" id="delete-acc-password" name="delete-acc-password" class="w-full px-2 py-1 border-2 border-custom-purple rounded-lg mb-1 focus:outline-none focus:border-purple-500 bg-purple-100" required>
                     <div class="flex items-center justify-center m-4">
@@ -141,86 +214,7 @@ $html->startBody();
             </div>
         </div>
     </div>
-    <script type="text/javascript">
-        $("#popup-bg, #popup-item, #chp-popup-item, #dlacc-popup-item").removeClass("hidden");
-        $("#popup-bg, #popup-item, #chp-popup-item, #dlacc-popup-item").hide();
-
-        const closePopup = (button_id, bg, popup_item, close_popup) => {
-            $(button_id).click((event) => {
-                $(bg).fadeIn(150);
-                $(popup_item).delay(150).fadeIn(150);
-                $(close_popup).click((event) => {
-                    $(bg + ", " + popup_item).fadeOut(150);
-                });
-            });
-        };
-
-        closePopup("#change-information-btn", "#popup-bg", "#popup-item", "#close-popup");
-        closePopup("#change-password-btn", "#popup-bg", "#chp-popup-item", "#chp-close-popup");
-        closePopup("#delete-account-btn", "#popup-bg", "#dlacc-popup-item", "#dlacc-close-popup");
-
-        // While editing in new and confirm password
-        $("#new-password, #confirm-password").on('input', () => {
-            // If new password is not the same as confirm password, disable save changes button, otherwise enable it
-            if ($("#new-password").val() !== $("#confirm-password").val()) {
-                $("#update-password").prop('disabled', true);
-            } else {
-                $("#update-password").prop('disabled', false);
-            }
-        });
-    </script>
     <?php
-    if (isset($_POST['update-information'])) {
-        $sid = $_SESSION['cit-student-id'];
-        $lastname = ucwords($_POST['edit-last-name']);
-        $firstname = ucwords($_POST['edit-first-name']);
-        $mi = ucwords($_POST['edit-middle-initial']);
-        $email = strtolower(str_replace(" ", "", $firstname)) . "." . strtolower(str_replace(" ", "", $lastname)) . "@cbsua.edu.ph";
-        $yearsec = strtoupper($_POST['edit-yearsec']);
-        $sqlupdate_student = "UPDATE `students` SET `last_name`= ?, `first_name`= ?, `middle_initial`= ?, `year_and_section`= ? WHERE `student_id` = ?";
-        $stmt_update_student = $conn->prepare($sqlupdate_student);
-        if ($stmt_update_student->execute([$lastname, $firstname, $mi, $yearsec, $sid])) {
-            $sqlupdate_account = "UPDATE `accounts` SET `email`=? WHERE `student_id` = ?";
-            $stmt_update_account = $conn->prepare($sqlupdate_account);
-            $_SESSION['cit-student-id'] = $sid;
-            ?>
-            <script>
-                swal('Changes saved!', '<?php echo $stmt_update_account->execute([$email, $sid]) ? "Modifying the name can also modify the email." : "But student email failed to update." ?>', 'success').then(() => {
-                    window.location.href = 'accountsettings.php';
-                });
-            </script>
-            <?php
-        } else {
-            ?><script>swal('Failed to update information!', '', 'error');</script>"<?php
-        }
-    }
-    if (isset($_POST['update-password'])) {
-        if (!password_verify($_POST['old-password'], $currentpass)) { # If old password is not the same as current password
-            ?>
-            <script>
-                swal("Wrong old password!" ,'', 'error');
-            </script>
-            <?php
-        } elseif ($_POST['new-password'] != $_POST['confirm-password']) {
-            # If new password is not equal to confirm password
-            ?>
-            <script>
-                swal("Password do not match" ,'', 'error');
-            </script>
-            <?php
-        } else { # Else update student password
-            $sqlupdate_account = "UPDATE `accounts` SET `password`=? WHERE `student_id` = ?";
-            $stmt_update_account = $conn->prepare($sqlupdate_account);
-            $hash_password = password_hash($_POST['new-password'], PASSWORD_DEFAULT);
-            if ($stmt_update_account->execute([$hash_password, $_SESSION['cit-student-id']])) {
-                ?>
-                <script>
-                    swal("Password changed successfully!" ,'', 'success');
-                </script>
-                <?php
-            }
-        }
-    }
     if (isset($_POST['delete-account'])) {
         $sid = $_SESSION['cit-student-id'];
         if (password_verify($_POST['delete-acc-password'], $currentpass)) { # If hashed password matches

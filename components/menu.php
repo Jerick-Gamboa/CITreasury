@@ -9,16 +9,6 @@ function menuContent() {
             </svg>
             Dashboard
         </a>
-        <!--ul class="pl-6 py-2" id="dashboard-items">
-            <li>
-                <a href="#" id="modify-item" class="hover:text-purple-200 flex items-center align-middle">
-                    <svg id="mdi-pencil" class="w-6 h-6 mr-2 fill-current" viewBox="0 0 24 24">
-                        <path d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z" />
-                    </svg>
-                    Modify Item
-                </a>
-            </li>
-        </ul -->
     </li>
     <li class="text-white font-bold">
         <a href="students.php" class="py-2 px-2 rounded transition-all duration-300-ease-in-out hover:text-custom-purplo hover:bg-white flex items-center align-middle">
@@ -67,22 +57,6 @@ function menuContent() {
             </svg>
             Account Settings
         </a>
-        <!-- ul class="pl-6 py-2" id="account-set-items">
-            <li>
-                <a href="#" class="hover:text-purple-200 flex items-center align-middle">
-                    <svg id="mdi-pencil" class="w-6 h-6 mr-2 fill-current" viewBox="0 0 24 24">
-                        <path d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z" />
-                    </svg>
-                    Modify Item
-                </a>
-                <a href="#" id="modify-item" class="mt-2 hover:text-purple-200 flex items-center align-middle">
-                    <svg id="mdi-pencil" class="w-6 h-6 mr-2 fill-current" viewBox="0 0 24 24">
-                        <path d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z" />
-                    </svg>
-                    Change Password
-                </a>
-            </li>
-        </ul -->
     </li>
     <li class="text-white font-bold">
         <a href="#" id="logout" class="py-2 px-2 rounded transition-all duration-300-ease-in-out hover:text-custom-purplo hover:bg-white flex items-center align-middle">
@@ -106,16 +80,6 @@ function menuUserContent() {
             </svg>
             Dashboard
         </a>
-        <!--ul class="pl-6 py-2" id="dashboard-items">
-            <li>
-                <a href="#" id="modify-item" class="hover:text-purple-200 flex items-center align-middle">
-                    <svg id="mdi-pencil" class="w-6 h-6 mr-2 fill-current" viewBox="0 0 24 24">
-                        <path d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z" />
-                    </svg>
-                    Modify Item
-                </a>
-            </li>
-        </ul -->
     </li>
     <li class="text-white font-bold">
         <a href="sanctions.php" class="py-2 px-2 rounded transition-all duration-300-ease-in-out hover:text-custom-purplo hover:bg-white flex items-center align-middle">

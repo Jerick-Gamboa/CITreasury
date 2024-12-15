@@ -9,7 +9,7 @@ class HTML {
 	}
 
 	public function addScript($src, $defer=false) {
-		echo "\t<script src=\"$src\" " . ($defer ? 'defer' : '') . "></script>\n";
+		echo "\t<script src=\"$src\"" . ($defer ? ' defer' : '') . "></script>\n";
 	}
 
 	public function startBody() {
@@ -59,5 +59,23 @@ function verifyUserLoggedIn($conn) {
 	} else { # If session is not found, return to login page
 	    header("location: ../");
 	}
+}
+
+function generateEmail($firstname, $lastname, $domain = "cbsua.edu.ph") {
+	$specialCharsMap = [
+		'ñ' => 'n', 'Ñ' => 'N',
+		'á' => 'a', 'Á' => 'A',
+		'é' => 'e', 'É' => 'E',
+		'í' => 'i', 'Í' => 'I',
+		'ó' => 'o', 'Ó' => 'O',
+		'ú' => 'u', 'Ú' => 'U',
+		'ü' => 'u', 'Ü' => 'U'
+    ];
+	$cleanFirstName = strtr(trim($firstname), $specialCharsMap);
+	$cleanLastName = strtr(trim($lastname), $specialCharsMap);
+	$email = $cleanFirstName . "." . $cleanLastName;
+	$email .= "@" . $domain;
+	$generatedEmail = strtolower(str_replace(" ", "", $email));
+	return $generatedEmail;
 }
 ?>
